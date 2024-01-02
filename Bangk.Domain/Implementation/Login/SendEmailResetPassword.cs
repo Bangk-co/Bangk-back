@@ -38,12 +38,16 @@ namespace Bangk.Domain.Implementation.Login
             {
                 email = email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
-                htmlMessage = $"<a href=\"{url}\">Reset Password</a>",
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
-                subject = "Reset Password Bangk"
+                TemplateId = _configuration.GetSection("SendGridEmailSender:TemplateResetPassword").Value,
+                Data = new
+                {
+                    username = $"{user.Name}",
+                    UrlCallback = url
+                }
             };
-
+               
             await SendGridEmailSender.SendEmailAsync(sendEmail);
             result.Result = true;
             return result;
