@@ -32,7 +32,7 @@ namespace Bangk.Domain.Implementation.Login
 
             user.PasswordResetGuid = Guid.NewGuid().ToString();
             await _userLoginService.Update(user);
-            var url = _configuration.GetSection("ResetPassword:UrlFront").Value + $"?hash={user.PasswordResetGuid}";
+            var url = _configuration.GetSection("ResetPassword:UrlFront").Value + $"?hash={user.PasswordResetGuid}&emil={user.Email}";
 
             var sendEmail = new SendGridEmailDto
             {
