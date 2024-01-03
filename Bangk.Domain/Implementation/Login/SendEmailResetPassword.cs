@@ -26,7 +26,7 @@ namespace Bangk.Domain.Implementation.Login
             if (user == null)
             {
                 result.HasErrors = true;
-                result.Errors.Add($"The email {email} does not exist.");
+                result.Errors.Add($"El correo ingresado no existe");
                 return result;
             }
 

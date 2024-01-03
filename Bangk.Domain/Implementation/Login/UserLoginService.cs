@@ -1,9 +1,11 @@
-﻿using FluentValidation;
-using Bangk.Common.Dto;
+﻿using Bangk.Common.Dto;
 using Bangk.Common.Utils;
 using Bangk.Domain.Contract.Login;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
+using FluentValidation;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Login
@@ -12,10 +14,12 @@ namespace Bangk.Domain.Implementation.Login
     {
         private readonly IValidator<LoginDto> _loginValidator;
         private readonly ICreateTokenService _createTokenService;
-        public UserLoginService(IUserRepository repository, IValidator<LoginDto> loginValidator, ICreateTokenService createTokenService) : base(repository)
+        private readonly IConfiguration _configuration;
+        public UserLoginService(IUserRepository repository, IValidator<LoginDto> loginValidator, ICreateTokenService createTokenService, IConfiguration configuration) : base(repository)
         {
             _loginValidator = loginValidator;
             _createTokenService = createTokenService;
+            _configuration = configuration;
         }
 
         public async Task<ResponseDto<string>> Execute(LoginDto login)
@@ -34,10 +38,22 @@ namespace Bangk.Domain.Implementation.Login
             }
 
             var user = await Repository.FirstOfDefaultAsync(x => x.Email == login.Email, x => x.Role);
-            if (user == null || !PasswordUtils.VerifyPasswordHash(login.Password, user.PasswordHash, user.PasswordSalt))
+            var key = _configuration.GetSection("PasswordConfig:Key").Value;
+            var iv = _configuration.GetSection("PasswordConfig:IV").Value;
+            try
+            {
+                var password = PasswordUtils.DecryptPassword(login.Password, key, iv);
+                if (user == null || !PasswordUtils.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                {
+                    result.HasErrors = true;
+                    result.Errors.Add("correo o contraseña inválidos");
+                    return result;
+                }
+            }
+            catch (Exception)
             {
                 result.HasErrors = true;
-                result.Errors.Add("Invalid email or password");
+                result.Errors.Add("correo o contraseña inválidos");
                 return result;
             }
 

@@ -40,7 +40,7 @@ namespace Bangk.Domain.Implementation.Login
             if (user == null)
             {
                 result.HasErrors = true;
-                result.Errors.Add($"The reset password link has been expired.");
+                result.Errors.Add($"El link para el cambio de contraña ha expirado.");
                 return result;
             }
 

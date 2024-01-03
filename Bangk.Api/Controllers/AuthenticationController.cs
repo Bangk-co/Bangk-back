@@ -53,7 +53,7 @@ namespace Bangk.Api.Controllers
         {
             if (string.IsNullOrEmpty(email))
             {
-                return BadRequest("The email is mandatory");
+                return BadRequest("El correo es obligatorio");
             }
 
             var result = await _sendEmailResetPassword.Execute(email);
