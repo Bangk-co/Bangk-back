@@ -5,15 +5,16 @@ using Bangk.Domain.Contract;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bangk.Repositories.Repositories;
 
 namespace Bangk.Api.Controllers
 {
     public class LogController : BaseController
     {
-        private readonly ILogDomain _logDomain;
+        private readonly ILogRepository _logDomain;
         private readonly IMapper _mapper;
 
-        public LogController(ILogDomain logDomain, IMapper mapper)
+        public LogController(ILogRepository logDomain, IMapper mapper)
         {
             _logDomain = logDomain;
             _mapper = mapper;

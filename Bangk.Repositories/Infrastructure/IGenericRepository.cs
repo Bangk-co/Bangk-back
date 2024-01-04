@@ -7,24 +7,32 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Infrastructure
 {
-    public interface IGenericRepository<T> where T : EntityBase
+    public interface IGenericRepository<TEntity, T> where TEntity : EntityBase
     {
-        Task<List<T>> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            params Expression<Func<T, object>>[] includes);
+        Task<List<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            params Expression<Func<TEntity, object>>[] includes);
 
-        Task<IQueryable<T>> GetAllQuery(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            params Expression<Func<T, object>>[] includes);
+        Task<IQueryable<TEntity>> GetAllQuery(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            params Expression<Func<TEntity, object>>[] includes);
 
-        Task<T> GetById(Guid id);
+        Task<TEntity> GetById(int id);
 
-        Task<T> FirstOfDefaultAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
+        Task<TEntity> FirstOfDefaultAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] includes);
 
-        Task<int> Create(T entity);
+        Task<int> Create(TEntity entity);
 
-        Task<int> CreateBulk(List<T> entityList);
+        Task<int> CreateBulk(List<TEntity> entityList);
 
-        Task<bool> Update(T entity);
+        Task<bool> Update(TEntity entity);
 
-        Task<int> Delete(T entity);
+        Task<int> Delete(TEntity entity);
+
+        int GetTotalDtoRecords(IQueryable<T> query);
+
+        Task<IList<T>> GetDtoList(IQueryable<T> query, int pageSize, int currentPage);
+
+        Task<int> UpdateBulk(List<TEntity> entityList);
+
+        Task<int> DeleteBulk(List<TEntity> entityList);
     }
 }

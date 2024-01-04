@@ -1,13 +1,19 @@
-﻿using FluentValidation;
-using Bangk.Common.Dto;
+﻿using Bangk.Common.Dto;
 using Bangk.Common.Validators;
 using Bangk.Domain.Contract;
+using Bangk.Domain.Contract.Files;
+using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.Login;
+using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
+using Bangk.Domain.Implementation.Files;
+using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.Login;
+using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.Users;
 using Bangk.Repositories.Repositories;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -23,6 +29,9 @@ namespace Bangk.Api.Extensions
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IGroupSettingRepository, GroupSettingRepository>();
+            services.AddScoped<ISettingRepository, SettingRepository>();
+            
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -30,11 +39,13 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IResetPasswordService, ResetPasswordService>();
             services.AddTransient<IGetUserByHashEmailResetService, GetUserByHashEmailResetService>();
             services.AddTransient<IGetUserByEmailService, GetUserByEmailService>();
-            services.AddTransient<ISendEmailResetPassword, SendEmailResetPassword>(); 
-
+            services.AddTransient<ISendEmailResetPassword, SendEmailResetPassword>();
+            services.AddTransient<IUploadFileService, UploadFileService>();
+            services.AddTransient<IGetGroupSettingListService, GetGroupSettingListService>();
+            services.AddTransient<IGetSettingListService, GetSettingListService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-           
+            //Azure Blob Storage
         }
     }
 }

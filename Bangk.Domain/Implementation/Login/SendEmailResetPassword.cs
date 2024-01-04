@@ -2,6 +2,7 @@
 using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Users;
+using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
@@ -12,12 +13,12 @@ namespace Bangk.Domain.Implementation.Login
     {
         private readonly IConfiguration _configuration;
         private readonly IGetUserByEmailService _getUserByEmailService;
-        private readonly IUserLoginService _userLoginService;
-        public SendEmailResetPassword(IConfiguration configuration, IGetUserByEmailService getUserByEmailService, IUserLoginService userLoginService)
+        private readonly IUserRepository _userRepository;
+        public SendEmailResetPassword(IConfiguration configuration, IGetUserByEmailService getUserByEmailService, IUserRepository userRepository)
         {
             _configuration = configuration;
             _getUserByEmailService = getUserByEmailService;
-            _userLoginService = userLoginService;
+            _userRepository = userRepository;
         }
         public async Task<ResponseDto<bool>> Execute(string email)
         {
@@ -31,7 +32,7 @@ namespace Bangk.Domain.Implementation.Login
             }
 
             user.PasswordResetGuid = Guid.NewGuid().ToString();
-            await _userLoginService.Update(user);
+            await _userRepository.Update(user);
             var url = _configuration.GetSection("ResetPassword:UrlFront").Value + $"?hash={user.PasswordResetGuid}&email={user.Email}";
 
             var sendEmail = new SendGridEmailDto

@@ -10,16 +10,18 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Login
 {
-    public class UserLoginService : DomainBase<User>, IUserLoginService
+    public class UserLoginService :  IUserLoginService
     {
         private readonly IValidator<LoginDto> _loginValidator;
         private readonly ICreateTokenService _createTokenService;
         private readonly IConfiguration _configuration;
-        public UserLoginService(IUserRepository repository, IValidator<LoginDto> loginValidator, ICreateTokenService createTokenService, IConfiguration configuration) : base(repository)
+        private readonly IUserRepository _repository;
+        public UserLoginService(IUserRepository repository, IValidator<LoginDto> loginValidator, ICreateTokenService createTokenService, IConfiguration configuration)
         {
             _loginValidator = loginValidator;
             _createTokenService = createTokenService;
             _configuration = configuration;
+            _repository = repository;
         }
 
         public async Task<ResponseDto<string>> Execute(LoginDto login)
@@ -37,7 +39,7 @@ namespace Bangk.Domain.Implementation.Login
                 return result;
             }
 
-            var user = await Repository.FirstOfDefaultAsync(x => x.Email == login.Email, x => x.Role);
+            var user = await _repository.FirstOfDefaultAsync(x => x.Email == login.Email, x => x.Role);
             var key = _configuration.GetSection("PasswordConfig:Key").Value;
             var iv = _configuration.GetSection("PasswordConfig:IV").Value;
             try
@@ -50,7 +52,7 @@ namespace Bangk.Domain.Implementation.Login
                     return result;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 result.HasErrors = true;
                 result.Errors.Add("correo o contraseña inválidos");

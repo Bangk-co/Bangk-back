@@ -28,7 +28,9 @@ namespace Bangk.Common.Utils
             {
                 aesAlg.Key = Encoding.UTF8.GetBytes(secretKey);
                 aesAlg.IV = Encoding.UTF8.GetBytes(iv);
-
+                aesAlg.KeySize = 256;
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = PaddingMode.PKCS7;
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
                 using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(encryptedPassword)))

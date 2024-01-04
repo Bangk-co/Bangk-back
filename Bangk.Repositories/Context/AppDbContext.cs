@@ -18,5 +18,7 @@ namespace Bangk.Repositories.Context
         public DbSet<Log> Logs { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<GroupSetting> GroupSettings { get; set; }
+        public DbSet<Setting> Settings { get; set; }
     }
 }

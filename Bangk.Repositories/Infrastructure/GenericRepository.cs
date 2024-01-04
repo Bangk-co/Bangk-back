@@ -10,32 +10,33 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Infrastructure
 {
-    public class GenericRepository<T> : IDisposable, IGenericRepository<T> where T : EntityBase
+
+    public class GenericRepository<TEntity, T> : IGenericRepository<TEntity, T> where TEntity : EntityBase
     {
         protected readonly AppDbContext Context;
-        private readonly DbSet<T> _dbSet;
+        private readonly DbSet<TEntity> _dbSet;
         private bool _disposed;
 
         public GenericRepository(AppDbContext context)
         {
             Context = context;
-            _dbSet = context.Set<T>();
+            _dbSet = context.Set<TEntity>();
         }
 
-        public async Task<List<T>> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            params Expression<Func<T, object>>[] includes)
+        public async Task<List<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            params Expression<Func<TEntity, object>>[] includes)
         {
             var query = await GetAllQuery(filter, orderBy, includes);
 
             return query.ToList();
         }
 
-        public Task<IQueryable<T>> GetAllQuery(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            params Expression<Func<T, object>>[] includes)
+        public Task<IQueryable<TEntity>> GetAllQuery(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            params Expression<Func<TEntity, object>>[] includes)
         {
-            IQueryable<T> query = _dbSet;
+            IQueryable<TEntity> query = _dbSet;
 
-            foreach (Expression<Func<T, object>> include in includes)
+            foreach (Expression<Func<TEntity, object>> include in includes)
                 query = query.Include(include);
 
             if (filter != null)
@@ -47,24 +48,24 @@ namespace Bangk.Repositories.Infrastructure
             return Task.FromResult(query);
         }
 
-        public async Task<T> GetById(Guid id)
+        public async Task<TEntity> GetById(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<T> FirstOfDefaultAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+        public async Task<TEntity> FirstOfDefaultAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] includes)
         {
-            IQueryable<T> query = _dbSet.Where(filter);
+            IQueryable<TEntity> query = _dbSet.Where(filter);
             if (includes.Any())
             {
-                foreach (Expression<Func<T, object>> include in includes)
+                foreach (Expression<Func<TEntity, object>> include in includes)
                     query = query.Include(include);
             }
 
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<int> Create(T entity)
+        public async Task<int> Create(TEntity entity)
         {
             try
             {
@@ -76,11 +77,11 @@ namespace Bangk.Repositories.Infrastructure
             catch (Exception ex)
             {
                 Logs.WriteErrorLog(ex.Message, ex);
-                return 0;
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<int> CreateBulk(List<T> entityList)
+        public async Task<int> CreateBulk(List<TEntity> entityList)
         {
             try
             {
@@ -95,11 +96,25 @@ namespace Bangk.Repositories.Infrastructure
             catch (Exception ex)
             {
                 Logs.WriteErrorLog(ex.Message, ex);
-                return 0;
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<bool> Update(T entity)
+        public async Task<int> UpdateBulk(List<TEntity> entityList)
+        {
+            try
+            {
+                _dbSet.UpdateRange(entityList);
+                return await Context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.WriteErrorLog(ex.Message, ex);
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> Update(TEntity entity)
         {
             try
             {
@@ -110,11 +125,11 @@ namespace Bangk.Repositories.Infrastructure
             catch (Exception ex)
             {
                 Logs.WriteErrorLog(ex.Message, ex);
-                return false;
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<int> Delete(T entity)
+        public async Task<int> Delete(TEntity entity)
         {
             try
             {
@@ -124,9 +139,39 @@ namespace Bangk.Repositories.Infrastructure
             catch (Exception ex)
             {
                 Logs.WriteErrorLog(ex.Message, ex);
-                return 0;
+                throw new Exception(ex.Message);
             }
         }
+
+        public async Task<int> DeleteBulk(List<TEntity> entityList)
+        {
+            try
+            {
+                _dbSet.RemoveRange(entityList);
+                return await Context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.WriteErrorLog(ex.Message, ex);
+                throw new Exception(ex.Message);
+            }
+        }
+        public int GetTotalDtoRecords(IQueryable<T> query)
+        {
+            return query.Count();
+        }
+
+        public async Task<IList<T>> GetDtoList(IQueryable<T> query, int pageSize, int currentPage)
+        {
+            if (pageSize > 0 && currentPage > 0)
+            {
+                query = query.Skip(pageSize * (currentPage - 1)).Take(pageSize);
+            }
+
+            return await query.ToListAsync();
+
+        }
+
 
         protected virtual void Dispose(bool disposing)
         {
@@ -142,5 +187,7 @@ namespace Bangk.Repositories.Infrastructure
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
     }
 }
+

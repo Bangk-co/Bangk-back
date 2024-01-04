@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Contract.Login
 {
-    public interface IUserLoginService : IDomainBase<User>
+    public interface IUserLoginService
     {
         Task<ResponseDto<string>> Execute(LoginDto login);
     }
