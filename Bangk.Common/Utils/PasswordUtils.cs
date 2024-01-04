@@ -26,22 +26,15 @@ namespace Bangk.Common.Utils
         {
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(secretKey);
-                aesAlg.IV = Encoding.UTF8.GetBytes(iv);
-                aesAlg.KeySize = 256;
-                aesAlg.Mode = CipherMode.CBC;
-                aesAlg.Padding = PaddingMode.PKCS7;
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(encryptedPassword)))
+                using (var rijndaelManaged = new RijndaelManaged { Key = Encoding.UTF8.GetBytes(secretKey), IV = Encoding.UTF8.GetBytes(iv), Mode = CipherMode.CBC })
+                using (var memoryStream =
+                       new MemoryStream(Convert.FromBase64String(encryptedPassword)))
+                using (var cryptoStream =
+                       new CryptoStream(memoryStream,
+                           rijndaelManaged.CreateDecryptor(Encoding.UTF8.GetBytes(secretKey), Encoding.UTF8.GetBytes(iv)),
+                           CryptoStreamMode.Read))
                 {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            return srDecrypt.ReadToEnd();
-                        }
-                    }
+                    return new StreamReader(cryptoStream).ReadToEnd();
                 }
             }
         }
