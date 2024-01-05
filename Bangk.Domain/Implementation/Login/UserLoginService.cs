@@ -1,7 +1,6 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Utils;
 using Bangk.Domain.Contract.Login;
-using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;

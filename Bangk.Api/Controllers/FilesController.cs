@@ -18,7 +18,6 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpPost("UploadFile")]
-        [AllowAnonymous]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
@@ -30,7 +29,7 @@ namespace Bangk.Api.Controllers
                     Result = false
                 };
 
-                error.Errors.Add("The company logo is mandatory.");
+                error.Errors.Add("El archivo a subir es obligatorio.");
                 return BadRequest(error);
             }
 
