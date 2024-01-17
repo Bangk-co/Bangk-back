@@ -20,5 +20,7 @@ namespace Bangk.Repositories.Context
         public DbSet<Role> Roles { get; set; }
         public DbSet<GroupSetting> GroupSettings { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        
     }
 }
