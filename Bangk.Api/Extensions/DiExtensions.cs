@@ -1,12 +1,14 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Validators;
 using Bangk.Domain.Contract;
+using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
+using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.Login;
@@ -31,7 +33,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IGroupSettingRepository, GroupSettingRepository>();
             services.AddScoped<ISettingRepository, SettingRepository>();
-            
+            services.AddScoped<IClientRepository, ClientRepository>();
+
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -42,7 +45,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ISendEmailResetPassword, SendEmailResetPassword>();
             services.AddTransient<IUploadFileService, UploadFileService>();
             services.AddTransient<IGetGroupSettingListService, GetGroupSettingListService>();
-            services.AddTransient<IGetSettingListService, GetSettingListService>(); 
+            services.AddTransient<IGetSettingListService, GetSettingListService>();
+            services.AddTransient<ICostumerService, GetClientService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
