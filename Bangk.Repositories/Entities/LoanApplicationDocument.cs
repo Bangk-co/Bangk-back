@@ -15,7 +15,9 @@ namespace Bangk.Repositories.Entities
         public string Extension { get; set; }
         public int DocumentType { get; set; }
         public string Url { get; set; }
-       
+
+        public LoanApplication LoanApplication { get; set; }
+
 
 
     }

@@ -11,18 +11,26 @@ namespace Bangk.Repositories.Entities
     {
         [ForeignKey("Client")]
         public int ClientId { get; set; }
-        public int LoanBalance { get; set; }
+        public decimal LoanBalance { get; set; }
 
         [ForeignKey("Setting")]
-        public int BankId { get; set; }  
+        public int BankId { get; set; }
+
+        [ForeignKey("Setting")]
         public int LoanType { get; set; }
         public string LoanNumber { get; set; }
 
         [ForeignKey("User")]
-        public int Reviewerld { get; set; }
+        public int ReviewerId { get; set; }
 
         [ForeignKey("Setting")]
-        public int Stateld { get; set; }
+        public int StateId { get; set; }
+
+        public Client Clients { get; set; }
+        public Setting Banks { get; set; }
+        public Setting LoanTypes { get; set; }
+        public Setting States { get; set; }
+        public User User { get; set; }
         
 
     }
