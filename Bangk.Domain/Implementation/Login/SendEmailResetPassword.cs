@@ -23,6 +23,13 @@ namespace Bangk.Domain.Implementation.Login
         public async Task<ResponseDto<bool>> Execute(string email)
         {
             var result = new ResponseDto<bool>();
+            if (string.IsNullOrEmpty(email))
+            {
+                result.HasErrors = true;
+                result.Errors.Add($"El correo es obligatorio");
+                return result;
+            }
+
             var user = _getUserByEmailService.Execute(email);
             if (user == null)
             {
