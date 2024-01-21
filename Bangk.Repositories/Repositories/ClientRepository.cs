@@ -3,6 +3,9 @@ using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -49,6 +52,12 @@ namespace Bangk.Repositories.Repositories
             }
 
             return query;
+        }
+
+
+        public Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
+        {
+            return Context.Clients.AnyAsync(e => string.Equals(e.Email, email) &&  string.Equals(e.IdentificationNumber, identificationNumber));
         }
     }
 }
