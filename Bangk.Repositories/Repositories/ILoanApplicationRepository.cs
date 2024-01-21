@@ -11,6 +11,9 @@ namespace Bangk.Repositories.Repositories
 {
     public interface ILoanApplicationRepository : IGenericRepository<LoanApplication, LoanApplicationDto>
     {
+        List<LoanApplicationDto> GetLoanApplicationInfo(int ClientId);
 
     }
+
+
 }

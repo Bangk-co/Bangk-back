@@ -10,12 +10,12 @@ namespace Bangk.Common.Dto
     public class LoanApplicationDto
     {
         
-        public int ClientId { get; set; }
-        public int LoanBalance { get; set; }
-        public int BankId { get; set; }
-        public int LoanType { get; set; }
+        public string ClientName { get; set; }
+        public decimal LoanBalance { get; set; }
+        public string BankName { get; set; }
+        public string LoanTypeName { get; set; }
         public string LoanNumber { get; set; }
-        public int Reviewerld { get; set; }
-        public int Stateld { get; set; }
+        public string ReviewerName { get; set; }
+        public string StateName { get; set; }
     }
 }

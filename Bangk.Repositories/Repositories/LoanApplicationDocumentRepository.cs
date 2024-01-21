@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public class LoanApplicationDocumentRepository : GenericRepository<LoanApplicationDocument, LoanApplicationDocumentDto>
+    public class LoanApplicationDocumentRepository : GenericRepository<LoanApplicationDocument, LoanApplicationDocumentDto>, ILoanApplicationDocumentRepository
     {
         public LoanApplicationDocumentRepository(AppDbContext context) : base(context)
         {
         }
-    }
+
+
+    }    
 }

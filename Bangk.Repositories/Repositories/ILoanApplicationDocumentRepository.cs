@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public interface ILoanApplicationDocumentRepository : IGenericRepository<LoanApplication, LoanApplicationDto>
+    public interface ILoanApplicationDocumentRepository : IGenericRepository<LoanApplicationDocument, LoanApplicationDocumentDto>
     {
     }
 }

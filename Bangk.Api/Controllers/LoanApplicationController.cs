@@ -1,0 +1,45 @@
+﻿using Bangk.Common.Dto;
+using Bangk.Domain.Contract.Costumer;
+using Bangk.Domain.Contract.LoanApplication;
+using Bangk.Domain.Implementation.Client;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
+namespace Bangk.Api.Controllers
+{
+    public class LoanApplicationController : BaseController
+    {
+        private readonly ILoanApplicationServices _getLoanApplicationServices;
+        public LoanApplicationController(ILoanApplicationServices getLoanApplicationServices)
+        {
+            _getLoanApplicationServices = getLoanApplicationServices;
+        }
+
+        [HttpGet("GetLoanApplicationService")]
+        [Authorize(Roles = "asesor")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+
+        public async Task<ActionResult<List<LoanApplicationDto>>> GetLoanApplicationService(int ClientId) 
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var role = identity.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault()?.Value;
+            var userId = identity.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+            var result = await _getLoanApplicationServices.Execute(ClientId);
+            return Ok(new
+            {
+                Projects = result
+            });
+        }
+
+    
+    }
+}
