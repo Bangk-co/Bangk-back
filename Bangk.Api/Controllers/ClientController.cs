@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
 {
-    [AllowAnonymous]
     public class ClientController : BaseController
     {
 
