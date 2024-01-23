@@ -1,18 +1,26 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
 
 namespace Bangk.Common.Dto
 {
-    public  class ClientDto
+    public class ClientDto
     {
+        
         public string Name { get; set; }
-        public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
-        public int CountryCodePhoneId { get; set; }
-        public string Email { get; set; }
-        public string IdentificationNumber { get; set; }
-        public DateTime BirthDate { get; set; }
-        public string IdentificationFileUrl { get; set; }
-        public int DocumenIdentificationTypeId { get; set; }
-        public int GenderId { get; set; }
+
+        public DateTime CreationDate { get; set; }
+
+        public int Applications { get; set; }
+
+        public decimal LoanBalance { get; set; }
+
+        public decimal Sales { get; set; }
+
+        public string ReviewerName { get; set; }
+
+        public string StateName { get; set; }
+
+
     }
 }
