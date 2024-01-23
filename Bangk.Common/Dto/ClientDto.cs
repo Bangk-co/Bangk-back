@@ -5,6 +5,7 @@ namespace Bangk.Common.Dto
 {
     public class ClientDto
     {
+        
         public string Name { get; set; }
 
         public DateTime CreationDate { get; set; }
