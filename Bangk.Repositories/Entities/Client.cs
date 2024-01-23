@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bangk.Repositories.Entities
@@ -16,5 +17,6 @@ namespace Bangk.Repositories.Entities
         public int DocumenIdentificationTypeId { get; set; }
         public int GenderId { get; set; }
         public DateTime PermissionTreatPersonalDataDate { get; set; }
-}
+        public virtual ICollection<LoanApplication> LoanApplications { get; set; }
+    }
 }
