@@ -27,14 +27,14 @@ namespace Bangk.Api.Extensions
         {
             // Fluent Validations
             services.AddSingleton<IValidator<LoginDto>, LoginValidator>();
-            services.AddSingleton<IValidator<ResetPasswordDto>, ResetPasswordValidator>(); 
+            services.AddSingleton<IValidator<ResetPasswordDto>, ResetPasswordValidator>();
+            services.AddSingleton<IValidator<SendCodeValidationEmailDto>, SendCodeValidationEmailValidator>(); 
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IGroupSettingRepository, GroupSettingRepository>();
             services.AddScoped<ISettingRepository, SettingRepository>();
             services.AddScoped<IClientRepository, ClientRepository>();
-
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -46,7 +46,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IUploadFileService, UploadFileService>();
             services.AddTransient<IGetGroupSettingListService, GetGroupSettingListService>();
             services.AddTransient<IGetSettingListService, GetSettingListService>();
-            services.AddTransient<ICostumerService, GetClientService>();
+            services.AddTransient<ISendCodeValidationEmailService, SendCodeValidationEmailService>();
+            services.AddTransient<IReSendCodeValidationEmailService, ReSendCodeValidationEmailService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

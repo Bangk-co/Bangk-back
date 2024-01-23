@@ -3,9 +3,6 @@ using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,38 +14,10 @@ namespace Bangk.Repositories.Repositories
         {
         }
 
-        
 
-        public IQueryable<ClientDto> GetClientListQuery(string searchValue)
+        public Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
-
-           
-
-            var query = from c in Context.Clients
-                        orderby c.Id descending
-                        select new ClientDto
-                        {
-                            
-                            Name = c.Name,
-                            LastName = c.LastName,
-                            PhoneNumber = c.PhoneNumber,
-                            Email = c.Email,
-                            IdentificationNumber = c.IdentificationNumber,
-                            BirthDate = c.BirthDate,
-                            GenderId = c.GenderId,
-                            IdentificationFileUrl = c.IdentificationFileUrl,
-                            DocumenIdentificationTypeId = c.DocumenIdentificationTypeId
-
-                        };
-
-
-
-            if (!string.IsNullOrEmpty(searchValue))
-            {
-                query = query.Where(u => u.Name.Contains(searchValue));
-            }
-
-            return query;
+            return Context.Clients.AnyAsync(e => string.Equals(e.Email, email) &&  string.Equals(e.IdentificationNumber, identificationNumber));
         }
     }
 }

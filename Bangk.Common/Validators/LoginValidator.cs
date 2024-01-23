@@ -10,7 +10,7 @@ namespace Bangk.Common.Validators
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("El correo es obligatorio");
             RuleFor(x => x.Email)
-                 .EmailAddress().WithMessage("Ingrese un correo valido");
+                 .EmailAddress().WithMessage("Ingrese un correo válido");
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("La contraseña es obligatoria");
           

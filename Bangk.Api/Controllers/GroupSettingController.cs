@@ -17,7 +17,7 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpGet("GetGroupSettingList")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [AllowAnonymous]
         public async Task<ActionResult<List<GroupSettingListDto>>> GetGroupSettingList()
         {
             var result = await _getGroupSettingListService.Execute();

@@ -15,5 +15,6 @@ namespace Bangk.Repositories.Entities
         public string IdentificationFileUrl { get; set; }
         public int DocumenIdentificationTypeId { get; set; }
         public int GenderId { get; set; }
-    }
+        public DateTime PermissionTreatPersonalDataDate { get; set; }
+}
 }
