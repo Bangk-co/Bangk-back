@@ -18,7 +18,7 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpGet("GetLoanApplicationService")]
-        [Authorize(Roles = "asesor")]
+        [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -29,7 +29,7 @@ namespace Bangk.Api.Controllers
             var result = await _getLoanApplicationServices.Execute(ClientId);
             return Ok(new
             {
-                Projects = result
+                loanApplications = result
             });
         }
 

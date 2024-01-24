@@ -1,6 +1,7 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Validators;
 using Bangk.Domain.Contract;
+using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
@@ -30,7 +31,8 @@ namespace Bangk.Api.Extensions
             // Fluent Validations
             services.AddSingleton<IValidator<LoginDto>, LoginValidator>();
             services.AddSingleton<IValidator<ResetPasswordDto>, ResetPasswordValidator>();
-            services.AddSingleton<IValidator<SendCodeValidationEmailDto>, SendCodeValidationEmailValidator>(); 
+            services.AddSingleton<IValidator<SendCodeValidationEmailDto>, SendCodeValidationEmailValidator>();
+            services.AddSingleton<IValidator<CreateClientDto>, CreateClientValidator>();
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -55,6 +57,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IReSendCodeValidationEmailService, ReSendCodeValidationEmailService>();
             services.AddTransient<ICostumerService, GetClientService>();
             services.AddTransient<ILoanApplicationServices, GetLoanApplicationServices>();
+            services.AddTransient<IClientInfoService, GetClientInfoService>();
+            services.AddTransient<ICreateClientService, CreateClientService>();
+            services.AddTransient<ICreateLoanApplicationService, CreateLoanApplicationService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

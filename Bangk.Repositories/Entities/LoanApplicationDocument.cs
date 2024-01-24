@@ -12,7 +12,6 @@ namespace Bangk.Repositories.Entities
         [ForeignKey("LoanApplication")]
         public int LoanApplicationId { get; set; }
         public string Name { get; set; }
-        public string Extension { get; set; }
         public int DocumentType { get; set; }
         public string Url { get; set; }
 

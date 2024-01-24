@@ -1,5 +1,5 @@
 ﻿using Bangk.Common.Dto;
-using Bangk.Domain.Contract.Costumer;
+using Bangk.Domain.Contract.Client;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Bangk.Repositories.Repositories;

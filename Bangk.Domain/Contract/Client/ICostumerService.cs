@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bangk.Domain.Contract.Costumer
+namespace Bangk.Domain.Contract.Client
 {
     public interface ICostumerService
     {

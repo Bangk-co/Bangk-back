@@ -17,20 +17,17 @@ namespace Bangk.Repositories.Entities
         public int BankId { get; set; }
 
         [ForeignKey("Setting")]
-        public int LoanType { get; set; }
+        public int LoanTypeId { get; set; }
         public int LoanNumber { get; set; }
-        public int LoadApplicationNumber { get; set; }
-        
         [ForeignKey("User")]
         public int ReviewerId { get; set; }
-
         [ForeignKey("Setting")]
         public int StateId { get; set; }
 
-        public Client Clients { get; set; }
-        public Setting Banks { get; set; }
-        public Setting LoanTypes { get; set; }
-        public Setting States { get; set; }
+        public Client Client { get; set; }
+        public Setting Bank { get; set; }
+        public Setting LoanType { get; set; }
+        public Setting State { get; set; }
         public User User { get; set; }
         
 

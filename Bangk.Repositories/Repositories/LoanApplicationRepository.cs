@@ -22,18 +22,19 @@ namespace Bangk.Repositories.Repositories
                         l in Context.LoanApplication on c.Id equals l.ClientId join
                         b in Context.Settings on l.BankId equals b.Id join
                         s in Context.Settings on l.StateId equals s.Id join
-                        lt in Context.Settings on l.LoanType equals lt.Id join
+                        lt in Context.Settings on l.LoanTypeId equals lt.Id join
                         u in Context.Users on l.ReviewerId equals u.Id
                         where c.Id == ClientId
                         select new LoanApplicationDto
                         {
-                            ClientName = string.Format("{0} {1}", c.Name, c.LastName),
-                            LoanBalance = l.LoanBalance,
-                            BankName = b.Name,
                             LoanTypeName = lt.Name,
-                            LoanNumber = l.LoanNumber,
+                            LoanApplicationId = l.Id,
+                            BankName = b.Name,
+                            CreationDate = l.CreationDate,
+                            LoanBalance = l.LoanBalance,
+                            StateName = s.Name,
                             ReviewerName = string.Format("{0} {1}", u.Name, u.LastName),
-                            StateName = s.Name
+                            
                         };
 
             return query.ToList();

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bangk.Repositories.Entities
 {
@@ -13,5 +14,7 @@ namespace Bangk.Repositories.Entities
         public byte[] PasswordSalt { get; set; }
         public Role Role { get; set; }
         public string PasswordResetGuid { get; set; }
+
+        public virtual ICollection<LoanApplication> LoanApplications { get; set; }
     }
 }
