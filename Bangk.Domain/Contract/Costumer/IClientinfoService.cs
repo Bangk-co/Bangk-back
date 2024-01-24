@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Contract.Costumer
 {
-    public interface IClientinfoService
+    public interface IClientInfoService
     {
         Task<List<ClientInfoDto>> Execute(int clientId);
 

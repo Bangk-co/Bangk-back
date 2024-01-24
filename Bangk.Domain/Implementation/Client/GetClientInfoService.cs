@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Client
 {
-    public class GetClientInfoService : IClientinfoService
+    public class GetClientInfoService : IClientInfoService
     {
         private readonly IClientRepository _IClientRepository;
 

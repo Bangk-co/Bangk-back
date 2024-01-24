@@ -1,29 +1,25 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
-using Bangk.Domain.Implementation.Client;
-using Bangk.Repositories.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
 {
     public class ClientController : BaseController
     {
-
-
         private readonly ICostumerService _getClientService;
-        private readonly IClientinfoService _getClientInfoService;
-        public ClientController(ICostumerService getClientService, IClientinfoService getClientInfoService)
+        private readonly IClientInfoService _getClientInfoService;
+        private readonly ICreateClientService _createClientService;
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
+            _createClientService = createClientService;
         }
 
         [HttpGet("GetClientService")]
@@ -31,17 +27,14 @@ namespace Bangk.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<List<ClientDto>>> GetClientService(int currentPage, int pageSize, string searchValue) {
-            
-             
-            var result = await _getClientService.Execute(currentPage, pageSize, searchValue); 
-            return Ok(new 
+        public async Task<ActionResult<List<ClientDto>>> GetClientService(int currentPage, int pageSize, string searchValue)
+        {
+            var result = await _getClientService.Execute(currentPage, pageSize, searchValue);
+            return Ok(new
             {
-                Clients = result 
-            }); }
-
-       
-
+                Clients = result
+            });
+        }
 
         [HttpGet("GetClientInfoService")]
         [Authorize(Roles = "asesor, superAdmin")]
@@ -50,8 +43,6 @@ namespace Bangk.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<ClientInfoDto>>> GetClientInfoService(int clientId)
         {
-
-            
             var result = await _getClientInfoService.Execute(clientId);
             return Ok(new
             {
@@ -59,6 +50,20 @@ namespace Bangk.Api.Controllers
             });
         }
 
+        [HttpPost("CreateClientService")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ClientDto>>> CreateClientService([FromForm] CreateClientDto createClientDto)
+        {
+            var result = await _createClientService.Execute(createClientDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                ClientId = result.Result
+            });
+        }
     }
-    
 }

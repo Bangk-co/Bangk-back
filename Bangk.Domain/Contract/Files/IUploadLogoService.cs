@@ -6,6 +6,6 @@ namespace Bangk.Domain.Contract.Files
 {
     public interface IUploadFileService
     {
-        Task<ResponseDto<string>> Execute(IFormFile file, string fileName = null);
+        Task<ResponseDto<string>> Execute(IFormFile file, string containerName, string fileName = null);
     }
 }

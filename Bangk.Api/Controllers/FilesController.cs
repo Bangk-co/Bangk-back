@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -11,10 +13,11 @@ namespace Bangk.Api.Controllers
     public class FilesController : BaseController
     {
         private readonly IUploadFileService _uploadFileService;
-
-        public FilesController(IUploadFileService uploadFileService)
+        private readonly IConfiguration _configuration;
+        public FilesController(IUploadFileService uploadFileService, IConfiguration configuration)
         {
             _uploadFileService = uploadFileService;
+            _configuration = configuration;
         }
 
         [HttpPost("UploadFile")]
@@ -33,7 +36,7 @@ namespace Bangk.Api.Controllers
                 return BadRequest(error);
             }
 
-            var result = await _uploadFileService.Execute(file);
+            var result = await _uploadFileService.Execute(file, _configuration.GetSection("AzureStorage:ContainerName").Value);
             if (result.HasErrors)
             {
                 return BadRequest(result);

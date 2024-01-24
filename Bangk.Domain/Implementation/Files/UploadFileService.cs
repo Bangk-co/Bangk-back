@@ -16,13 +16,13 @@ namespace Bangk.Domain.Implementation.Files
         {
             _configuration = configuration;
         }
-
-        public async Task<ResponseDto<string>> Execute(IFormFile file, string fileName = null)
+        
+        public async Task<ResponseDto<string>> Execute(IFormFile file, string containerName, string fileName = null)
         {
             var result = new ResponseDto<string>();
             string connectionString = 
                 $"DefaultEndpointsProtocol=https;AccountName={_configuration.GetSection("AzureStorage:StorageAccountName").Value};AccountKey={_configuration.GetSection("AzureStorage:StorageAccountKey").Value}";
-            BlobContainerClient containerClient = new BlobContainerClient(connectionString, _configuration.GetSection("AzureStorage:ContainerName").Value);
+            BlobContainerClient containerClient = new BlobContainerClient(connectionString, containerName);
             // Get a reference to a blob
             BlobClient blobClient = containerClient.GetBlobClient(string.IsNullOrEmpty(fileName) ? file.FileName : fileName);
 
