@@ -3,6 +3,7 @@ using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -20,9 +21,6 @@ namespace Bangk.Repositories.Repositories
 
         public IQueryable<ClientDto> GetClientListQuery(string searchValue)
         {
-
-
-
             var query = from c in Context.Clients
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).First()
                         where c.LoanApplications.Count > 0
@@ -37,7 +35,6 @@ namespace Bangk.Repositories.Repositories
                             Applications = c.LoanApplications.Count()
                         };
 
-
             if (!string.IsNullOrEmpty(searchValue))
             {
                 query = query.Where(u => u.Name.Contains(searchValue));
@@ -45,6 +42,7 @@ namespace Bangk.Repositories.Repositories
 
             return query.AsQueryable();
         }
+
 
         public IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId)
         {
@@ -73,11 +71,6 @@ namespace Bangk.Repositories.Repositories
 
         }
 
-        public Task<Client> GetClientes (int id)
-        {
-            var client = GetById(id);
-            return client;
-        } 
 
 
         public Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)

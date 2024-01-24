@@ -13,7 +13,9 @@ namespace Bangk.Common.Dto
         public decimal LoanBalance { get; set; }
         public string BankName { get; set; }
         public string LoanTypeName { get; set; }
+
         public int LoanApplicationId { get; set; }
+
         public string ReviewerName { get; set; }
         public string StateName { get; set; }
 

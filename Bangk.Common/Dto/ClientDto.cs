@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 
 namespace Bangk.Common.Dto
 {
     public class ClientDto
     {
+        
         public string Name { get; set; }
 
         public DateTime CreationDate { get; set; }
@@ -18,6 +20,7 @@ namespace Bangk.Common.Dto
         public string ReviewerName { get; set; }
 
         public string StateName { get; set; }
+
 
     }
 }
