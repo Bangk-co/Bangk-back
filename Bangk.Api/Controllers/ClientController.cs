@@ -7,36 +7,58 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
 {
-    [AllowAnonymous]
     public class ClientController : BaseController
     {
 
+
         private readonly ICostumerService _getClientService;
-        public ClientController(ICostumerService getClientService)
+        private readonly IClientinfoService _getClientInfoService;
+        public ClientController(ICostumerService getClientService, IClientinfoService getClientInfoService)
         {
             _getClientService = getClientService;
+            _getClientInfoService = getClientInfoService;
         }
 
         [HttpGet("GetClientService")]
-        [Authorize(Roles = "asesor")]
+        [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<ClientDto>>> GetClientService(int currentPage, int pageSize, string searchValue) {
             
-            var identity = HttpContext.User.Identity as ClaimsIdentity; 
-            var role = identity.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault()?.Value; 
-            var userId = identity.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; 
+             
             var result = await _getClientService.Execute(currentPage, pageSize, searchValue); 
             return Ok(new 
             {
-                Projects = result 
+                Clients = result 
             }); }
+
+       
+
+
+        [HttpGet("GetClientInfoService")]
+        [Authorize(Roles = "asesor, superAdmin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<List<ClientInfoDto>>> GetClientInfoService(int clientId)
+        {
+
+            
+            var result = await _getClientInfoService.Execute(clientId);
+            return Ok(new
+            {
+                ClientsInfo = result
+            });
+        }
+
     }
+    
 }

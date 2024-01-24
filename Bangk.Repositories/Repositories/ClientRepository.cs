@@ -23,33 +23,19 @@ namespace Bangk.Repositories.Repositories
 
 
 
-            var subquery = from l in Context.LoanApplication
-                           group l by l.ClientId into clientGroup
-                           select new
-                           {
-                               ClientId = clientGroup.Key,
-                               LoanApplicationsCount = clientGroup.Count()
-                           };
-
-            var query = from l in Context.LoanApplication
-                        join c in Context.Clients on l.ClientId equals c.Id
-                        join u in Context.Users on l.ReviewerId equals u.Id
-                        join s in Context.Settings on l.StateId equals s.Id
-                        join sub in subquery on c.Id equals sub.ClientId into subGroup
-                        from sub in subGroup.DefaultIfEmpty()
-                        orderby l.Id descending
+            var query = from c in Context.Clients
+                        let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).First()
+                        where c.LoanApplications.Count > 0
+                        orderby c.Id descending
                         select new ClientDto
                         {
                             Name = string.Format("{0} {1}", c.Name, c.LastName),
-                            CreationDate = l.CreationDate,
-                            LoanBalance = l.LoanBalance,
-                            ReviewerName = string.Format("{0} {1}", u.Name, u.LastName),
-                            StateName = s.Name,
-                            Applications = sub.LoanApplicationsCount
+                            CreationDate = c.CreationDate,
+                            LoanBalance = c.LoanApplications.Sum(l => l.LoanBalance),
+                            ReviewerName = string.Format("{0} {1}", loans.Clients.Name, loans.Clients.LastName),
+                            StateName = Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name,
+                            Applications = c.LoanApplications.Count()
                         };
-
-            
-
 
 
             if (!string.IsNullOrEmpty(searchValue))
@@ -58,6 +44,33 @@ namespace Bangk.Repositories.Repositories
             }
 
             return query.AsQueryable();
+        }
+
+        public IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId)
+        {
+            var query = from c in Context.Clients
+                        join s in Context.Settings on c.DocumenIdentificationTypeId equals s.Id
+                        join sg in Context.Settings on c.GenderId equals sg.Id
+                        join sc in Context.Settings on c.CountryCodePhoneId equals sc.Id
+                        where c.Id == clientId
+                        select new ClientInfoDto
+                        {
+
+                            Name = string.Format("{0} {1}", c.Name, c.LastName),
+                            DocumentType = s.Name,
+                            IdentificationNumber = c.IdentificationNumber,
+                            IdClient = c.Id,
+                            Email = c.Email,
+                            CountryCode = sc.Id,
+                            PhoneNumber = c.PhoneNumber,
+                            BirthDate = c.BirthDate,
+                            GenderName = sg.Name
+
+
+                        };
+            return query;
+
+
         }
 
         public Task<Client> GetClientes (int id)
