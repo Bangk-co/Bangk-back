@@ -21,14 +21,8 @@ namespace Bangk.Domain.Implementation.LoanApplication
 
         public async Task<List<LoanApplicationDto>> Execute(int ClientId)
         {
-            try
-            {
-                var loanApplications = _ILoanApplicationRepository.GetLoanApplicationInfo(ClientId);
-                return loanApplications;
-            }catch (Exception ex)
-            {
-                throw new Exception($"Se ha generado un error consultando la información de los créditos del cliente -> {ex.Message}");
-            }
+            var loanApplications = _ILoanApplicationRepository.GetLoanApplicationInfo(ClientId);
+            return  loanApplications;
         }
     }
 }

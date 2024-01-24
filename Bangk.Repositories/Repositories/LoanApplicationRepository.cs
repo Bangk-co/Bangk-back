@@ -27,13 +27,14 @@ namespace Bangk.Repositories.Repositories
                         where c.Id == ClientId
                         select new LoanApplicationDto
                         {
-                            ClientName = string.Format("{0} {1}", c.Name, c.LastName),
-                            LoanBalance = l.LoanBalance,
-                            BankName = b.Name,
                             LoanTypeName = lt.Name,
-                            LoanNumber = l.LoanNumber,
+                            LoanApplicationId = l.Id,
+                            BankName = b.Name,
+                            CreationDate = l.CreationDate,
+                            LoanBalance = l.LoanBalance,
+                            StateName = s.Name,
                             ReviewerName = string.Format("{0} {1}", u.Name, u.LastName),
-                            StateName = s.Name
+                            
                         };
 
             return query.ToList();

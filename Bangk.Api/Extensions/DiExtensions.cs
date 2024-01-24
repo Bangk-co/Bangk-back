@@ -55,6 +55,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IReSendCodeValidationEmailService, ReSendCodeValidationEmailService>();
             services.AddTransient<ICostumerService, GetClientService>();
             services.AddTransient<ILoanApplicationServices, GetLoanApplicationServices>();
+            services.AddTransient<IClientinfoService, GetClientInfoService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

@@ -13,6 +13,6 @@ namespace Bangk.Repositories.Repositories
         Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber);
         IQueryable<ClientDto> GetClientListQuery(string searchValue);
 
-        
+        IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
     }
 }
