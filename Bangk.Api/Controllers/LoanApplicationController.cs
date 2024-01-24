@@ -1,15 +1,10 @@
 ﻿using Bangk.Common.Dto;
-using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.LoanApplication;
-using Bangk.Domain.Implementation.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
