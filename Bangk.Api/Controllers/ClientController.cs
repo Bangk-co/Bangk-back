@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
 {
+    [AllowAnonymous]
     public class ClientController : BaseController
     {
         private readonly ICostumerService _getClientService;
@@ -73,13 +74,16 @@ namespace Bangk.Api.Controllers
         [Authorize(Roles = "asesor, superAdmin")]
         public async Task<IActionResult> UpdateClient(int clientId, ClientUpdateInfoDto updatedClient)
         {
-            var result = await _updateClientService.UpdateClient(clientId, updatedClient);
-            if (result != null)
+            var result = await _updateClientService.Execute(clientId, updatedClient);
+            if (result.HasErrors)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
-            
-            return BadRequest(result);
+
+            return Ok(new
+            {
+                ClientUpdate = result.Result
+            });
         }
 
     }

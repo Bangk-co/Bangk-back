@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.Client
 {
     public interface IUpdateClientService
     {
-        Task<ResponseDto<ClientUpdateInfoDto>> UpdateClient(int clientId, ClientUpdateInfoDto updateClient);
+        Task<ResponseDto<ClientUpdateInfoDto>> Execute(int clientId, ClientUpdateInfoDto updateClient);
     }
 }

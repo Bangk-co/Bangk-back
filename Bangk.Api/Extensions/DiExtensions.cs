@@ -33,6 +33,7 @@ namespace Bangk.Api.Extensions
             services.AddSingleton<IValidator<ResetPasswordDto>, ResetPasswordValidator>();
             services.AddSingleton<IValidator<SendCodeValidationEmailDto>, SendCodeValidationEmailValidator>();
             services.AddSingleton<IValidator<CreateClientDto>, CreateClientValidator>();
+            services.AddSingleton<IValidator<ClientUpdateInfoDto>, UpdateClientValidator>();
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();

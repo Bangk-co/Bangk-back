@@ -15,6 +15,6 @@ namespace Bangk.Repositories.Repositories
 
         IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
 
-        Task<ClientUpdateInfoDto> ClientByIdUpdate(int clienteId, ClientUpdateInfoDto updateClient);
+        
     }
 }

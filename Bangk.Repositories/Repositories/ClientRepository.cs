@@ -71,31 +71,6 @@ namespace Bangk.Repositories.Repositories
             return Context.Clients.AnyAsync(e => string.Equals(e.Email, email) && string.Equals(e.IdentificationNumber, identificationNumber));
         }
 
-        public async Task<ClientUpdateInfoDto> ClientByIdUpdate(int clienteId, ClientUpdateInfoDto updateClient)
-        {
-            var client = GetById(clienteId).Result;
-
-            if (client != null)
-            {
-
-                client.Name = !string.IsNullOrEmpty(updateClient.Name) ? updateClient.Name : client.Name;
-                client.LastName = !string.IsNullOrEmpty(updateClient.LastName) ? updateClient.LastName : client.LastName;
-                client.DocumenIdentificationTypeId = updateClient.DocumentTypeId != 0 ? updateClient.DocumentTypeId : client.DocumenIdentificationTypeId;
-                client.IdentificationNumber = !string.IsNullOrEmpty(updateClient.IdentificationNumber) ? updateClient.IdentificationNumber : client.IdentificationNumber;
-                client.Email = !string.IsNullOrEmpty(updateClient.Email) ? updateClient.Email : client.Email;
-                client.CountryCodePhoneId = updateClient.CountryCode != 0 ? updateClient.CountryCode : client.CountryCodePhoneId;
-                client.PhoneNumber = !string.IsNullOrEmpty(updateClient.PhoneNumber) ? updateClient.PhoneNumber : client.PhoneNumber;
-                client.BirthDate = updateClient.BirthDate != new DateTime() ? updateClient.BirthDate : client.BirthDate;
-                client.GenderId = updateClient.GenderId != 0 ? updateClient.GenderId : client.GenderId;
-
-                bool result = Update(client).Result;
-                if (!result) return null;
-
-                return updateClient;
-            }
-
-            return null;
-        }
 
 
     }
