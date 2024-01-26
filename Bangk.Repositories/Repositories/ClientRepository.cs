@@ -25,14 +25,15 @@ namespace Bangk.Repositories.Repositories
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         where c.LoanApplications.Count > 0 &&
                               (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue))
-                        orderby c.Id descending
+                        orderby c.Name ascending
                         select new ClientDto
                         {
                             IdClient = c.Id,
                             Name = string.Format("{0} {1}", c.Name, c.LastName),
                             CreationDate = c.CreationDate,
                             LoanBalance = c.LoanApplications.Sum(l => l.LoanBalance),
-                            ReviewerName = loans != null ? string.Format("{0} {1}", loans.Client.Name, loans.Client.LastName) : string.Empty,
+                            ReviewerName = loans != null ? string.Format("{0} {1}", Context.Users.FirstOrDefault
+                            (u => u.Id == loans.ReviewerId).Name, Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).LastName) : string.Empty,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name : string.Empty,
                             Applications = c.LoanApplications.Count()
                         };
@@ -43,6 +44,7 @@ namespace Bangk.Repositories.Repositories
         public IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId)
         {
             var query = from c in Context.Clients
+                        let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         join s in Context.Settings on c.DocumenIdentificationTypeId equals s.Id
                         join sg in Context.Settings on c.GenderId equals sg.Id
                         join sc in Context.Settings on c.CountryCodePhoneId equals sc.Id
@@ -50,7 +52,8 @@ namespace Bangk.Repositories.Repositories
                         select new ClientInfoDto
                         {
 
-                            Name = string.Format("{0} {1}", c.Name, c.LastName),
+                            Name = c.Name,
+                            LastName = c.LastName,
                             DocumentType = s.Name,
                             IdentificationNumber = c.IdentificationNumber,
                             IdClient = c.Id,
@@ -58,8 +61,8 @@ namespace Bangk.Repositories.Repositories
                             CountryCode = sc.Id,
                             PhoneNumber = c.PhoneNumber,
                             BirthDate = c.BirthDate,
-                            GenderName = sg.Name
-
+                            GenderName = sg.Name,
+                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name : string.Empty
 
                         };
 
