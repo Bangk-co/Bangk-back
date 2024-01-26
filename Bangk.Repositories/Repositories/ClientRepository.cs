@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
@@ -17,32 +18,24 @@ namespace Bangk.Repositories.Repositories
         {
         }
 
+
         public IQueryable<ClientDto> GetClientListQuery(string searchValue)
         {
             var query = from c in Context.Clients
-                        let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).First()
-                        where c.LoanApplications.Count > 0
+                        let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
+                        where c.LoanApplications.Count > 0 &&
+                              (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue))
                         orderby c.Id descending
                         select new ClientDto
                         {
+                            IdClient = c.Id,
                             Name = string.Format("{0} {1}", c.Name, c.LastName),
                             CreationDate = c.CreationDate,
                             LoanBalance = c.LoanApplications.Sum(l => l.LoanBalance),
-                            ReviewerName = string.Format("{0} {1}", loans.Client.Name, loans.Client.LastName),
-                            StateName = Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name,
+                            ReviewerName = loans != null ? string.Format("{0} {1}", loans.Client.Name, loans.Client.LastName) : string.Empty,
+                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name : string.Empty,
                             Applications = c.LoanApplications.Count()
                         };
-
-            if (!string.IsNullOrEmpty(searchValue))
-            {
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    query = query.Where(u => u.Name.Contains(searchValue));
-                }
-
-                return query.AsQueryable();
-
-            }
 
             return query.AsQueryable();
         }
@@ -77,5 +70,33 @@ namespace Bangk.Repositories.Repositories
         {
             return Context.Clients.AnyAsync(e => string.Equals(e.Email, email) && string.Equals(e.IdentificationNumber, identificationNumber));
         }
+
+        public async Task<ClientUpdateInfoDto> ClientByIdUpdate(int clienteId, ClientUpdateInfoDto updateClient)
+        {
+            var client = GetById(clienteId).Result;
+
+            if (client != null)
+            {
+
+                client.Name = !string.IsNullOrEmpty(updateClient.Name) ? updateClient.Name : client.Name;
+                client.LastName = !string.IsNullOrEmpty(updateClient.LastName) ? updateClient.LastName : client.LastName;
+                client.DocumenIdentificationTypeId = updateClient.DocumentTypeId != 0 ? updateClient.DocumentTypeId : client.DocumenIdentificationTypeId;
+                client.IdentificationNumber = !string.IsNullOrEmpty(updateClient.IdentificationNumber) ? updateClient.IdentificationNumber : client.IdentificationNumber;
+                client.Email = !string.IsNullOrEmpty(updateClient.Email) ? updateClient.Email : client.Email;
+                client.CountryCodePhoneId = updateClient.CountryCode != 0 ? updateClient.CountryCode : client.CountryCodePhoneId;
+                client.PhoneNumber = !string.IsNullOrEmpty(updateClient.PhoneNumber) ? updateClient.PhoneNumber : client.PhoneNumber;
+                client.BirthDate = updateClient.BirthDate != new DateTime() ? updateClient.BirthDate : client.BirthDate;
+                client.GenderId = updateClient.GenderId != 0 ? updateClient.GenderId : client.GenderId;
+
+                bool result = Update(client).Result;
+                if (!result) return null;
+
+                return updateClient;
+            }
+
+            return null;
+        }
+
+
     }
 }

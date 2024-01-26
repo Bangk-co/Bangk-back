@@ -1,6 +1,7 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
+using Bangk.Repositories.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,11 +16,13 @@ namespace Bangk.Api.Controllers
         private readonly ICostumerService _getClientService;
         private readonly IClientInfoService _getClientInfoService;
         private readonly ICreateClientService _createClientService;
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService)
+        private readonly IUpdateClientService _updateClientService;
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, IUpdateClientService updateClientService)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
+            _updateClientService = updateClientService;
         }
 
         [HttpGet("GetClientService")]
@@ -65,5 +68,19 @@ namespace Bangk.Api.Controllers
                 ClientId = result.Result
             });
         }
+        
+        [HttpPut("UpdateClientService")]
+        [Authorize(Roles = "asesor, superAdmin")]
+        public async Task<IActionResult> UpdateClient(int clientId, ClientUpdateInfoDto updatedClient)
+        {
+            var result = await _updateClientService.UpdateClient(clientId, updatedClient);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            
+            return BadRequest(result);
+        }
+
     }
 }

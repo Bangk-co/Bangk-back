@@ -6,7 +6,7 @@ namespace Bangk.Common.Dto
 {
     public class ClientDto
     {
-        
+        public int IdClient { get; set; }
         public string Name { get; set; }
 
         public DateTime CreationDate { get; set; }

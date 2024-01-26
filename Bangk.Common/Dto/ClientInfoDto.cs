@@ -19,4 +19,20 @@ namespace Bangk.Common.Dto
         public string GenderName {  get; set; }
 
     }
+
+    public class ClientUpdateInfoDto
+    {
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public int DocumentTypeId { get; set; }
+        public string IdentificationNumber { get; set; }
+        public string Email { get; set; }
+        public int CountryCode { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime BirthDate { get; set; }
+        public int GenderId { get; set; }
+       
+
+    }
+
 }
