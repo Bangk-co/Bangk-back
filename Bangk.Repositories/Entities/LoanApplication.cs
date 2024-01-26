@@ -11,14 +11,14 @@ namespace Bangk.Repositories.Entities
     {
         [ForeignKey("Client")]
         public int ClientId { get; set; }
-        public decimal LoanBalance { get; set; }
+        public long LoanBalance { get; set; }
 
         [ForeignKey("Setting")]
         public int BankId { get; set; }
 
         [ForeignKey("Setting")]
         public int LoanTypeId { get; set; }
-        public int LoanNumber { get; set; }
+        public long LoanNumber { get; set; }
         [ForeignKey("User")]
         public int ReviewerId { get; set; }
         [ForeignKey("Setting")]

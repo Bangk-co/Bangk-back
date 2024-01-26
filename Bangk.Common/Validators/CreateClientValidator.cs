@@ -28,7 +28,7 @@ namespace Bangk.Common.Validators
             RuleFor(x => x.DocumenIdentificationTypeId)
                 .GreaterThan(0).WithMessage("El tipo de identificación  del cliente es obligatorio");
             RuleFor(x => x.IdentificationFile)
-             .NotNull().WithMessage("El saldo del crédito es obligatorio");
+             .NotNull().WithMessage("El archivo del la cedula del cliente es obligatorio");
 
             RuleFor(x => x.LoadAplicacionDto)
               .NotNull().WithMessage("La información de la solitud es obligatorio");

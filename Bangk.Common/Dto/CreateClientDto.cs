@@ -24,8 +24,8 @@ namespace Bangk.Common.Dto
         public IFormFile BankStatementFile { get; set; }
         public int BankId { get; set; }
         public int LoanTypeId { get; set; }
-        public int LoanBalance { get; set; }
-        public int LoanNumber { get; set; }
+        public long LoanBalance { get; set; }
+        public long LoanNumber { get; set; }
 
     }
 }
