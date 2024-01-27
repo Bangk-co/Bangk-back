@@ -3,9 +3,7 @@ using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -69,9 +67,9 @@ namespace Bangk.Repositories.Repositories
             return query;
         }
 
-        public Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
+        public async Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
-            return Context.Clients.AnyAsync(e => string.Equals(e.Email, email) && string.Equals(e.IdentificationNumber, identificationNumber));
+            return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) && string.Equals(e.IdentificationNumber, identificationNumber));
         }
 
 

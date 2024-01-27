@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,12 @@ namespace Bangk.Common.Enums
 
     public enum DocumentType
     {
-        BankStatement
+        [Description("Extractos bancarios")]
+
+        BankStatement,
+        [Description("Póliza # ")]
+        InsurancePolicy
+
 
     }
 }

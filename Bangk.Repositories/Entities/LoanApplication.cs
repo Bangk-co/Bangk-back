@@ -29,7 +29,7 @@ namespace Bangk.Repositories.Entities
         public Setting LoanType { get; set; }
         public Setting State { get; set; }
         public User User { get; set; }
-        
 
+        public virtual ICollection<LoanApplicationDocument> LoanApplicationDocuments { get; set; }
     }
 }

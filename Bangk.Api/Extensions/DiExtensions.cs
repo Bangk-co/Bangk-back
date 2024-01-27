@@ -6,6 +6,7 @@ using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.LoanApplication;
+using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Users;
@@ -14,6 +15,7 @@ using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.LoanApplication;
+using Bangk.Domain.Implementation.LoanApplicationDocument;
 using Bangk.Domain.Implementation.Login;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.Users;
@@ -62,6 +64,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ICreateClientService, CreateClientService>();
             services.AddTransient<ICreateLoanApplicationService, CreateLoanApplicationService>();
             services.AddTransient<IUpdateClientService, UpdateClientService>();
+            services.AddTransient<IGetLoadApplicationDocumentService, GetLoadApplicationDocumentService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
