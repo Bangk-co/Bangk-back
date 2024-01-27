@@ -14,5 +14,7 @@ namespace Bangk.Repositories.Repositories
         IQueryable<ClientDto> GetClientListQuery(string searchValue);
 
         IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
+
+        
     }
 }
