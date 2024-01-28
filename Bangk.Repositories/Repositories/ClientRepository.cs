@@ -1,4 +1,5 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Utils;
 using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
@@ -17,24 +18,27 @@ namespace Bangk.Repositories.Repositories
         }
 
 
-        public IQueryable<ClientDto> GetClientListQuery(string searchValue)
+        public IQueryable<ClientDto> GetClientListQuery(string searchValue, string sortField, string sortOrder)
         {
             var query = from c in Context.Clients
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         where c.LoanApplications.Count > 0 &&
                               (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue))
-                        orderby c.Name ascending
                         select new ClientDto
                         {
                             IdClient = c.Id,
-                            Name = string.Format("{0} {1}", c.Name, c.LastName),
+                            Name = c.Name + " " + c.LastName,  
                             CreationDate = c.CreationDate,
                             LoanBalance = c.LoanApplications.Sum(l => l.LoanBalance),
-                            ReviewerName = loans != null ? string.Format("{0} {1}", Context.Users.FirstOrDefault
-                            (u => u.Id == loans.ReviewerId).Name, Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).LastName) : string.Empty,
+                            ReviewerName = loans != null ? Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).Name + " " + Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).LastName : string.Empty,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name : string.Empty,
                             Applications = c.LoanApplications.Count()
                         };
+
+            if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
+            {
+                query = ExtensionMethods.OrderBy(query, sortField, sortOrder.ToLower() == "desc");
+            }
 
             return query.AsQueryable();
         }
