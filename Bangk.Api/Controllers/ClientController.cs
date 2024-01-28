@@ -30,7 +30,7 @@ namespace Bangk.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<List<ClientDto>>> GetClientService(int currentPage, int pageSize, string searchValue, [FromQuery] string sortOrder)
+        public async Task<ActionResult<List<ClientDto>>> GetClientService(int currentPage, int pageSize, string searchValue, string sortOrder)
         {
             var result = await _getClientService.Execute(currentPage, pageSize, searchValue, sortOrder);
             return Ok(new
