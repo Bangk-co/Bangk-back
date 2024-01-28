@@ -10,7 +10,7 @@ namespace Bangk.Domain.Contract.Client
 {
     public interface ICostumerService
     {
-        Task<PaginationDto<ClientDto>> Execute(int currentPage, int pageSize, string searchValue);
+        Task<PaginationDto<ClientDto>> Execute(int currentPage, int pageSize, string searchValue,string sortOrder);
         
 
     }

@@ -11,7 +11,7 @@ namespace Bangk.Repositories.Repositories
     public interface IClientRepository : IGenericRepository<Client, ClientDto>
     {
         Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber);
-        IQueryable<ClientDto> GetClientListQuery(string searchValue);
+        IQueryable<ClientDto> GetClientListQuery(string searchValue, string sortOrder);
 
         IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
 

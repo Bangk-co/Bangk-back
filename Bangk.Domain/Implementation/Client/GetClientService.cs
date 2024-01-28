@@ -22,9 +22,9 @@ namespace Bangk.Domain.Implementation.Client
             _ClientRepository = ClientRepository;
         }
 
-        public async Task<PaginationDto<ClientDto>> Execute(int currentPage, int pageSize, string searchValue)
+        public async Task<PaginationDto<ClientDto>> Execute(int currentPage, int pageSize, string searchValue, string sortOrder)
         {
-            var query = _ClientRepository.GetClientListQuery(searchValue);
+            var query = _ClientRepository.GetClientListQuery(searchValue, sortOrder);
 
             return new PaginationDto<ClientDto>()
             {
