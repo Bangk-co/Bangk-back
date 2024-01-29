@@ -73,10 +73,7 @@ namespace Bangk.Repositories.Repositories
 
         public async Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
-            return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) && string.Equals(e.IdentificationNumber, identificationNumber));
+            return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
         }
-
-
-
     }
 }
