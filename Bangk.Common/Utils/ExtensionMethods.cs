@@ -10,6 +10,11 @@ namespace Bangk.Common.Utils
         {
             string command = desc ? "OrderByDescending" : "OrderBy";
             var type = typeof(TEntity);
+
+            
+            
+            orderByProperty = string.Concat(orderByProperty.Split('_').Select(word => char.ToUpper(word[0]) + word.Substring(1)));
+
             var property = type.GetProperty(orderByProperty);
             var parameter = Expression.Parameter(type, "p");
             var propertyAccess = Expression.MakeMemberAccess(parameter, property);
