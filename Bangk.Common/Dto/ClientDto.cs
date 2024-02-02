@@ -21,6 +21,8 @@ namespace Bangk.Common.Dto
 
         public string StateName { get; set; }
 
+        public int ReviewerId { get; set; }
+
 
     }
 }

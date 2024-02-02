@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -33,7 +34,7 @@ namespace Bangk.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<List<ClientDto>>> GetClientService(int currentPage, int pageSize, string searchValue, string sortField, string sortOrder)
         {
-            var result = await _getClientService.Execute(currentPage, pageSize, searchValue, sortField, sortOrder);
+            var result = await _getClientService.Execute(currentPage, pageSize, searchValue, sortField, sortOrder, User);
             return Ok(new
             {
                 Clients = result
