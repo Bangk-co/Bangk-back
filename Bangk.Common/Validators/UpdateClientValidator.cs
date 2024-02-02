@@ -20,7 +20,9 @@ namespace Bangk.Common.Validators
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("El número de celular del cliente es obligatorio");
             RuleFor(x => x.BirthDate)
-                .NotEmpty().WithMessage("El fecha de nacimiento del cliente es obligatorio");
+                .NotEmpty().WithMessage("La fecha de nacimiento del cliente es obligatorio");
+            RuleFor(x => x.DocumentIssueDate)
+                .NotEmpty().WithMessage("La fecha de expedición del cliente es obligatorio");
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("El nombre del cliente es obligatorio");
             RuleFor(x => x.LastName)

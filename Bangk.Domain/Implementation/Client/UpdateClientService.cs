@@ -53,6 +53,7 @@ namespace Bangk.Domain.Implementation.Client
                         existClient.LastName = updateClient.LastName;
                         existClient.DocumenIdentificationTypeId = updateClient.DocumentTypeId;
                         existClient.IdentificationNumber = updateClient.IdentificationNumber;
+                        existClient.DocumentIssueDate = updateClient.DocumentIssueDate;
                         existClient.Email = updateClient.Email;
                         existClient.CountryCodePhoneId = updateClient.CountryCode;
                         existClient.PhoneNumber = updateClient.PhoneNumber;

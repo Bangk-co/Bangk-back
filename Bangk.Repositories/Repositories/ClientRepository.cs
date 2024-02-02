@@ -72,6 +72,7 @@ namespace Bangk.Repositories.Repositories
                             CountryCode = sc.Id,
                             PhoneNumber = c.PhoneNumber,
                             BirthDate = c.BirthDate,
+                            DocumentIssueDate = c.DocumentIssueDate,
                             GenderName = sg.Name,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name : string.Empty
 
