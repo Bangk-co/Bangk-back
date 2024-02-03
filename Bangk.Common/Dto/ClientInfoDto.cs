@@ -19,6 +19,7 @@ namespace Bangk.Common.Dto
         public DateTime BirthDate { get; set; }
         public string StateName { get; set; }
         public string GenderName {  get; set; }
+        public DateTime DocumentIssueDate { get; set; }
 
     }
 
@@ -33,8 +34,7 @@ namespace Bangk.Common.Dto
         public string PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
         public int GenderId { get; set; }
-       
-
+        public DateTime DocumentIssueDate { get; set; }
     }
 
 }
