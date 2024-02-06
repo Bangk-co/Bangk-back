@@ -23,5 +23,7 @@ namespace Bangk.Repositories.Context
         public DbSet<Client> Clients { get; set; }
         public DbSet<LoanApplication> LoanApplication { get; set; }
         public DbSet<LoanApplicationDocument> LoanApplicationDocument { get; set; }
+        public DbSet<LoanApplicationStateHistory> LoanApplicationStateHistory { get; set; }
+        
     }
 }

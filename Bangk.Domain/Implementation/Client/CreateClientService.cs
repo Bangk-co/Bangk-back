@@ -1,6 +1,5 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Enums;
-using Bangk.Common.Validators;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Files;
 using Bangk.Repositories.Repositories;
@@ -20,8 +19,10 @@ namespace Bangk.Domain.Implementation.Client
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IUserRepository _userRepository;
         private readonly ILoanApplicationDocumentRepository _loanApplicationDocumentRepository;
+        private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
         public CreateClientService(IClientRepository repository, IValidator<CreateClientDto> createClientValidator, IUploadFileService uploadFileService, 
-            IConfiguration configuration, ILoanApplicationRepository loanApplicationRepository, ILoanApplicationDocumentRepository loanApplicationDocumentRepository, IUserRepository userRepository)
+            IConfiguration configuration, ILoanApplicationRepository loanApplicationRepository, ILoanApplicationDocumentRepository loanApplicationDocumentRepository, 
+            IUserRepository userRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
         {
             _clientRepository = repository;
             _createClientValidator = createClientValidator;
@@ -30,6 +31,7 @@ namespace Bangk.Domain.Implementation.Client
             _loanApplicationRepository = loanApplicationRepository;
             _loanApplicationDocumentRepository = loanApplicationDocumentRepository;
             _userRepository = userRepository;
+            _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
         }
 
         public async Task<ResponseDto<int>> Execute(CreateClientDto createClientDto)
@@ -99,6 +101,14 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanApplicationDocumentRepository.Create(loanApplicationDocument);
+            var loadApplicationStateHistory = new Repositories.Entities.LoanApplicationStateHistory
+            {
+                LoanApplicationId = loanApplication.Id,
+                Observations = string.Empty,
+                StateId = (int)ApplicationStateEnum.Potencial,
+            };
+
+            await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
             result.Result = client.Id;
             scope.Complete();
             return result;

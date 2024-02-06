@@ -44,7 +44,7 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<ILoanApplicationRepository, LoanApplicationRepository>();
             services.AddScoped<ILoanApplicationDocumentRepository, LoanApplicationDocumentRepository>();
-
+            services.AddScoped<ILoanApplicationStateHistoryRepository, LoanApplicationStateHistoryRepository>(); 
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
