@@ -12,9 +12,11 @@ namespace Bangk.Api.Controllers
     public class LoanApplicationController : BaseController
     {
         private readonly ILoanApplicationServices _getLoanApplicationServices;
-        public LoanApplicationController(ILoanApplicationServices getLoanApplicationServices)
+        private readonly IGetLoadApplicationByIdService _getLoadApplicationByIdService;
+        public LoanApplicationController(ILoanApplicationServices getLoanApplicationServices, IGetLoadApplicationByIdService getLoadApplicationByIdService)
         {
             _getLoanApplicationServices = getLoanApplicationServices;
+            _getLoadApplicationByIdService = getLoadApplicationByIdService;
         }
 
         [HttpGet("GetLoanApplicationService")]
@@ -22,7 +24,6 @@ namespace Bangk.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-
         public async Task<ActionResult<List<LoanApplicationDto>>> GetLoanApplicationService(int ClientId) 
         {
             
@@ -33,6 +34,18 @@ namespace Bangk.Api.Controllers
             });
         }
 
-    
+        [HttpGet("GetLoanApplicationByApplicationId")]
+        [Authorize(Roles = "asesor, superAdmin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<List<LoanApplicationDto>>> GetLoanApplicationByApplicationId(int loanApplicationId)
+        {
+            var result = await _getLoadApplicationByIdService.Execute(loanApplicationId);
+            return Ok(new
+            {
+                loanApplication = result
+            });
+        }
     }
 }
