@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
 {
-    [AllowAnonymous]
     public class LoanApplicationStateHistoryController: BaseController
     {
         private readonly ILoanApplicationStateHistory _getLoanApplicationStateHistoryService;
