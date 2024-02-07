@@ -22,6 +22,7 @@ namespace Bangk.Repositories.Repositories
 
             var query = from history in Context.LoanApplicationStateHistory
                         where history.LoanApplicationId == loanApplicationId
+                        orderby history.StateId descending
                         select new LoanApplicationStateHistoryDto
                         {
                             StateName = Enum.GetName(enumType, history.StateId),
