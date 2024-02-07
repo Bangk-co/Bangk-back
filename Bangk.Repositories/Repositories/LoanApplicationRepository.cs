@@ -1,4 +1,5 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
@@ -42,10 +43,12 @@ namespace Bangk.Repositories.Repositories
 
         }
 
-        public Task<LoanApplicationInfoDto> GetLoanApplicationById(int loanApplicationId)
+        public async Task<LoanApplicationInfoDto> GetLoanApplicationById(int loanApplicationId)
         {
             var query = from c in Context.Clients
                         join l in Context.LoanApplication on c.Id equals l.ClientId
+                        let observation = Context.LoanApplicationStateHistory.Where(h => h.StateId == (int)ApplicationStateHistoryEnum.RevisionDeExtracto &&
+                            h.LoanApplicationId == loanApplicationId).FirstOrDefault()
                         where l.Id == loanApplicationId
                         select new LoanApplicationInfoDto
                         {
@@ -61,10 +64,14 @@ namespace Bangk.Repositories.Repositories
                             LoanBalance = l.LoanBalance,
                             LoanNumber = l.LoanNumber,
                             LoanType = l.LoanTypeId,
-                            PhoneNumber = c.PhoneNumber
+                            PhoneNumber = c.PhoneNumber,
+                            MonthlyCostInsurance = l.MonthlyCostInsurance,
+                            Observations = observation == null ? string.Empty : observation.Observations,
+                            ClientId = l.ClientId,
+                            LoanApplicationId = l.Id,
                         };
 
-            return query.FirstOrDefaultAsync();
+            return await query.FirstOrDefaultAsync();
 
         }
     }

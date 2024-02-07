@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Entities
 {
@@ -23,13 +19,13 @@ namespace Bangk.Repositories.Entities
         public int ReviewerId { get; set; }
         [ForeignKey("Setting")]
         public int StateId { get; set; }
+        public long? MonthlyCostInsurance { get; set; }
 
         public Client Client { get; set; }
         public Setting Bank { get; set; }
         public Setting LoanType { get; set; }
         public Setting State { get; set; }
         public User User { get; set; }
-
         public virtual ICollection<LoanApplicationDocument> LoanApplicationDocuments { get; set; }
     }
 }

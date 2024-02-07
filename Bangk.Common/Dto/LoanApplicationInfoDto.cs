@@ -17,6 +17,9 @@ namespace Bangk.Common.Dto
         public int BankId { get; set; }
         public int LoanType { get; set; }
         public long LoanNumber { get; set; }
-
+        public long? MonthlyCostInsurance { get; set; }
+        public string Observations { get; set; }
+        public int ClientId { get; set; }
+        public int LoanApplicationId { get; set; }
     }
 }

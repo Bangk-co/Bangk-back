@@ -3,9 +3,10 @@ using Bangk.Common.Enums;
 using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
@@ -30,7 +31,11 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return query.AsQueryable();
+        }
 
+        public async Task<LoanApplicationStateHistory> GetLoanApplicationStateHistoryByStateAndLoanApplicationId(int stateId, int loanApplicationId)
+        {
+           return await Context.LoanApplicationStateHistory.Where(h => h.StateId == stateId && h.LoanApplicationId == loanApplicationId).FirstOrDefaultAsync();
         }
     }
 }
