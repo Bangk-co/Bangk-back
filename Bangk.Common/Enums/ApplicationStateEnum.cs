@@ -9,7 +9,32 @@ namespace Bangk.Common.Enums
 {
     public enum ApplicationStateEnum
     {
-        Potencial = 109
+        Potencial = 109,
+        Prospecto = 110,
+        Activo = 111
+    }
+
+    public enum ApplicationStateHistoryEnum
+    {
+        SolicitudCreada = 119,
+        RevisionDeExtracto = 120,
+        CotizacionEnviada = 121,
+        CotizaciónAceptada = 123,
+        FormulariosDiligenciados = 124,
+        EstufioSarlaft = 125,
+        EstudioListaRestrictivaSBS = 126,
+        PolizaEmitida = 127,
+        PolizaPagada = 128,
+        CartaDeEndosoRealizada = 129,
+        EndosoAceptada = 130,
+        ProximoARenovar = 131,
+        Renpvado = 132,
+        Vencido = 133,
+        RechazadoPorLaAseguradora = 134,
+        CotizaciónRechazada = 135,
+        CotizaciónNoRespondida = 136
+
+
     }
 
     public enum DocumentType

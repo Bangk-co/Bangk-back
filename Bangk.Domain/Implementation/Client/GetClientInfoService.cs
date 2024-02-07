@@ -27,7 +27,5 @@ namespace Bangk.Domain.Implementation.Client
         }
 
         
-
-        
     }
 }
