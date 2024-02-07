@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Common.Enums
 {
-    public enum ApplicationStateEnum
+    public enum ClientStateEnum
     {
         Potencial = 109,
         Prospecto = 110,
@@ -21,14 +21,14 @@ namespace Bangk.Common.Enums
         CotizacionEnviada = 121,
         CotizaciónAceptada = 123,
         FormulariosDiligenciados = 124,
-        EstufioSarlaft = 125,
+        EstudioSarlaft = 125,
         EstudioListaRestrictivaSBS = 126,
         PolizaEmitida = 127,
         PolizaPagada = 128,
         CartaDeEndosoRealizada = 129,
         EndosoAceptada = 130,
         ProximoARenovar = 131,
-        Renpvado = 132,
+        Renovado = 132,
         Vencido = 133,
         RechazadoPorLaAseguradora = 134,
         CotizaciónRechazada = 135,

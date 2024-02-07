@@ -70,7 +70,8 @@ namespace Bangk.Domain.Implementation.Client
                 LastName = createClientDto.LastName,
                 Name = createClientDto.Name,
                 PhoneNumber = createClientDto.PhoneNumber,
-                PermissionTreatPersonalDataDate = createClientDto.PermissionTreatPersonalDataDate
+                PermissionTreatPersonalDataDate = createClientDto.PermissionTreatPersonalDataDate,
+                State = (int)ClientStateEnum.Potencial,
             };
 
             var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
@@ -85,7 +86,7 @@ namespace Bangk.Domain.Implementation.Client
                 LoanNumber = createClientDto.LoadAplicacionDto.LoanNumber,
                 LoanTypeId = createClientDto.LoadAplicacionDto.LoanTypeId,
                 BankId = createClientDto.LoadAplicacionDto.BankId,
-                StateId = (int)ApplicationStateEnum.Potencial,
+                StateId = (int)ApplicationStateHistoryEnum.SolicitudCreada,
                 ReviewerId = user.Id
             };
 
@@ -105,7 +106,7 @@ namespace Bangk.Domain.Implementation.Client
             {
                 LoanApplicationId = loanApplication.Id,
                 Observations = string.Empty,
-                StateId = (int)ApplicationStateEnum.Potencial,
+                StateId = (int)ApplicationStateHistoryEnum.SolicitudCreada,
             };
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);

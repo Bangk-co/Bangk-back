@@ -19,7 +19,7 @@ namespace Bangk.Common.Dto
         public DateTime BirthDate { get; set; }
         public string StateName { get; set; }
         public string GenderName {  get; set; }
-        public DateTime DocumentIssueDate { get; set; }
+        public DateTime? DocumentIssueDate { get; set; }
 
     }
 
