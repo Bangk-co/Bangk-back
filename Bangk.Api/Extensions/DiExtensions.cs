@@ -8,6 +8,7 @@ using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
+using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Users;
@@ -18,6 +19,7 @@ using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.LoanApplication;
 using Bangk.Domain.Implementation.LoanApplicationDocument;
 using Bangk.Domain.Implementation.LoanApplicationStateHistory;
+using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.Users;
@@ -48,7 +50,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ILoanApplicationRepository, LoanApplicationRepository>();
             services.AddScoped<ILoanApplicationDocumentRepository, LoanApplicationDocumentRepository>();
             services.AddScoped<ILoanApplicationStateHistoryRepository, LoanApplicationStateHistoryRepository>();
-            
+            services.AddScoped<ILoanQuoteRepository, LoanQuoteRepository>();
+
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -71,7 +74,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetLoadApplicationDocumentService, GetLoadApplicationDocumentService>();
             services.AddTransient<ILoanApplicationStateHistory, GetLoanApplicationStateHistoryService>();
             services.AddTransient<IGetLoadApplicationByIdService, GetLoadApplicationByIdService>();
-            services.AddTransient<IUpdateLoanApplicationService, UpdateLoanApplicationService>(); 
+            services.AddTransient<IUpdateLoanApplicationService, UpdateLoanApplicationService>();
+            services.AddTransient<ILoanQuoteService, LoanQuoteService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

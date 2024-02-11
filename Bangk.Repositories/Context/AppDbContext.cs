@@ -24,6 +24,7 @@ namespace Bangk.Repositories.Context
         public DbSet<LoanApplication> LoanApplication { get; set; }
         public DbSet<LoanApplicationDocument> LoanApplicationDocument { get; set; }
         public DbSet<LoanApplicationStateHistory> LoanApplicationStateHistory { get; set; }
-        
+        public DbSet<LoanQuote> LoanQuote { get; set; }
+
     }
 }
