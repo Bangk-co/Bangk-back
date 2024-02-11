@@ -18,7 +18,7 @@ namespace Bangk.Business.Extension.SenderGrid
             }
 
             var client = new SendGridClient(sendGridApiKey);
-            var msg = MailHelper.CreateSingleTemplateEmail(new EmailAddress(sendGridEmailDto.From, sendGridEmailDto.Name), new EmailAddress(sendGridEmailDto.email),
+            var msg = MailHelper.CreateSingleTemplateEmail(new EmailAddress(sendGridEmailDto.From, sendGridEmailDto.Name), new EmailAddress(sendGridEmailDto.email.Trim()),
                 sendGridEmailDto.TemplateId, sendGridEmailDto.Data);
 
             var response = await client.SendEmailAsync(msg);
