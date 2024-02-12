@@ -1,8 +1,6 @@
-﻿using Bangk.Common.Dto;
-using Bangk.Domain.Contract.LoanQuote;
+﻿using Bangk.Domain.Contract.LoanQuote;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -11,10 +9,13 @@ namespace Bangk.Api.Controllers
     {
         private readonly ILoanQuoteService _loanQuoteService;
         private readonly IGetLoanQuoteInfoByLoanApplicationIdService _getLoanQuoteInfoByLoanApplicationIdService;
-        public LoanQuoteController(ILoanQuoteService loanQuoteService, IGetLoanQuoteInfoByLoanApplicationIdService getLoanQuoteInfoByLoanApplicationIdService)
+        private readonly IAcceptLoanQuoteService _acceptLoanQuoteService;
+        public LoanQuoteController(ILoanQuoteService loanQuoteService, IGetLoanQuoteInfoByLoanApplicationIdService getLoanQuoteInfoByLoanApplicationIdService,
+            IAcceptLoanQuoteService acceptLoanQuoteService)
         {
             _loanQuoteService = loanQuoteService;
             _getLoanQuoteInfoByLoanApplicationIdService = getLoanQuoteInfoByLoanApplicationIdService;
+            _acceptLoanQuoteService = acceptLoanQuoteService;
         }
 
         [HttpPost("CreateLoanQuote")]
@@ -35,6 +36,14 @@ namespace Bangk.Api.Controllers
         public async Task<IActionResult> GetLoanQuoteByApplicationId(int loanApplicationId)
         {
             var result = await _getLoanQuoteInfoByLoanApplicationIdService.Execute(loanApplicationId);
+            return Ok(result);
+        }
+
+        [HttpPost("AcceptLoanQuote")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId)
+        {
+            var result = await _acceptLoanQuoteService.Execute(loanApplicationId);
             return Ok(result);
         }
     }

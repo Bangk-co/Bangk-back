@@ -24,13 +24,13 @@ namespace Bangk.Repositories.Repositories
                         join state in Context.Settings on c.State equals state.Id
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         where c.LoanApplications.Count > 0 &&
-                              (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue) || c.LastName.Contains(searchValue) || 
-                              (c.Name + " " + c.LastName).Contains(searchValue) ||c.IdentificationNumber.Contains(searchValue) || 
+                              (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue) || c.LastName.Contains(searchValue) ||
+                              (c.Name + " " + c.LastName).Contains(searchValue) || c.IdentificationNumber.Contains(searchValue) ||
                               c.Email.Contains(searchValue))
                         select new ClientDto
                         {
                             IdClient = c.Id,
-                            Name = c.Name + " " + c.LastName,  
+                            Name = c.Name + " " + c.LastName,
                             CreationDate = c.CreationDate,
                             LoanBalance = c.LoanApplications.Sum(l => l.LoanBalance),
                             ReviewerName = loans != null ? Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).Name + " " + Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).LastName : string.Empty,
@@ -83,6 +83,16 @@ namespace Bangk.Repositories.Repositories
         public async Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
             return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
+        }
+
+        public async Task<Client> GetClientByLoanApplicationId(int loanApplicationId)
+        {
+            var query = from c in Context.Clients
+                        join l in Context.LoanApplication on c.Id equals l.ClientId
+                        where l.Id == loanApplicationId
+                        select c;
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }
