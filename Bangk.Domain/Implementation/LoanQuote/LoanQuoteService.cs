@@ -33,7 +33,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
             _clientRepository = clientRepository;
         }
 
-        public async Task<bool> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string observations )
+        public async Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string observations )
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             var loanQuote = new Repositories.Entities.LoanQuote
@@ -44,6 +44,8 @@ namespace Bangk.Domain.Implementation.LoanQuote
             };
 
             await _loanQuoteRepository.Create(loanQuote);
+
+            int loanQuoteId = loanQuote.Id;
 
             var loanApplicationStatusHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
@@ -73,7 +75,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
 
             scope.Complete();
 
-            return true;
+            return loanQuoteId;
 
         }
     }
