@@ -10,10 +10,11 @@ namespace Bangk.Api.Controllers
     public class LoanQuoteController : BaseController
     {
         private readonly ILoanQuoteService _loanQuoteService;
-
-        public LoanQuoteController(ILoanQuoteService loanQuoteService)
+        private readonly IGetLoanQuoteInfoByLoanApplicationIdService _getLoanQuoteInfoByLoanApplicationIdService;
+        public LoanQuoteController(ILoanQuoteService loanQuoteService, IGetLoanQuoteInfoByLoanApplicationIdService getLoanQuoteInfoByLoanApplicationIdService)
         {
             _loanQuoteService = loanQuoteService;
+            _getLoanQuoteInfoByLoanApplicationIdService = getLoanQuoteInfoByLoanApplicationIdService;
         }
 
         [HttpPost("CreateLoanQuote")]
@@ -29,5 +30,12 @@ namespace Bangk.Api.Controllers
             return Ok("Se ha enviado la cotización con éxito.");
         }
 
+        [HttpPost("GetLoanQuoteByApplicationId")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetLoanQuoteByApplicationId(int loanApplicationId)
+        {
+            var result = await _getLoanQuoteInfoByLoanApplicationIdService.Execute(loanApplicationId);
+            return Ok(result);
+        }
     }
 }
