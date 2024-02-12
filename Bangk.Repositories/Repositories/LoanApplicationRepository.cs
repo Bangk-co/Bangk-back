@@ -49,6 +49,7 @@ namespace Bangk.Repositories.Repositories
                         join l in Context.LoanApplication on c.Id equals l.ClientId
                         let observation = Context.LoanApplicationStateHistory.Where(h => h.StateId == (int)ApplicationStateHistoryEnum.RevisionDeExtracto &&
                             h.LoanApplicationId == loanApplicationId).FirstOrDefault()
+                        let document = Context.LoanApplicationDocument.Where(d => d.LoanApplicationId == l.Id && d.DocumentType == (int)DocumentType.BankStatement).FirstOrDefault()
                         where l.Id == loanApplicationId
                         select new LoanApplicationInfoDto
                         {
@@ -69,6 +70,8 @@ namespace Bangk.Repositories.Repositories
                             Observations = observation == null ? string.Empty : observation.Observations,
                             ClientId = l.ClientId,
                             LoanApplicationId = l.Id,
+                            BankStatementUrl = document == null ? string.Empty : document.Url,
+                            BankStatementName = document == null ? string.Empty : document.Name,
                         };
 
             return await query.FirstOrDefaultAsync();

@@ -19,7 +19,6 @@ namespace Bangk.Api.Controllers
         [HttpGet("GetLoadApplicationDocumentByClient")]
         [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [AllowAnonymous]
         public async Task<ActionResult<List<LoanApplicationDto>>> GetLoadApplicationDocumentByClient(int ClientId) 
         {
             var result = await _getLoanApplicationDocumentServices.Execute(ClientId);

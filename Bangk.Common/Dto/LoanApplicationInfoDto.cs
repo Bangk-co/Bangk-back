@@ -21,5 +21,7 @@ namespace Bangk.Common.Dto
         public string Observations { get; set; }
         public int ClientId { get; set; }
         public int LoanApplicationId { get; set; }
+        public string BankStatementUrl { get; set; }
+        public string BankStatementName { get; set; }
     }
 }
