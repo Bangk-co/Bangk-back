@@ -69,6 +69,7 @@ namespace Bangk.Repositories.Repositories
                             LoanApplicationId = l.Id,
                             BankStatementUrl = document == null ? string.Empty : document.Url,
                             BankStatementName = document == null ? string.Empty : document.Name,
+                            DocumentIssueDate = c.DocumentIssueDate
                         };
 
             return await query.FirstOrDefaultAsync();

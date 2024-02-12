@@ -23,5 +23,6 @@ namespace Bangk.Common.Dto
         public int LoanApplicationId { get; set; }
         public string BankStatementUrl { get; set; }
         public string BankStatementName { get; set; }
+        public DateTime? DocumentIssueDate { get; set; }
     }
 }
