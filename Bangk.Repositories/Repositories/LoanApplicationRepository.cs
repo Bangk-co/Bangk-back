@@ -21,7 +21,6 @@ namespace Bangk.Repositories.Repositories
             var query = from c in Context.Clients
                         join l in Context.LoanApplication on c.Id equals l.ClientId
                         join b in Context.Settings on l.BankId equals b.Id
-                        join s in Context.Settings on l.StateId equals s.Id
                         join lt in Context.Settings on l.LoanTypeId equals lt.Id
                         join u in Context.Users on l.ReviewerId equals u.Id
                         where c.Id == ClientId
@@ -32,7 +31,7 @@ namespace Bangk.Repositories.Repositories
                             BankName = b.Name,
                             CreationDate = l.CreationDate,
                             LoanBalance = l.LoanBalance,
-                            StateName = s.Name,
+                            StateName = Context.LoanApplicationStateHistory.OrderByDescending(lh => lh.CreationDate).FirstOrDefault().State.Name,
                             ReviewerName = string.Format("{0} {1}", u.Name, u.LastName),
 
                         };

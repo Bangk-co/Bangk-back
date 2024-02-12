@@ -86,7 +86,6 @@ namespace Bangk.Domain.Implementation.Client
                 LoanNumber = createClientDto.LoadAplicacionDto.LoanNumber,
                 LoanTypeId = createClientDto.LoadAplicacionDto.LoanTypeId,
                 BankId = createClientDto.LoadAplicacionDto.BankId,
-                StateId = (int)ApplicationStateHistoryEnum.SolicitudCreada,
                 ReviewerId = user.Id
             };
 

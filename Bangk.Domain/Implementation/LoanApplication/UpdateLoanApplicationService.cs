@@ -54,7 +54,6 @@ namespace Bangk.Domain.Implementation.LoanApplication
             loanApplication.LoanBalance = updateLoanApplicationDto.LoanBalance;
             loanApplication.MonthlyCostInsurance = updateLoanApplicationDto.MonthlyCostInsurance;
             loanApplication.LoanTypeId = updateLoanApplicationDto.LoanTypeId;
-            loanApplication.StateId = (int)ApplicationStateHistoryEnum.RevisionDeExtracto;
             await _loanApplicationRepository.Update(loanApplication);
 
             if (updateLoanApplicationDto.IsValidateLoanApplication)
