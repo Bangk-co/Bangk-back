@@ -18,16 +18,17 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("CreateLoanQuote")]
         [Authorize(Roles = "asesor, superAdmin")]
-        
-        public async Task<IActionResult> CreateLoanQuote(int insuranceId, int loanApplicationId, long yearlyFee, string observations)
+        [AllowAnonymous]
+
+        public async Task<IActionResult> CreateLoanQuote(int insuranceId, int loanApplicationId, long yearlyFee)
         {
-            int loanQuoteId = await _loanQuoteService.Execute(insuranceId, loanApplicationId, yearlyFee, observations);
+            int loanQuoteId = await _loanQuoteService.Execute(insuranceId, loanApplicationId, yearlyFee);
             if (loanQuoteId == 0) 
             {
                 return BadRequest("No se pudo crear la cotización del préstamo.");
             }
 
-            return Ok(loanQuoteId);
+            return Ok(loanApplicationId);
         }
 
     }
