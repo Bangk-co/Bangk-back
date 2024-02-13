@@ -32,7 +32,7 @@ namespace Bangk.Api.Controllers
             return Ok(loanQuoteId);
         }
 
-        [HttpPost("GetLoanQuoteByApplicationId")]
+        [HttpGet("GetLoanQuoteByApplicationId")]
         [AllowAnonymous]
         public async Task<IActionResult> GetLoanQuoteByApplicationId(int loanApplicationId)
         {
