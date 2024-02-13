@@ -18,6 +18,7 @@ namespace Bangk.Common.Dto
 
         public string ReviewerName { get; set; }
         public string StateName { get; set; }
+        public string IconsBanksUrl { get; set; }
 
         public DateTime CreationDate { get; set; }
     }

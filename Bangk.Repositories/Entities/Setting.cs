@@ -6,8 +6,10 @@ namespace Bangk.Repositories.Entities
     {
         public string Name { get; set; }
         public string Code { get; set; }
+
         [ForeignKey("GroupSetting")]
         public int SettingGroupId { get; set; }
+        public string IconsBanksUrl { get; set; }
         public GroupSetting GroupSettings { get; set; }
     }
 }

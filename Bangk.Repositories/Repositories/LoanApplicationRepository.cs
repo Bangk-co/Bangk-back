@@ -29,6 +29,7 @@ namespace Bangk.Repositories.Repositories
                             LoanTypeName = lt.Name,
                             LoanApplicationId = l.Id,
                             BankName = b.Name,
+                            IconsBanksUrl = b.IconsBanksUrl,
                             CreationDate = l.CreationDate,
                             LoanBalance = l.LoanBalance,
                             StateName = Context.LoanApplicationStateHistory.OrderByDescending(lh => lh.CreationDate).FirstOrDefault().State.Name,
