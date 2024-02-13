@@ -20,7 +20,6 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("CreateLoanQuote")]
         [Authorize(Roles = "asesor, superAdmin")]
-        [AllowAnonymous]
 
         public async Task<IActionResult> CreateLoanQuote(int insuranceId, int loanApplicationId, long yearlyFee)
         {
