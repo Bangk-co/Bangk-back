@@ -6,7 +6,6 @@ using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -22,19 +21,20 @@ namespace Bangk.Repositories.Repositories
         public IQueryable<ClientDto> GetClientListQuery(string searchValue, string sortField, string sortOrder, ClaimsPrincipal user)
         {
             var query = from c in Context.Clients
+                        join state in Context.Settings on c.State equals state.Id
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         where c.LoanApplications.Count > 0 &&
-                              (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue) || c.LastName.Contains(searchValue) || 
-                              (c.Name + " " + c.LastName).Contains(searchValue) ||c.IdentificationNumber.Contains(searchValue) || 
+                              (string.IsNullOrEmpty(searchValue) || c.Name.Contains(searchValue) || c.LastName.Contains(searchValue) ||
+                              (c.Name + " " + c.LastName).Contains(searchValue) || c.IdentificationNumber.Contains(searchValue) ||
                               c.Email.Contains(searchValue))
                         select new ClientDto
                         {
                             IdClient = c.Id,
-                            Name = c.Name + " " + c.LastName,  
+                            Name = c.Name + " " + c.LastName,
                             CreationDate = c.CreationDate,
                             LoanBalance = c.LoanApplications.Sum(l => l.LoanBalance),
                             ReviewerName = loans != null ? Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).Name + " " + Context.Users.FirstOrDefault(u => u.Id == loans.ReviewerId).LastName : string.Empty,
-                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == loans.StateId).Name : string.Empty,
+                            StateName = state.Name,
                             Applications = c.LoanApplications.Count(),
                             ReviewerId = loans.ReviewerId
                         };
@@ -75,7 +75,6 @@ namespace Bangk.Repositories.Repositories
                             DocumentIssueDate = c.DocumentIssueDate,
                             GenderName = sg.Name,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty
-
                         };
 
             return query;
@@ -84,6 +83,16 @@ namespace Bangk.Repositories.Repositories
         public async Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
             return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
+        }
+
+        public async Task<Client> GetClientByLoanApplicationId(int loanApplicationId)
+        {
+            var query = from c in Context.Clients
+                        join l in Context.LoanApplication on c.Id equals l.ClientId
+                        where l.Id == loanApplicationId
+                        select c;
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

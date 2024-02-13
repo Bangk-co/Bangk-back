@@ -42,7 +42,6 @@ namespace Bangk.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [AllowAnonymous]
         public async Task<ActionResult<LoanApplicationInfoDto>> GetLoanApplicationByApplicationId(int loanApplicationId)
         {
             var result = await _getLoadApplicationByIdService.Execute(loanApplicationId);

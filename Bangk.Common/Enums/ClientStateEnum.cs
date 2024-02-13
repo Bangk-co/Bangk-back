@@ -43,7 +43,10 @@ namespace Bangk.Common.Enums
 
         BankStatement,
         [Description("Póliza # ")]
-        InsurancePolicy
+        InsurancePolicy,
+        [Description("Carta de endoso")]
+        EndorsementLetters
+
 
 
     }
