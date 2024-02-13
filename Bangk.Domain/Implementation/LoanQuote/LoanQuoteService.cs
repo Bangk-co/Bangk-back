@@ -22,25 +22,25 @@ namespace Bangk.Domain.Implementation.LoanQuote
         private readonly IConfiguration _configuration;
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IClientRepository _clientRepository;
-        private readonly ISettingRepository _settingRepository;
+        
 
         public LoanQuoteService(ILoanQuoteRepository loanQuoteRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IConfiguration configuration,
-            ILoanApplicationRepository LoanApplicationRepository, IClientRepository clientRepository, ISettingRepository settingRepository )
+            ILoanApplicationRepository LoanApplicationRepository, IClientRepository clientRepository )
         {
             _loanQuoteRepository = loanQuoteRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _configuration = configuration;
             _loanApplicationRepository = LoanApplicationRepository;
             _clientRepository = clientRepository;
-            _settingRepository = settingRepository;
+           
         }
 
-        public async Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee)
+        public async Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string insuranceName)
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
 
-            //var insurance = _settingRepository.GetById(insuranceId);
+            
             var loanQuote = new Repositories.Entities.LoanQuote
             {
                 InsuranceId = insuranceId,
@@ -56,7 +56,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
             var loanApplicationStatusHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
                 LoanApplicationId = loanApplicationId,
-                Observations = $"Cotizado enviada",
+                Observations = $"Cotizado con {insuranceName}",
                 StateId = (int)ApplicationStateHistoryEnum.CotizacionEnviada
 
             };
