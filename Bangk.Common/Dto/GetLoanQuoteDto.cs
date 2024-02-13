@@ -9,5 +9,6 @@
         public long YearlyFee { get; set;}
         public string ClientName { get; set;}
         public string ClientLastName { get; set;}
+        public long? MonthlyCostInsurance { get; set; }
     }
 }

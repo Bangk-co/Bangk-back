@@ -32,7 +32,8 @@ namespace Bangk.Repositories.Repositories
                             InsuraceCurrierName = insu.Name,
                             LoanBalance = l.LoanBalance,
                             LoanTypeName = type.Name,
-                            YearlyFee = lq.YearlyFee
+                            YearlyFee = lq.YearlyFee,
+                            MonthlyCostInsurance = l.MonthlyCostInsurance
                         };
             return await query.FirstOrDefaultAsync();
         }
