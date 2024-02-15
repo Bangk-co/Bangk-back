@@ -1,15 +1,9 @@
 ﻿using Bangk.Business.Extension.SenderGrid;
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
-using Bangk.Common.Utils;
 using Bangk.Domain.Contract.LoanQuote;
-using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -22,17 +16,15 @@ namespace Bangk.Domain.Implementation.LoanQuote
         private readonly IConfiguration _configuration;
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IClientRepository _clientRepository;
-        
 
         public LoanQuoteService(ILoanQuoteRepository loanQuoteRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IConfiguration configuration,
-            ILoanApplicationRepository LoanApplicationRepository, IClientRepository clientRepository )
+            ILoanApplicationRepository LoanApplicationRepository, IClientRepository clientRepository)
         {
             _loanQuoteRepository = loanQuoteRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _configuration = configuration;
             _loanApplicationRepository = LoanApplicationRepository;
             _clientRepository = clientRepository;
-           
         }
 
         public async Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string insuranceName)

@@ -46,8 +46,10 @@ namespace Bangk.Common.Enums
         InsurancePolicy,
         [Description("Carta de endoso")]
         EndorsementLetters
+    }
 
-
-
+    public enum SMLVEnum
+    {
+        SMLV = 124
     }
 }

@@ -5,6 +5,7 @@ using Bangk.Domain.Contract.Files;
 using Bangk.Repositories.Repositories;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -20,9 +21,11 @@ namespace Bangk.Domain.Implementation.Client
         private readonly IUserRepository _userRepository;
         private readonly ILoanApplicationDocumentRepository _loanApplicationDocumentRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
+        private readonly ISettingRepository _settingRepository;
+
         public CreateClientService(IClientRepository repository, IValidator<CreateClientDto> createClientValidator, IUploadFileService uploadFileService, 
             IConfiguration configuration, ILoanApplicationRepository loanApplicationRepository, ILoanApplicationDocumentRepository loanApplicationDocumentRepository, 
-            IUserRepository userRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
+            IUserRepository userRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, ISettingRepository settingRepository)
         {
             _clientRepository = repository;
             _createClientValidator = createClientValidator;
@@ -32,6 +35,7 @@ namespace Bangk.Domain.Implementation.Client
             _loanApplicationDocumentRepository = loanApplicationDocumentRepository;
             _userRepository = userRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
+            _settingRepository = settingRepository;
         }
 
         public async Task<ResponseDto<int>> Execute(CreateClientDto createClientDto)
@@ -107,6 +111,15 @@ namespace Bangk.Domain.Implementation.Client
                 Observations = string.Empty,
                 StateId = (int)ApplicationStateHistoryEnum.SolicitudCreada,
             };
+
+
+            var smlv = int.Parse((await _settingRepository.GetById((int)SMLVEnum.SMLV)).Code);
+
+            var smlvNumber = createClientDto.LoadAplicacionDto.LoanBalance / smlv;
+            if(smlvNumber > 135)
+            {
+                loadApplicationStateHistory.Observations = "Valor del préstamo supera los 135 SMMLV";
+            }
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
             result.Result = client.Id;

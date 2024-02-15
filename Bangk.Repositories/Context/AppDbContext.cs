@@ -12,6 +12,7 @@ namespace Bangk.Repositories.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Log>().Ignore(_ => _.CreationDate);
+            modelBuilder.Entity<Setting>().Ignore(_ => _.CreationDate); 
             base.OnModelCreating(modelBuilder);
         }
         
