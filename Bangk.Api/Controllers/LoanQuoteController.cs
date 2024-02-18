@@ -10,12 +10,14 @@ namespace Bangk.Api.Controllers
         private readonly ILoanQuoteService _loanQuoteService;
         private readonly IGetLoanQuoteInfoByLoanApplicationIdService _getLoanQuoteInfoByLoanApplicationIdService;
         private readonly IAcceptLoanQuoteService _acceptLoanQuoteService;
+        private readonly IRejectLoanQuoteService _rejectLoanQuoteService;
         public LoanQuoteController(ILoanQuoteService loanQuoteService, IGetLoanQuoteInfoByLoanApplicationIdService getLoanQuoteInfoByLoanApplicationIdService,
-            IAcceptLoanQuoteService acceptLoanQuoteService)
+            IAcceptLoanQuoteService acceptLoanQuoteService, IRejectLoanQuoteService rejectLoanQuoteService)
         {
             _loanQuoteService = loanQuoteService;
             _getLoanQuoteInfoByLoanApplicationIdService = getLoanQuoteInfoByLoanApplicationIdService;
             _acceptLoanQuoteService = acceptLoanQuoteService;
+            _rejectLoanQuoteService = rejectLoanQuoteService;
         }
 
         [HttpPost("CreateLoanQuote")]
@@ -45,6 +47,14 @@ namespace Bangk.Api.Controllers
         public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId)
         {
             var result = await _acceptLoanQuoteService.Execute(loanApplicationId);
+            return Ok(result);
+        }
+
+        [HttpPost("RejectLoanQuote")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId, string observations)
+        {
+            var result = await _rejectLoanQuoteService.Execute(loanApplicationId, observations);
             return Ok(result);
         }
     }
