@@ -16,4 +16,11 @@ namespace Bangk.Common.Dto
         public string Url { get; set; }
 
     }
+
+    public class DownloadDocumentDto
+    {
+        public int DocumentId { get; set; }
+        public string Url { get; set; }
+
+    }
 }

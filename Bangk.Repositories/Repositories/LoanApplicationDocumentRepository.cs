@@ -5,6 +5,7 @@ using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using EnumsNET;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -60,6 +61,14 @@ namespace Bangk.Repositories.Repositories
             };
 
             return clientDto;
+        }
+
+        public async Task<DownloadDocumentDto> GetBlobUrlForDocument(int documentId)
+        {
+            return await Context.LoanApplicationDocument
+                .Where(d => d.Id == documentId)
+                .Select(d => new DownloadDocumentDto { DocumentId = d.Id, Url = d.Url })
+                .FirstOrDefaultAsync();
         }
     }
 }

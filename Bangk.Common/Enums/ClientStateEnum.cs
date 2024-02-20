@@ -11,7 +11,8 @@ namespace Bangk.Common.Enums
     {
         Potencial = 109,
         Prospecto = 110,
-        Activo = 111
+        Activo = 111,
+        Inactivo = 116
     }
 
     public enum ApplicationStateHistoryEnum
@@ -20,19 +21,19 @@ namespace Bangk.Common.Enums
         RevisionDeExtracto = 120,
         CotizacionEnviada = 121,
         CotizaciónAceptada = 123,
-        FormulariosDiligenciados = 124,
-        EstudioSarlaft = 125,
-        EstudioListaRestrictivaSBS = 126,
-        PolizaEmitida = 127,
-        PolizaPagada = 128,
-        CartaDeEndosoRealizada = 129,
-        EndosoAceptada = 130,
-        ProximoARenovar = 131,
-        Renovado = 132,
-        Vencido = 133,
-        RechazadoPorLaAseguradora = 134,
-        CotizaciónRechazada = 135,
-        CotizaciónNoRespondida = 136
+        FormulariosDiligenciados = 125,
+        EstudioSarlaft = 126,
+        EstudioListaRestrictivaSBS = 127,
+        PolizaEmitida = 128,
+        PolizaPagada = 129,
+        CartaDeEndosoRealizada = 130,
+        EndosoAceptada = 131,
+        ProximoARenovar = 132,
+        Renovado = 133,
+        Vencido = 134,
+        RechazadoPorLaAseguradora = 135,
+        CotizaciónRechazada = 136,
+        CotizaciónNoRespondida = 137
 
 
     }
