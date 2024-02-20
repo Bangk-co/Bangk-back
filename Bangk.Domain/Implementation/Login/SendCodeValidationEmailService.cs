@@ -43,7 +43,7 @@ namespace Bangk.Domain.Implementation.Login
             if (client)
             {
                 result.HasErrors = true;
-                result.Errors.Add($"El client ingresado ya existe");
+                result.Errors.Add($"El cliente ingresado ya existe");
                 return result;
             }
 

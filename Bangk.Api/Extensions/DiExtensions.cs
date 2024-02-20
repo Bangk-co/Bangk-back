@@ -79,6 +79,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetLoanQuoteInfoByLoanApplicationIdService, GetLoanQuoteInfoByLoanApplicationIdService>();
             services.AddTransient<IAcceptLoanQuoteService, AcceptLoanQuoteService>();
             services.AddTransient<IGetDownloadDocumentService, GetDownloandDocumentService>();
+            services.AddTransient<IRejectLoanQuoteService, RejectLoanQuoteService>(); 
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

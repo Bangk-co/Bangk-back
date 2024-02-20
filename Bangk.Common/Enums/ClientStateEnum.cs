@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Bangk.Common.Enums
 {
@@ -13,6 +8,7 @@ namespace Bangk.Common.Enums
         Prospecto = 110,
         Activo = 111,
         Inactivo = 116
+        PerdidoRechazo = 138
     }
 
     public enum ApplicationStateHistoryEnum
@@ -34,7 +30,6 @@ namespace Bangk.Common.Enums
         RechazadoPorLaAseguradora = 135,
         CotizaciónRechazada = 136,
         CotizaciónNoRespondida = 137
-
 
     }
 
