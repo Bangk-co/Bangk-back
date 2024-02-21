@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.LoanApplicationDocument
 {
-    public class GetDownloandDocumentService: IGetDownloadDocumentService
+    public class GetDownloadDocumentService: IGetDownloadDocumentService
     {
         private readonly ILoanApplicationDocumentRepository _loanApplicationDocuementRepository;
-        public GetDownloandDocumentService(ILoanApplicationDocumentRepository loanApplicationDocumentRepository)
+        public GetDownloadDocumentService(ILoanApplicationDocumentRepository loanApplicationDocumentRepository)
         {
             _loanApplicationDocuementRepository = loanApplicationDocumentRepository;
         }

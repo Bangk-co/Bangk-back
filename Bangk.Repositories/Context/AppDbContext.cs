@@ -12,10 +12,10 @@ namespace Bangk.Repositories.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Log>().Ignore(_ => _.CreationDate);
-            modelBuilder.Entity<Setting>().Ignore(_ => _.CreationDate); 
+            modelBuilder.Entity<Setting>().Ignore(_ => _.CreationDate);
             base.OnModelCreating(modelBuilder);
         }
-        
+
         public DbSet<Log> Logs { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -26,6 +26,7 @@ namespace Bangk.Repositories.Context
         public DbSet<LoanApplicationDocument> LoanApplicationDocument { get; set; }
         public DbSet<LoanApplicationStateHistory> LoanApplicationStateHistory { get; set; }
         public DbSet<LoanQuote> LoanQuote { get; set; }
+        public DbSet<LoanInsurancePolicy> LoanInsurancePolicy { get; set; }
 
     }
 }

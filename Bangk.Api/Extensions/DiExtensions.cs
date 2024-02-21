@@ -51,7 +51,7 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ILoanApplicationDocumentRepository, LoanApplicationDocumentRepository>();
             services.AddScoped<ILoanApplicationStateHistoryRepository, LoanApplicationStateHistoryRepository>();
             services.AddScoped<ILoanQuoteRepository, LoanQuoteRepository>();
-
+            services.AddScoped<ILoanInsurancePolicyRepository, LoanInsurancePolicyRepository>(); 
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -78,9 +78,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanQuoteService, LoanQuoteService>();
             services.AddTransient<IGetLoanQuoteInfoByLoanApplicationIdService, GetLoanQuoteInfoByLoanApplicationIdService>();
             services.AddTransient<IAcceptLoanQuoteService, AcceptLoanQuoteService>();
-            services.AddTransient<IGetDownloadDocumentService, GetDownloandDocumentService>();
+            services.AddTransient<IGetDownloadDocumentService, GetDownloadDocumentService>();
             services.AddTransient<IRejectLoanQuoteService, RejectLoanQuoteService>(); 
-
+            services.AddTransient<IGetAllLoanInsurancePolicyByLoanApplicationIdService, GetAllLoanInsurancePolicyByLoanApplicationIdService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
