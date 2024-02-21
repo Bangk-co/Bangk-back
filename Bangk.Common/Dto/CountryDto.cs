@@ -11,4 +11,10 @@ namespace Bangk.Common.Dto
         public int Id { get; set; }
         public string Name { get; set; }
     }
+
+    public class NationalityDto
+    {
+        public int Id { get; set; }
+        public string Nationality { get; set; }
+    }
 }
