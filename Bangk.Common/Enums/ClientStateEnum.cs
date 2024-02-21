@@ -7,7 +7,7 @@ namespace Bangk.Common.Enums
         Potencial = 109,
         Prospecto = 110,
         Activo = 111,
-        Inactivo = 116
+        Inactivo = 116,
         PerdidoRechazo = 138
     }
 
