@@ -63,6 +63,9 @@ namespace Bangk.Domain.Implementation.Client
                 return result;
             }
 
+            var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
+            var identificationFileUrl = file.Result;
+
             var client = new Repositories.Entities.Client()
             {
                 Email = createClientDto.Email,
@@ -76,12 +79,12 @@ namespace Bangk.Domain.Implementation.Client
                 PhoneNumber = createClientDto.PhoneNumber,
                 PermissionTreatPersonalDataDate = createClientDto.PermissionTreatPersonalDataDate,
                 State = (int)ClientStateEnum.Potencial,
+                IdentificationFileUrl = identificationFileUrl
             };
 
-            var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
-            client.IdentificationFileUrl = file.Result;
             await _clientRepository.Create(client);
             var user = await _userRepository.GetUserWithLessApplication();
+
 
             var loanApplication = new Repositories.Entities.LoanApplication
             {
@@ -94,6 +97,18 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanApplicationRepository.Create(loanApplication);
+
+
+            var identificationDocument = new Repositories.Entities.LoanApplicationDocument
+            {
+                LoanApplicationId = loanApplication.Id,
+                Name = createClientDto.IdentificationFile.FileName,  
+                DocumentType = (int)DocumentType.Identification,  
+                Url = identificationFileUrl  
+            };
+
+            await _loanApplicationDocumentRepository.Create(identificationDocument);
+
 
             file = await _uploadFileService.Execute(createClientDto.LoadAplicacionDto.BankStatementFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
             var loanApplicationDocument = new Repositories.Entities.LoanApplicationDocument
