@@ -19,6 +19,7 @@ namespace Bangk.Repositories.Entities
         public virtual ICollection<LoanApplication> LoanApplications { get; set; }
         public DateTime? DocumentIssueDate {  get; set; }
         public int State {  get; set; }
+        public virtual ICollection<LoanApplicationDocument> LoanApplicationDocument { get; set; }
 
     }
 }

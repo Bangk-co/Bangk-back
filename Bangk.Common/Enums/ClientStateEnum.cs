@@ -38,13 +38,12 @@ namespace Bangk.Common.Enums
         [Description("Extractos bancarios")]
 
         BankStatement,
-        [Description("Cedula")]
-
-        Identification,
         [Description("Póliza # ")]
         InsurancePolicy,
         [Description("Carta de endoso")]
-        EndorsementLetters
+        EndorsementLetters,
+        [Description("Cedula")]
+        Identification
     }
 
     public enum SMLVEnum

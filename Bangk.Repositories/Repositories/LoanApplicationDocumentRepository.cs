@@ -21,12 +21,14 @@ namespace Bangk.Repositories.Repositories
         public async Task<ClientDocumentDto> GetClientDocumentByClientId(int clientId)
         {
             var clientInfoQuery = from c in Context.Clients
+                                  join l in Context.LoanApplication on c.Id equals l.ClientId
+                                  join ld in Context.LoanApplicationDocument on l.Id equals ld.LoanApplicationId
                                   where c.Id == clientId
                                   select new
                                   {
                                       ClientId = c.Id,
                                       CreateIdentificationDate = c.CreationDate,
-                                      IdentificationUrl = c.IdentificationFileUrl,
+                                      DocumentId = ld.Id,
                                       LoanApplications = c.LoanApplications.Select(s => new
                                       {
                                           LoanApplicationId = s.Id,
@@ -57,7 +59,7 @@ namespace Bangk.Repositories.Repositories
             {
                 ClientId = clientInfo.ClientId,
                 CreateIdentificationDate = clientInfo.CreateIdentificationDate,
-                IdentificationUrl = clientInfo.IdentificationUrl,
+                DocumentId = clientInfo.DocumentId,
                 ClientDocumentListDtos = clientDocumentDtos.ToList()
             };
 
