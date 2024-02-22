@@ -3,6 +3,7 @@ using Bangk.Common.Validators;
 using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
+using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.LoanApplication;
@@ -14,6 +15,7 @@ using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
 using Bangk.Domain.Implementation.Client;
+using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.LoanApplication;
@@ -51,7 +53,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ILoanApplicationDocumentRepository, LoanApplicationDocumentRepository>();
             services.AddScoped<ILoanApplicationStateHistoryRepository, LoanApplicationStateHistoryRepository>();
             services.AddScoped<ILoanQuoteRepository, LoanQuoteRepository>();
-            services.AddScoped<ILoanInsurancePolicyRepository, LoanInsurancePolicyRepository>(); 
+            services.AddScoped<ILoanInsurancePolicyRepository, LoanInsurancePolicyRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -81,6 +84,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetDownloadDocumentService, GetDownloadDocumentService>();
             services.AddTransient<IRejectLoanQuoteService, RejectLoanQuoteService>(); 
             services.AddTransient<IGetAllLoanInsurancePolicyByLoanApplicationIdService, GetAllLoanInsurancePolicyByLoanApplicationIdService>();
+            services.AddTransient<IGetCountryService, GetCountryService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
