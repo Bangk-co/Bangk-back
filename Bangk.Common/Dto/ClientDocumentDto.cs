@@ -1,7 +1,5 @@
-﻿using Bangk.Common.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Bangk.Common.Dto
 {
@@ -22,7 +20,7 @@ namespace Bangk.Common.Dto
 
     public class DocumentByTypeDto
     {
-        public string DocumentUrl { get; set; }
+        public int DocumentId { get; set; }
         public string DocumentName  { get; set; }
         public DateTime CreateDocumentDate { get; set; }
     }

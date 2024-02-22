@@ -7,6 +7,7 @@ using EnumsNET;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
@@ -31,9 +32,9 @@ namespace Bangk.Repositories.Repositories
                                           LoanApplicationId = s.Id,
                                           LoanApplicationDocuments = s.LoanApplicationDocuments.Select(d => new
                                           {
+                                              d.Id,
                                               d.DocumentType,
-                                              d.CreationDate,
-                                              d.Url
+                                              d.CreationDate
                                           })
                                       })
                                   };
@@ -46,8 +47,8 @@ namespace Bangk.Repositories.Repositories
                     DocumentType = g.Key,
                     DocumentByTypeDtos = g.Select(doc => new DocumentByTypeDto
                     {
+                        DocumentId = doc.Id,
                         CreateDocumentDate = doc.CreationDate,
-                        DocumentUrl = doc.Url,
                         DocumentName = $"{((DocumentType)doc.DocumentType).AsString(EnumFormat.Description) } Solicitud {s.LoanApplicationId}"
                     }).ToList()
                 }));
