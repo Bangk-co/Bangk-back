@@ -11,9 +11,11 @@ namespace Bangk.Api.Controllers
     public class CountryController: BaseController
     {
         private readonly IGetCountryService _getCountryService;
-        public CountryController(IGetCountryService getCountryService )
+        private readonly IGetNationalityService _getNationalityService;
+        public CountryController(IGetCountryService getCountryService, IGetNationalityService getNationalityService )
         {
             _getCountryService = getCountryService;
+            _getNationalityService = getNationalityService;
         }
 
         [HttpGet("GetCountriesList")]
@@ -38,5 +40,33 @@ namespace Bangk.Api.Controllers
                 Countries = result
             });
         }
+
+
+
+        [HttpGet("GetNationalityList")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<NationalityDto>>> GetNationalityList()
+        {
+            var result = await _getNationalityService.Execute();
+            if (result.Count == 0)
+            {
+                var error = new ResponseDto<bool>
+                {
+                    HasErrors = true,
+                    Result = false
+                };
+
+                error.Errors.Add("La lista no existe.");
+                return BadRequest(error);
+            }
+
+            return Ok(new
+            {
+                Countries = result
+            });
+        }
+
+
+
     }
 }

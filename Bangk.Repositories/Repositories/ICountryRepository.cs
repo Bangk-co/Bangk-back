@@ -12,5 +12,7 @@ namespace Bangk.Repositories.Repositories
     public interface ICountryRepository: IGenericRepository<Country, CountryDto>
     {
         Task<List<CountryDto>> GetCountries();
+
+        Task<List<NationalityDto>> GetNationality();
     }
 }

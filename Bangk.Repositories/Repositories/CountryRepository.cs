@@ -26,5 +26,16 @@ namespace Bangk.Repositories.Repositories
                 Name = c.Name
             }).OrderBy(x => x.Name).ToListAsync();
         }
+
+        public async Task<List<NationalityDto>> GetNationality()
+        {
+            return await Context.Countries.Select(c => new NationalityDto
+            {
+                Id = c.Id,
+                Nationality = c.Nationality
+            }).OrderBy(x => x.Nationality).ToListAsync();
+        }
+
+
     }
 }
