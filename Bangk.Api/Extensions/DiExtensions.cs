@@ -1,6 +1,7 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Validators;
 using Bangk.Domain.Contract;
+using Bangk.Domain.Contract.City;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Country;
@@ -12,8 +13,10 @@ using Bangk.Domain.Contract.LoanApplicationStateHistory;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Settings;
+using Bangk.Domain.Contract.State;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
+using Bangk.Domain.Implementation.City;
 using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
@@ -24,6 +27,7 @@ using Bangk.Domain.Implementation.LoanApplicationStateHistory;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
 using Bangk.Domain.Implementation.Settings;
+using Bangk.Domain.Implementation.State;
 using Bangk.Domain.Implementation.Users;
 using Bangk.Repositories.Repositories;
 using FluentValidation;
@@ -55,6 +59,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ILoanQuoteRepository, LoanQuoteRepository>();
             services.AddScoped<ILoanInsurancePolicyRepository, LoanInsurancePolicyRepository>();
             services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IStateRepository, StateRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -86,6 +92,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetAllLoanInsurancePolicyByLoanApplicationIdService, GetAllLoanInsurancePolicyByLoanApplicationIdService>();
             services.AddTransient<IGetCountryService, GetCountryService>();
             services.AddTransient<IGetNationalityService, GetNationalityService>();
+            services.AddTransient<IGetStatesService, GetStatesService>();
+            services.AddTransient<IGetCityService, GetCityService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
