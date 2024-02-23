@@ -8,7 +8,7 @@ namespace Bangk.Common.Dto
         public int ClientId { get; set; }
         public string IdentificationName { get; } = "Cédula";
         public DateTime CreateIdentificationDate { get; set; }
-        public int DocumentId { get; set; }
+        public int DocumentIdentificationId { get; set; }
         public List<ClientDocumentListDto> ClientDocumentListDtos { get; set; }
     }
 

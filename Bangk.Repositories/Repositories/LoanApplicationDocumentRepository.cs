@@ -28,11 +28,11 @@ namespace Bangk.Repositories.Repositories
                                   {
                                       ClientId = c.Id,
                                       CreateIdentificationDate = c.CreationDate,
-                                      DocumentId = ld.Id,
+                                      DocumentIdentificationId = ld.Id,
                                       LoanApplications = c.LoanApplications.Select(s => new
                                       {
                                           LoanApplicationId = s.Id,
-                                          LoanApplicationDocuments = s.LoanApplicationDocuments.Select(d => new
+                                          LoanApplicationDocuments = s.LoanApplicationDocuments.Where(d => d.DocumentType != (int)DocumentType.Identification).Select(d => new
                                           {
                                               d.Id,
                                               d.DocumentType,
@@ -59,7 +59,7 @@ namespace Bangk.Repositories.Repositories
             {
                 ClientId = clientInfo.ClientId,
                 CreateIdentificationDate = clientInfo.CreateIdentificationDate,
-                DocumentId = clientInfo.DocumentId,
+                DocumentIdentificationId = clientInfo.DocumentIdentificationId,
                 ClientDocumentListDtos = clientDocumentDtos.ToList()
             };
 
