@@ -23,7 +23,7 @@ namespace Bangk.Repositories.Repositories
             var clientInfoQuery = from c in Context.Clients
                                   join l in Context.LoanApplication on c.Id equals l.ClientId
                                   join ld in Context.LoanApplicationDocument on l.Id equals ld.LoanApplicationId
-                                  where c.Id == clientId
+                                  where c.Id == clientId && ld.DocumentType == (int)DocumentType.Identification
                                   select new
                                   {
                                       ClientId = c.Id,
