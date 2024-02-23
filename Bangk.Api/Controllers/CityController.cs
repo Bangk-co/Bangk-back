@@ -48,7 +48,7 @@ namespace Bangk.Api.Controllers
 
             return Ok(new
             {
-                States = result
+                Cities = result
             });
         }
     }
