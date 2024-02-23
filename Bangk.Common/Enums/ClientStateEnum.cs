@@ -41,7 +41,9 @@ namespace Bangk.Common.Enums
         [Description("Póliza # ")]
         InsurancePolicy,
         [Description("Carta de endoso")]
-        EndorsementLetters
+        EndorsementLetters,
+        [Description("Cedula")]
+        Identification
     }
 
     public enum SMLVEnum
