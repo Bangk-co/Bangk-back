@@ -7,7 +7,7 @@ namespace Bangk.Common.Dto
         public int LoanApplicationId { get; set; }
         public int? HousingTypeId { get; set; }
         public long? HousingValue { get; set; }
-        public DateTime BuiltgDate { get; set; }
+        public DateTime? BuiltgDate { get; set; }
         public int? BuiltArea { get; set; }
         public string Address { get; set; }
         public int? CityId { get; set; }
