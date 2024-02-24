@@ -10,6 +10,7 @@ using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
+using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Settings;

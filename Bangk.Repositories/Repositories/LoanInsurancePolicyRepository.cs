@@ -64,5 +64,11 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<LoanInsurancePolicy> GetLoanInsurancePolicyByLoadApplicationId(int loanApplicationId)
+        {
+            var query = Context.LoanInsurancePolicy.Where(l => l.LoanApplicationId  == loanApplicationId);
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

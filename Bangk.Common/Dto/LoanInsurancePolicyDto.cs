@@ -8,27 +8,27 @@ namespace Bangk.Common.Dto
 {
     public class LoanInsurancePolicyDto
     {
-        public int LoanApplicationId { get; set; }
-        public int HousingTypeId { get; set; }
-        public long HousingValue { get; set; }
+        public int? LoanApplicationId { get; set; }
+        public int? HousingTypeId { get; set; }
+        public long? HousingValue { get; set; }
         public DateTime BuiltgDate { get; set; }
-        public int BuiltArea { get; set; }
+        public int? BuiltArea { get; set; }
         public string Address { get; set; }
-        public int CityId { get; set; }
-        public int BirthCityId { get; set; }
-        public int CountryNationalityId { get; set; }
-        public int NumberChildren { get; set; }
-        public int CivilStatusId { get; set; }
+        public int? CityId { get; set; }
+        public int? BirthCityId { get; set; }
+        public int? CountryNationalityId { get; set; }
+        public int? NumberChildren { get; set; }
+        public int? CivilStatusId { get; set; }
         public string Occupation { get; set; }
-        public int OccupationActivityId { get; set; }
+        public int? OccupationActivityId { get; set; }
         public bool IsPublicPerson { get; set; }
-        public int ResidenceCityId { get; set; }
-        public long MonthlyIncome { get; set; }
-        public long MonthlyExpenses { get; set; }
-        public long AssetValue { get; set; }
-        public long LiabilitiesValue { get; set; }
-        public int Weight { get; set; }
-        public int Height { get; set; }
+        public int? ResidenceCityId { get; set; }
+        public long? MonthlyIncome { get; set; }
+        public long? MonthlyExpenses { get; set; }
+        public long? AssetValue { get; set; }
+        public long? LiabilitiesValue { get; set; }
+        public int? Weight { get; set; }
+        public int? Height { get; set; }
         public bool HIVActive { get; set; }
         public bool PlannedMedicalProcidure { get; set; }
         public bool Disability { get; set; }

@@ -63,9 +63,6 @@ namespace Bangk.Domain.Implementation.Client
                 return result;
             }
 
-            var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
-            var identificationFileUrl = file.Result;
-
             var client = new Repositories.Entities.Client()
             {
                 Email = createClientDto.Email,
@@ -79,13 +76,10 @@ namespace Bangk.Domain.Implementation.Client
                 PhoneNumber = createClientDto.PhoneNumber,
                 PermissionTreatPersonalDataDate = createClientDto.PermissionTreatPersonalDataDate,
                 State = (int)ClientStateEnum.Potencial,
-                IdentificationFileUrl = identificationFileUrl
             };
 
             await _clientRepository.Create(client);
             var user = await _userRepository.GetUserWithLessApplication();
-
-
             var loanApplication = new Repositories.Entities.LoanApplication
             {
                 ClientId = client.Id,
@@ -97,8 +91,8 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanApplicationRepository.Create(loanApplication);
-
-
+            var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
+            var identificationFileUrl = file.Result;
             var identificationDocument = new Repositories.Entities.LoanApplicationDocument
             {
                 LoanApplicationId = loanApplication.Id,
@@ -108,8 +102,6 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanApplicationDocumentRepository.Create(identificationDocument);
-
-
             file = await _uploadFileService.Execute(createClientDto.LoadAplicacionDto.BankStatementFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
             var loanApplicationDocument = new Repositories.Entities.LoanApplicationDocument
             {
@@ -129,7 +121,6 @@ namespace Bangk.Domain.Implementation.Client
 
 
             var smlv = int.Parse((await _settingRepository.GetById((int)SMLVEnum.SMLV)).Code);
-
             var smlvNumber = createClientDto.LoadAplicacionDto.LoanBalance / smlv;
             if(smlvNumber > 135)
             {
