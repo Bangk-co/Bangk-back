@@ -9,6 +9,7 @@ using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
+using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Settings;
@@ -86,6 +87,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetAllLoanInsurancePolicyByLoanApplicationIdService, GetAllLoanInsurancePolicyByLoanApplicationIdService>();
             services.AddTransient<IGetCountryService, GetCountryService>();
             services.AddTransient<IGetNationalityService, GetNationalityService>();
+            services.AddTransient<ICreateLoanInsurancePolicyService, CreateLoanInsurancePolicyService>();
+
+            
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

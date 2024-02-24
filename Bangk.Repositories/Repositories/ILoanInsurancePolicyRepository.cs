@@ -8,5 +8,6 @@ namespace Bangk.Repositories.Repositories
     public interface ILoanInsurancePolicyRepository : IGenericRepository<LoanInsurancePolicy, LoanInsurancePolicyDto>
     {
         Task<LoanInsurancePolicyDto> GetAllLoanInsurancePolicyByLoanApplicationId(int loanApplicationId);
+        Task<LoanInsurancePolicy> GetLoanInsurancePolicyByLoadApplicationId(int loanApplicationId);
     }
 }
