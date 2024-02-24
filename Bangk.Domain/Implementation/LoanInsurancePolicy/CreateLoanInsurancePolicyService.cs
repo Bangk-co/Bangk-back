@@ -53,8 +53,18 @@ namespace Bangk.Domain.Implementation.Client
                     PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure,
                     ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId,
                     Weight = loanInsurancePolicySaveDto.Weight,
-                    LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId
-
+                    LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
+                    ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber,
+                    BasementNumber = loanInsurancePolicySaveDto.BasementNumber,
+                    IncomeOrigin = loanInsurancePolicySaveDto.IncomeOrigin,
+                    BuildingFloorsNumber = loanInsurancePolicySaveDto.BuildingFloorsNumber,
+                    BeneficiaryIdentificationNumber = loanInsurancePolicySaveDto.BeneficiaryIdentificationNumber,
+                    BeneficiaryIdentificationTypeId = loanInsurancePolicySaveDto.BeneficiaryIdentificationTypeId,
+                    BeneficiaryName = loanInsurancePolicySaveDto.BeneficiaryName,
+                    DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo,
+                    Diseases = loanInsurancePolicySaveDto.Diseases,
+                    DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo,
+                    PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo
                 };
 
                 await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
@@ -87,6 +97,19 @@ namespace Bangk.Domain.Implementation.Client
                 loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
                 loanInsurencePolicy.ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId;
                 loanInsurencePolicy.Weight = loanInsurancePolicySaveDto.Weight;
+                loanInsurencePolicy.ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber;
+                loanInsurencePolicy.BasementNumber = loanInsurancePolicySaveDto.BasementNumber;
+                loanInsurencePolicy.IncomeOrigin = loanInsurancePolicySaveDto.IncomeOrigin;
+                loanInsurencePolicy.BuildingFloorsNumber = loanInsurancePolicySaveDto.BuildingFloorsNumber;
+                loanInsurencePolicy.BeneficiaryIdentificationNumber = loanInsurancePolicySaveDto.BeneficiaryIdentificationNumber;
+                loanInsurencePolicy.BeneficiaryIdentificationTypeId = loanInsurancePolicySaveDto.BeneficiaryIdentificationTypeId;
+                loanInsurencePolicy.BeneficiaryName = loanInsurancePolicySaveDto.BeneficiaryName;
+                loanInsurencePolicy.DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
+                loanInsurencePolicy.Diseases = loanInsurancePolicySaveDto.Diseases;
+                loanInsurencePolicy.DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo;
+                loanInsurencePolicy.PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
+
+
                 await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             }
 

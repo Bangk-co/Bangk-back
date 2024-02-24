@@ -31,5 +31,16 @@ namespace Bangk.Repositories.Entities
         public bool LifeEnsure { get; set; }
         public bool Convicted { get; set; }
         public bool Beneficiaries { get; set; }
+        public string IncomeOrigin { get; set; }
+        public int? BasementNumber { get; set; }
+        public int? ApartmentNumber { get; set; }
+        public int? BuildingFloorsNumber { get; set; }
+        public string Diseases { get; set; }
+        public string DiseasesMoreInfo { get; set; }
+        public string PlannedMedicalProcidureMoreInfo { get; set; }
+        public string  DisabilityMoreInfo { get; set; }
+        public string  BeneficiaryName { get; set; }
+        public int? BeneficiaryIdentificationTypeId { get; set; }
+        public string BeneficiaryIdentificationNumber { get; set; }
     }
 }

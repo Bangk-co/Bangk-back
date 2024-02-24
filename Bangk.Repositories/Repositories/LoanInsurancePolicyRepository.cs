@@ -58,8 +58,18 @@ namespace Bangk.Repositories.Repositories
                             PhoneNumber = c.PhoneNumber,
                             PlannedMedicalProcidure = lp.PlannedMedicalProcidure,
                             ResidenceCityId = lp.ResidenceCityId,
-                            Weight = lp.Weight
-
+                            Weight = lp.Weight,
+                            ApartmentNumber = lp.ApartmentNumber,
+                            BasementNumber = lp.BasementNumber,
+                            BuildingFloorsNumber = lp.BuildingFloorsNumber,
+                            IncomeOrigin = lp.IncomeOrigin,
+                            BeneficiaryIdentificationNumber = lp.BeneficiaryIdentificationNumber,
+                            BeneficiaryIdentificationTypeId = lp.BeneficiaryIdentificationTypeId,
+                            BeneficiaryName = lp.BeneficiaryName,
+                            DisabilityMoreInfo = lp.DisabilityMoreInfo,
+                            Diseases = lp.Diseases,
+                            DiseasesMoreInfo = lp.DiseasesMoreInfo,
+                            PlannedMedicalProcidureMoreInfo = lp.PlannedMedicalProcidureMoreInfo
                         };
 
             return await query.FirstOrDefaultAsync();
