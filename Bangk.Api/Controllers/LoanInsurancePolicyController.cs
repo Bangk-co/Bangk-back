@@ -26,7 +26,10 @@ namespace Bangk.Api.Controllers
         public async Task<IActionResult> GetLoanQuoteByApplicationId(int loanApplicationId)
         {
             var result = await _loanInsurancePolicyByLoanApplicationIdService.Execute(loanApplicationId);
-            return Ok(result);
+            return Ok(new
+            {
+                LoanInsurancePolicies = result
+            });
         }
 
         [HttpPost("CreateLoanInsurancePolicy")]
