@@ -11,11 +11,13 @@ namespace Bangk.Api.Controllers
     {
         private readonly IGetAllLoanInsurancePolicyByLoanApplicationIdService _loanInsurancePolicyByLoanApplicationIdService;
         private readonly ICreateLoanInsurancePolicyService _createLoanInsurancePolicyService;
+        private readonly IChangeStateLoanInsurancePolicyService _changeStateLoanInsurancePolicyService;
         public LoanInsurancePolicyController(IGetAllLoanInsurancePolicyByLoanApplicationIdService loanInsurancePolicyByLoanApplicationIdService,
-            ICreateLoanInsurancePolicyService createLoanInsurancePolicyService)
+            ICreateLoanInsurancePolicyService createLoanInsurancePolicyService, IChangeStateLoanInsurancePolicyService changeStateLoanInsurancePolicyService)
         {
             _loanInsurancePolicyByLoanApplicationIdService = loanInsurancePolicyByLoanApplicationIdService;
             _createLoanInsurancePolicyService = createLoanInsurancePolicyService;
+            _changeStateLoanInsurancePolicyService = changeStateLoanInsurancePolicyService;
         }
       
 
@@ -32,6 +34,14 @@ namespace Bangk.Api.Controllers
         public async Task<IActionResult> CreateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
         {
             var result = await _createLoanInsurancePolicyService.Execute(loanInsurancePolicySaveDto);
+            return Ok(result);
+        }
+
+        [HttpPost("ChangeStateLoanInsurancePolicy")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangeStateLoanInsurancePolicy(int loanApplicationId)
+        {
+            var result = await _changeStateLoanInsurancePolicyService.Execute(loanApplicationId);
             return Ok(result);
         }
     }

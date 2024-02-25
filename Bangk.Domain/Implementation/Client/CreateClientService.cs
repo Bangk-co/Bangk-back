@@ -119,7 +119,6 @@ namespace Bangk.Domain.Implementation.Client
                 StateId = (int)ApplicationStateHistoryEnum.SolicitudCreada,
             };
 
-
             var smlv = int.Parse((await _settingRepository.GetById((int)SMLVEnum.SMLV)).Code);
             var smlvNumber = createClientDto.LoadAplicacionDto.LoanBalance / smlv;
             if(smlvNumber > 135)
