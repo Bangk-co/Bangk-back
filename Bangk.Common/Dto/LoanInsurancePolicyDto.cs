@@ -54,5 +54,8 @@ namespace Bangk.Common.Dto
         public string BeneficiaryName { get; set; }
         public int? BeneficiaryIdentificationTypeId { get; set; }
         public string BeneficiaryIdentificationNumber { get; set; }
+        public int ClienId { get; set; }
+        public DateTime BirthDate { get; set; }
+        public int GenderId { get; set; }
     }
 }
