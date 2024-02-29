@@ -26,6 +26,8 @@ namespace Bangk.Repositories.Repositories
                         from subbc in ct.DefaultIfEmpty()
                         join rc in Context.Cities on sublp.ResidenceCityId equals rc.Id into cr
                         from subrc in cr.DefaultIfEmpty()
+                        join ic in Context.Cities on sublp.CityId equals ic.Id into ci
+                        from subic in ci.DefaultIfEmpty()
                         where l.Id == loanApplicationId
                         select new LoanInsurancePolicyDto
                         {
@@ -83,7 +85,8 @@ namespace Bangk.Repositories.Repositories
                             BirthStateId = subbc.StateId,
                             BirthCountryId = subbc.State.CountryId,
                             ResidenceCountryId = subrc.State.CountryId,
-                            ResidenceStateId = subrc.StateId
+                            ResidenceStateId = subrc.StateId,
+                            StateId = subic.StateId 
                         };
 
             return await query.FirstOrDefaultAsync();
