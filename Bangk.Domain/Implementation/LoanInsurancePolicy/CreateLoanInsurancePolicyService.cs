@@ -15,11 +15,11 @@ namespace Bangk.Domain.Implementation.Client
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
         }
 
-        public async Task<ResponseDto<bool>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
+        public async Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
         {
-            var result = new ResponseDto<bool>
+            var result = new ResponseDto<LoanInsurancePolicyDto>
             {
-                Result = true
+                Result = new LoanInsurancePolicyDto()
             };
 
             var loanInsurencePolicy = await _loanInsurancePolicyRepository.GetLoanInsurancePolicyByLoadApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
@@ -113,6 +113,7 @@ namespace Bangk.Domain.Implementation.Client
                 await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             }
 
+            result.Result = await _loanInsurancePolicyRepository.GetAllLoanInsurancePolicyByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
             return result;
         }
     }

@@ -5,6 +5,6 @@ namespace Bangk.Domain.Contract.LoanInsurancePolicy
 {
     public interface ICreateLoanInsurancePolicyService 
     {
-        Task<ResponseDto<bool>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto);
+        Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto);
     }
 }

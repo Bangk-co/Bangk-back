@@ -72,7 +72,7 @@ namespace Bangk.Api.Controllers
         }
         
         [HttpPut("UpdateClientService")]
-        [Authorize(Roles = "asesor, superAdmin")]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateClient(int clientId, ClientUpdateInfoDto updatedClient)
         {
             var result = await _updateClientService.Execute(clientId, updatedClient);

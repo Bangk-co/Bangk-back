@@ -1,7 +1,6 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
-using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using System.Threading.Tasks;
 

@@ -72,7 +72,10 @@ namespace Bangk.Repositories.Repositories
                             PlannedMedicalProcidureMoreInfo = sublp.PlannedMedicalProcidureMoreInfo,
                             ClienId = c.Id,
                             BirthDate = c.BirthDate,
-                            GenderId = c.GenderId
+                            GenderId = c.GenderId,
+                            BuildingFloorsNumber = sublp.BuildingFloorsNumber,
+                            LoanBalance = l.LoanBalance,
+                            MonthlyCostInsurance = l.MonthlyCostInsurance
                         };
 
             return await query.FirstOrDefaultAsync();
