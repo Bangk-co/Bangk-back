@@ -59,5 +59,9 @@ namespace Bangk.Common.Dto
         public int GenderId { get; set; }
         public long LoanBalance { get; set; }
         public long? MonthlyCostInsurance { get; set; }
+        public int? BirthStateId { get; set; }
+        public int? BirthCountryId { get; set; }
+        public int? ResidenceCountryId { get; set; }
+        public int? ResidenceStateId { get; set; }
     }
 }

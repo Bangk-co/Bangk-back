@@ -22,6 +22,10 @@ namespace Bangk.Repositories.Repositories
                         join c in Context.Clients on l.ClientId equals c.Id
                         join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId into t
                         from sublp in t.DefaultIfEmpty()
+                        join bc in Context.Cities on sublp.BirthCityId equals bc.Id into ct
+                        from subbc in ct.DefaultIfEmpty()
+                        join rc in Context.Cities on sublp.ResidenceCityId equals rc.Id into cr
+                        from subrc in cr.DefaultIfEmpty()
                         where l.Id == loanApplicationId
                         select new LoanInsurancePolicyDto
                         {
@@ -75,7 +79,11 @@ namespace Bangk.Repositories.Repositories
                             GenderId = c.GenderId,
                             BuildingFloorsNumber = sublp.BuildingFloorsNumber,
                             LoanBalance = l.LoanBalance,
-                            MonthlyCostInsurance = l.MonthlyCostInsurance
+                            MonthlyCostInsurance = l.MonthlyCostInsurance,
+                            BirthStateId = subbc.StateId,
+                            BirthCountryId = subbc.State.CountryId,
+                            ResidenceCountryId = subrc.State.CountryId,
+                            ResidenceStateId = subrc.StateId
                         };
 
             return await query.FirstOrDefaultAsync();
