@@ -40,12 +40,12 @@ namespace Bangk.Domain.Implementation.Client
                observation = $"Riesgo de salud presente {loanInsurencePolicy.DiseasesMoreInfo}"; 
             }
 
-            if (loanInsurencePolicy.Disability)
+            if (loanInsurencePolicy.Disability.HasValue && loanInsurencePolicy.Disability.Value)
             {
                 observation += !string.IsNullOrEmpty(observation) ?  $",Riesgo de salud presente {loanInsurencePolicy.DisabilityMoreInfo}" : $"Riesgo de salud presente {loanInsurencePolicy.DisabilityMoreInfo}";
             }
 
-            if (loanInsurencePolicy.PlannedMedicalProcidure)
+            if (loanInsurencePolicy.PlannedMedicalProcidure.HasValue && loanInsurencePolicy.PlannedMedicalProcidure.Value)
             {
                 observation += !string.IsNullOrEmpty(observation) ? $",Riesgo de salud presente {loanInsurencePolicy.PlannedMedicalProcidureMoreInfo}" : $"Riesgo de salud presente {loanInsurencePolicy.PlannedMedicalProcidureMoreInfo}";
             }
