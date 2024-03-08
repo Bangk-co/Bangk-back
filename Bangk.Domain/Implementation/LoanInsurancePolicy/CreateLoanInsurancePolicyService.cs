@@ -1,6 +1,7 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Repositories;
+using System;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Client
@@ -108,7 +109,7 @@ namespace Bangk.Domain.Implementation.Client
                 loanInsurencePolicy.Diseases = loanInsurancePolicySaveDto.Diseases;
                 loanInsurencePolicy.DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo;
                 loanInsurencePolicy.PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
-
+                loanInsurencePolicy.CreationDate = DateTime.Now;
 
                 await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             }
