@@ -14,7 +14,7 @@ namespace Bangk.Repositories.Entities
 
         [ForeignKey("Setting")]
         public int LoanTypeId { get; set; }
-        public long LoanNumber { get; set; }
+        public string LoanNumber { get; set; }
         [ForeignKey("User")]
         public int ReviewerId { get; set; }
         
