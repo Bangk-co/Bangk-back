@@ -86,7 +86,8 @@ namespace Bangk.Repositories.Repositories
                             BirthCountryId = subbc.State.CountryId,
                             ResidenceCountryId = subrc.State.CountryId,
                             ResidenceStateId = subrc.StateId,
-                            StateId = subic.StateId 
+                            StateId = subic.StateId,
+                            LoanTypeId = l.LoanTypeId
                         };
 
             return await query.FirstOrDefaultAsync();
