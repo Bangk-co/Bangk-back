@@ -45,7 +45,7 @@ namespace Bangk.Common.Validators
             RuleFor(dto => dto.BankId).GreaterThan(0).WithMessage("El banco al que pertenece el crédito es obligatorio"); ;
             RuleFor(dto => dto.LoanTypeId).GreaterThan(0).WithMessage("El tipo de crédito es obligatorio"); ;
             RuleFor(dto => dto.LoanBalance).GreaterThan(0).WithMessage("El saldo del crédito es obligatorio"); ;
-            RuleFor(dto => dto.LoanNumber).GreaterThan(0).WithMessage("El número del crédito es obligatorio"); ;
+            RuleFor(dto => dto.LoanNumber).NotEmpty().WithMessage("El número del crédito es obligatorio"); ;
         }
     }
 }

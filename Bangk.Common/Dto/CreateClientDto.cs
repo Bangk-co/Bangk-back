@@ -25,7 +25,7 @@ namespace Bangk.Common.Dto
         public int BankId { get; set; }
         public int LoanTypeId { get; set; }
         public long LoanBalance { get; set; }
-        public long LoanNumber { get; set; }
+        public string LoanNumber { get; set; }
 
     }
 }

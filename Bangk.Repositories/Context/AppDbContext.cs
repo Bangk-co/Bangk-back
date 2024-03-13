@@ -31,5 +31,7 @@ namespace Bangk.Repositories.Context
         public DbSet<State> State { get; set; }
         public DbSet<City> Cities { get; set; }
 
+        public DbSet<LoanForm> LoanForms { get; set; }
+
     }
 }
