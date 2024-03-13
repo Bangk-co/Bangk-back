@@ -9,7 +9,7 @@ namespace Bangk.Common.Dto
 {
     public class LoanFormDto
     {
-        public int LoanApplicationId { get; set; }
+        public int Id { get; set; }
         public string FormName { get; set; }
         public string Concept { get; set; }
         public string Comment { get; set; }

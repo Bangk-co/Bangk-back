@@ -11,6 +11,6 @@ namespace Bangk.Repositories.Repositories
 {
     public interface ILoanFormRepository: IGenericRepository<LoanForm, LoanFormDto>
     {
-
+        Task<List<LoanFormDto>> GetLoanFormById(int loanApplicationId);
     }
 }
