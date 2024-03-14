@@ -5,6 +5,7 @@ using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,7 +37,31 @@ namespace Bangk.Repositories.Repositories
 
         public async Task<LoanApplicationStateHistory> GetLoanApplicationStateHistoryByStateAndLoanApplicationId(int stateId, int loanApplicationId)
         {
-           return await Context.LoanApplicationStateHistory.Where(h => h.StateId == stateId && h.LoanApplicationId == loanApplicationId).FirstOrDefaultAsync();
+            return await Context.LoanApplicationStateHistory.Where(h => h.StateId == stateId && h.LoanApplicationId == loanApplicationId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<LoanApplicationStateDto>> GetLoanApplicationQuoteAccepted()
+        {
+            var query = from application in Context.LoanApplication
+                        join client in Context.Clients on application.ClientId equals client.Id
+                        where Context.LoanApplicationStateHistory
+                            .Where(history => history.LoanApplicationId == application.Id)
+                            .OrderByDescending(history => history.CreationDate)
+                            .FirstOrDefault().StateId == (int)ApplicationStateHistoryEnum.CotizaciónAceptada
+                        select new LoanApplicationStateDto
+                        {
+                            ClientEmail = client.Email,
+                            clientId = client.Id,
+                            ClientLastName = client.LastName,
+                            ClientName = client.Name,
+                            LoanApplicationId = application.Id,
+                            CreationDate = Context.LoanApplicationStateHistory
+                                .Where(history => history.LoanApplicationId == application.Id)
+                                .OrderByDescending(history => history.CreationDate)
+                                .FirstOrDefault().CreationDate
+                        };
+
+            return await query.ToListAsync();
         }
     }
 }

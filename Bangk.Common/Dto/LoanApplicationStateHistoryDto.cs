@@ -21,4 +21,14 @@ namespace Bangk.Common.Dto
         public DateTime CreationDate { get; set; }
 
     }
+
+    public class LoanApplicationStateDto
+    {
+        public int LoanApplicationId { get; set; }
+        public int clientId { get; set; }
+        public string ClientName { get; set; }
+        public string ClientLastName { get; set; }
+        public string ClientEmail { get; set; }
+        public DateTime CreationDate { get; set; }
+    }
 }

@@ -18,6 +18,7 @@ using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.State;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
+using Bangk.Domain.Implementation.BackgroundTask;
 using Bangk.Domain.Implementation.City;
 using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Country;
@@ -105,6 +106,8 @@ namespace Bangk.Api.Extensions
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
+
+            services.AddHostedService<CompleteApplicationJob>();
         }
     }
 }

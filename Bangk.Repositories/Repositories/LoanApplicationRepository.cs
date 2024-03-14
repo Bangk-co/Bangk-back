@@ -32,7 +32,7 @@ namespace Bangk.Repositories.Repositories
                             IconsBanksUrl = b.IconsBanksUrl,
                             CreationDate = l.CreationDate,
                             LoanBalance = l.LoanBalance,
-                            StateName = Context.LoanApplicationStateHistory.OrderByDescending(lh => lh.CreationDate).FirstOrDefault().State.Name,
+                            StateName = Context.LoanApplicationStateHistory.Where(m => m.LoanApplicationId == l.Id ).OrderByDescending(lh => lh.CreationDate).FirstOrDefault().State.Name,
                             ReviewerName = string.Format("{0} {1}", u.Name, u.LastName),
 
                         };
