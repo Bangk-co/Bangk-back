@@ -65,5 +65,9 @@ namespace Bangk.Common.Dto
         public int? ResidenceStateId { get; set; }
         public int? StateId { get; set; }
         public int LoanTypeId { get; set; }
+        public int? CityVehiculeId { get; set; }
+        public string VehicleLicensePlate { get; set; }
+        public int? StateVehiculeId { get; set; }
+        public int? CountryVehiculeId { get; set; }
     }
 }

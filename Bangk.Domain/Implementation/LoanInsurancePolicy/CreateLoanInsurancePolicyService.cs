@@ -2,6 +2,7 @@
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Repositories;
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Client
@@ -65,7 +66,9 @@ namespace Bangk.Domain.Implementation.Client
                     DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo,
                     Diseases = loanInsurancePolicySaveDto.Diseases,
                     DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo,
-                    PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo
+                    PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
+                    CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
+                    VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
                 };
 
                 await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
@@ -110,7 +113,8 @@ namespace Bangk.Domain.Implementation.Client
                 loanInsurencePolicy.DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo;
                 loanInsurencePolicy.PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
                 loanInsurencePolicy.CreationDate = DateTime.Now;
-
+                loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
+                loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
                 await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             }
 

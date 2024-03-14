@@ -42,5 +42,7 @@ namespace Bangk.Repositories.Entities
         public string  BeneficiaryName { get; set; }
         public int? BeneficiaryIdentificationTypeId { get; set; }
         public string BeneficiaryIdentificationNumber { get; set; }
+        public int? CityVehiculeId { get; set; }
+        public string VehicleLicensePlate { get; set; }
     }
 }
