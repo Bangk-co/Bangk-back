@@ -57,17 +57,6 @@ namespace Bangk.Api.Controllers
             }
 
             var result = await _getLoanFormService.Execute(loanApplicationId);
-            if (result.Count == 0)
-            {
-                var error = new ResponseDto<bool>
-                {
-                    HasErrors = true,
-                    Result = false
-                };
-
-                error.Errors.Add("No existen comentarios para esta solicitud.");
-                return BadRequest(error);
-            }
 
             return Ok(new
             {
