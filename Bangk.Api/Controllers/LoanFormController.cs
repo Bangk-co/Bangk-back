@@ -14,11 +14,13 @@ namespace Bangk.Api.Controllers
     {
         private readonly ILoanSaveFormService _loanSaveFormService;
         private readonly IGetLoanFormService _getLoanFormService;
+        private readonly IChangeStateFormsValidatedService _changeStateFormsValidatedService;
 
-        public LoanFormController(ILoanSaveFormService loanSaveFormService, IGetLoanFormService getLoanFormService)
+        public LoanFormController(ILoanSaveFormService loanSaveFormService, IGetLoanFormService getLoanFormService, IChangeStateFormsValidatedService changeStateFormsValidatedService)
         {
             _loanSaveFormService = loanSaveFormService;
             _getLoanFormService = getLoanFormService;
+            _changeStateFormsValidatedService = changeStateFormsValidatedService;
         }
 
 
@@ -71,6 +73,17 @@ namespace Bangk.Api.Controllers
             {
                 GetLoanForm = result
             });
+        }
+
+        [HttpPost("ChangeStateForms")]
+        [Authorize(Roles = "asesor, superAdmin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ChangeStateForms(int loanApplicationId, string observations)
+        {
+            var result = await _changeStateFormsValidatedService.Execute(loanApplicationId, observations);
+            return Ok(result);
         }
     }
 }
