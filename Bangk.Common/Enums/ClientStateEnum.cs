@@ -18,6 +18,7 @@ namespace Bangk.Common.Enums
         CotizacionEnviada = 121,
         CotizaciónAceptada = 123,
         FormulariosDiligenciados = 125,
+        FormulariosValidados = 676,
         EstudioSarlaft = 126,
         EstudioListaRestrictivaSBS = 127,
         PolizaEmitida = 128,

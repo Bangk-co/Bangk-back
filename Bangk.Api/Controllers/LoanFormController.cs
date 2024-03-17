@@ -14,11 +14,13 @@ namespace Bangk.Api.Controllers
     {
         private readonly ILoanSaveFormService _loanSaveFormService;
         private readonly IGetLoanFormService _getLoanFormService;
+        private readonly IChangeStateFormsValidatedService _changeStateFormsValidatedService;
 
-        public LoanFormController(ILoanSaveFormService loanSaveFormService, IGetLoanFormService getLoanFormService)
+        public LoanFormController(ILoanSaveFormService loanSaveFormService, IGetLoanFormService getLoanFormService, IChangeStateFormsValidatedService changeStateFormsValidatedService)
         {
             _loanSaveFormService = loanSaveFormService;
             _getLoanFormService = getLoanFormService;
+            _changeStateFormsValidatedService = changeStateFormsValidatedService;
         }
 
 
@@ -55,22 +57,22 @@ namespace Bangk.Api.Controllers
             }
 
             var result = await _getLoanFormService.Execute(loanApplicationId);
-            if (result.Count == 0)
-            {
-                var error = new ResponseDto<bool>
-                {
-                    HasErrors = true,
-                    Result = false
-                };
-
-                error.Errors.Add("No existen comentarios para esta solicitud.");
-                return BadRequest(error);
-            }
 
             return Ok(new
             {
                 GetLoanForm = result
             });
+        }
+
+        [HttpPost("ChangeStateForms")]
+        [Authorize(Roles = "asesor, superAdmin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ChangeStateForms(int loanApplicationId, string observations)
+        {
+            var result = await _changeStateFormsValidatedService.Execute(loanApplicationId, observations);
+            return Ok(result);
         }
     }
 }
