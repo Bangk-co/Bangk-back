@@ -42,7 +42,7 @@ namespace Bangk.Domain.Implementation.LoanForm
             {
                 CreationDate = DateTime.Now,
                 LoanApplicationId = loanApplicationId,
-                Observations = observation,
+                Observations = observation ?? string.Empty,
                 StateId = (int)ApplicationStateHistoryEnum.FormulariosValidados
             };
 
