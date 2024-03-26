@@ -62,7 +62,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
                     updateLoanApplicationDto.LoanApplicationId);
                 if (loanApplicationHistory != null)
                 {
-                    loanApplicationHistory.CreationDate = DateTime.Now;
+                    loanApplicationHistory.CreationDate = DateTime.UtcNow;
                     loanApplicationHistory.Observations = updateLoanApplicationDto.Observations;
                     await _loanApplicationStateHistoryRepository.Update(loanApplicationHistory);
                     scope.Complete();
@@ -71,7 +71,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
 
                 loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
                 {
-                    CreationDate = DateTime.Now,
+                    CreationDate = DateTime.UtcNow,
                     Observations = updateLoanApplicationDto.Observations,
                     LoanApplicationId = updateLoanApplicationDto.LoanApplicationId,
                     StateId = (int)ApplicationStateHistoryEnum.RevisionDeExtracto

@@ -69,7 +69,7 @@ namespace Bangk.Repositories.Infrastructure
         {
             try
             {
-                entity.CreationDate = DateTime.Now;
+                entity.CreationDate = DateTime.UtcNow;
 
                 await _dbSet.AddAsync(entity);
                 return await Context.SaveChangesAsync();
@@ -87,7 +87,7 @@ namespace Bangk.Repositories.Infrastructure
             {
                 entityList.ForEach(entity =>
                 {
-                    entity.CreationDate = DateTime.Now;
+                    entity.CreationDate = DateTime.UtcNow;
                 });
 
                 await _dbSet.AddRangeAsync(entityList);

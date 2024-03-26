@@ -41,7 +41,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
 
             var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
-                CreationDate = DateTime.Now,
+                CreationDate = DateTime.UtcNow,
                 LoanApplicationId = loanApplicationId,
                 Observations = observation,
                 StateId = (int)ApplicationStateHistoryEnum.CotizaciónRechazada

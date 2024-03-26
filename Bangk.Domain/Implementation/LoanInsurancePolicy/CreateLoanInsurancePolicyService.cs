@@ -112,7 +112,7 @@ namespace Bangk.Domain.Implementation.Client
                 loanInsurencePolicy.Diseases = loanInsurancePolicySaveDto.Diseases;
                 loanInsurencePolicy.DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo;
                 loanInsurencePolicy.PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
-                loanInsurencePolicy.CreationDate = DateTime.Now;
+                loanInsurencePolicy.CreationDate = DateTime.UtcNow;
                 loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
                 loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
                 await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);

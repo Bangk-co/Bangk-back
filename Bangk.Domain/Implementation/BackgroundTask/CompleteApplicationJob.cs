@@ -32,8 +32,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var nextOccurrence = _schedule.GetNextOccurrence(DateTime.Now);
-                var delay = nextOccurrence - DateTime.Now;
+                var nextOccurrence = _schedule.GetNextOccurrence(DateTime.UtcNow);
+                var delay = nextOccurrence - DateTime.UtcNow;
 
                 if (delay.TotalMilliseconds > 0)
                     await Task.Delay(delay, stoppingToken);
@@ -97,7 +97,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 {
                     var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
                     {
-                        CreationDate = DateTime.Now,
+                        CreationDate = DateTime.UtcNow,
                         LoanApplicationId = l.LoanApplicationId,
                         Observations = string.Empty,
                         StateId = (int)ApplicationStateHistoryEnum.CotizaciónNoRespondida
