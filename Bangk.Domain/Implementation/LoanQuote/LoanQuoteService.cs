@@ -16,50 +16,48 @@ namespace Bangk.Domain.Implementation.LoanQuote
         private readonly IConfiguration _configuration;
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly ISettingRepository _settingRepository;
 
         public LoanQuoteService(ILoanQuoteRepository loanQuoteRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IConfiguration configuration,
-            ILoanApplicationRepository LoanApplicationRepository, IClientRepository clientRepository)
+            ILoanApplicationRepository LoanApplicationRepository, IClientRepository clientRepository, ISettingRepository settingRepository)
         {
             _loanQuoteRepository = loanQuoteRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _configuration = configuration;
             _loanApplicationRepository = LoanApplicationRepository;
             _clientRepository = clientRepository;
+            _settingRepository = settingRepository;
         }
 
         public async Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string insuranceName)
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
-
-
-            
             var loanQuote = new Repositories.Entities.LoanQuote
             {
                 InsuranceId = insuranceId,
                 LoanApplicationId = loanApplicationId,
-                YearlyFee = yearlyFee,
-
+                YearlyFee = yearlyFee
             };
 
             await _loanQuoteRepository.Create(loanQuote);
-
-            
-
+            var loanApplicationInfo =  await _loanApplicationRepository.GetById(loanApplicationId);
             var loanApplicationStatusHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
                 LoanApplicationId = loanApplicationId,
                 Observations = $"Cotizado con {insuranceName}",
                 StateId = (int)ApplicationStateHistoryEnum.CotizacionEnviada
-
             };
 
+            var smlv = int.Parse((await _settingRepository.GetById((int)SMLVEnum.SMLV)).Code);
+            var smlvNumber = loanApplicationInfo.LoanBalance / smlv;
+            if (smlvNumber > 135)
+            {
+                loanApplicationStatusHistory.Observations += ",Valor del préstamo supera los 135 SMMLV";
+            }
+
             await _loanApplicationStateHistoryRepository.Create(loanApplicationStatusHistory);
-
-            var loanApplicationInfo = _loanApplicationRepository.GetById(loanApplicationId);
-            var clientInfo = _clientRepository.GetById(loanApplicationInfo.Result.ClientId);
-
-            var url = _configuration.GetSection("LoanQuote:UrlFront").Value + $"?requestId={loanApplicationInfo.Result.Id}";
-
+            var clientInfo = _clientRepository.GetById(loanApplicationInfo.ClientId);
+            var url = _configuration.GetSection("LoanQuote:UrlFront").Value + $"?requestId={loanApplicationInfo.Id}";
             var sendEmail = new SendGridEmailDto
             {
                 email = clientInfo.Result.Email,
@@ -72,15 +70,11 @@ namespace Bangk.Domain.Implementation.LoanQuote
                     clientname = $"{clientInfo.Result.Name +" "+ clientInfo.Result.LastName}",
                     UrlCallback = url
                 }
-
             };
 
             await SendGridEmailSender.SendEmailAsync(sendEmail);
-
             scope.Complete();
-
             return loanApplicationId;
-
         }
     }
 }
