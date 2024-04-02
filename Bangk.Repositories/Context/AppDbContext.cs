@@ -30,8 +30,8 @@ namespace Bangk.Repositories.Context
         public DbSet<Country> Countries { get; set; }
         public DbSet<State> State { get; set; }
         public DbSet<City> Cities { get; set; }
-
         public DbSet<LoanForm> LoanForms { get; set; }
+        public DbSet<Beneficiary> Beneficiaries { get; set; }
 
     }
 }

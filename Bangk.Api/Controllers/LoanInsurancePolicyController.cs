@@ -1,8 +1,10 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
+using Bangk.Repositories.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -36,6 +38,10 @@ namespace Bangk.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CreateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
         {
+            if(loanInsurancePolicySaveDto.beneficiary.Count > 7)
+            {
+                return( BadRequest("Supero el limite de beneficiarios permitidos.") );
+            }
             var result = await _createLoanInsurancePolicyService.Execute(loanInsurancePolicySaveDto);
             return Ok(result);
         }

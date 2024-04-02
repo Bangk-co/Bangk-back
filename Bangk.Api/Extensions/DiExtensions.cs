@@ -66,6 +66,7 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<ILoanFormRepository, LoanFormRepository>();
+            services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -104,6 +105,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanSaveFormService, LoanSaveFormService>();
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
+            
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
