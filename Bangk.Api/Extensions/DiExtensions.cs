@@ -67,6 +67,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<ILoanFormRepository, LoanFormRepository>();
             services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+            
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();

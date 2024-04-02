@@ -13,6 +13,7 @@ namespace Bangk.Repositories.Context
         {
             modelBuilder.Entity<Log>().Ignore(_ => _.CreationDate);
             modelBuilder.Entity<Setting>().Ignore(_ => _.CreationDate);
+            modelBuilder.Entity<Notification>().Ignore(_ => _.CreationDate);
             base.OnModelCreating(modelBuilder);
         }
 
@@ -32,6 +33,6 @@ namespace Bangk.Repositories.Context
         public DbSet<City> Cities { get; set; }
         public DbSet<LoanForm> LoanForms { get; set; }
         public DbSet<Beneficiary> Beneficiaries { get; set; }
-
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

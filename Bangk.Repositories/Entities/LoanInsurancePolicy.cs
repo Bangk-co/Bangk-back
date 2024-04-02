@@ -33,7 +33,7 @@ namespace Bangk.Repositories.Entities
         public bool? Convicted { get; set; }
         public string IncomeOrigin { get; set; }
         public int? BasementNumber { get; set; }
-        public bool Beneficiaries { get; set; }
+        public bool? Beneficiaries { get; set; }
         public int? ApartmentNumber { get; set; }
         public int? BuildingFloorsNumber { get; set; }
         public string Diseases { get; set; }

@@ -38,7 +38,7 @@ namespace Bangk.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CreateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
         {
-            if(loanInsurancePolicySaveDto.beneficiary.Count > 7)
+            if(loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 7)
             {
                 return( BadRequest("Supero el limite de beneficiarios permitidos.") );
             }

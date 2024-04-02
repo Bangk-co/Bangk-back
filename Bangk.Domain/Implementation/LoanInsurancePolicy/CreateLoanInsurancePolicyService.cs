@@ -3,8 +3,6 @@ using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Client
@@ -13,12 +11,12 @@ namespace Bangk.Domain.Implementation.Client
     {
         private readonly ILoanInsurancePolicyRepository _loanInsurancePolicyRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
-
-
-        public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository)
+        private readonly INotificationRepository _notificationRepository;
+        public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository, INotificationRepository notificationRepository)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _beneficiaryRepository = beneficiaryRepository;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
@@ -31,161 +29,189 @@ namespace Bangk.Domain.Implementation.Client
             var loanInsurencePolicy = await _loanInsurancePolicyRepository.GetLoanInsurancePolicyByLoadApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
             if (loanInsurencePolicy == null)
             {
-                var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
-                {
-                    Address = loanInsurancePolicySaveDto.Address,
-                    IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false,
-                    LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
-                    HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false,
-                    HousingValue = loanInsurancePolicySaveDto.HousingValue,
-                    HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId,
-                    HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false,
-                    Height = loanInsurancePolicySaveDto.Height,
-                    AssetValue = loanInsurancePolicySaveDto.AssetValue,
-                    BirthCityId = loanInsurancePolicySaveDto.BirthCityId,
-                    BuiltArea = loanInsurancePolicySaveDto.BuiltArea,
-                    BuiltgDate = loanInsurancePolicySaveDto.BuiltgDate,
-                    Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries,
-                    CityId = loanInsurancePolicySaveDto.CityId,
-                    CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId,
-                    Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false,
-                    CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId,
-                    Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false,
-                    LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false,
-                    MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses,
-                    MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome,
-                    NumberChildren = loanInsurancePolicySaveDto.NumberChildren,
-                    Occupation = loanInsurancePolicySaveDto.Occupation,
-                    OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId,
-                    PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false,
-                    ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId,
-                    Weight = loanInsurancePolicySaveDto.Weight,
-                    LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
-                    ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber,
-                    BasementNumber = loanInsurancePolicySaveDto.BasementNumber,
-                    IncomeOrigin = loanInsurancePolicySaveDto.IncomeOrigin,
-                    BuildingFloorsNumber = loanInsurancePolicySaveDto.BuildingFloorsNumber,
-                    DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo,
-                    Diseases = loanInsurancePolicySaveDto.Diseases,
-                    DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo,
-                    PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
-                    CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
-                    VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
-                };
+                await CreateLoanInsurancePolicy(loanInsurancePolicySaveDto);
+            }
+            else
+            {
+                await UpdateLoanInsurancePolicy(loanInsurancePolicySaveDto, loanInsurencePolicy);
+            }
 
-                await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
+            var notifications = await _notificationRepository.GetNotificationByApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
+            if(notifications != null && notifications.Count > 0)
+            {
+               await _notificationRepository.DeleteBulk(notifications);
+            }
 
-                if(loanInsurancePolicySaveDto.beneficiary.Count > 0 && loanInsurancePolicySaveDto.beneficiary.Count <= 7 && newLoanInsurencePolicy.Beneficiaries)
+            await CreateNotification(loanInsurancePolicySaveDto.LoanApplicationId);
+            result.Result = await _loanInsurancePolicyRepository.GetAllLoanInsurancePolicyByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
+            return result;
+        }
+
+        private async Task CreateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
+        {
+            var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
+            {
+                Address = loanInsurancePolicySaveDto.Address,
+                IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false,
+                LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
+                HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false,
+                HousingValue = loanInsurancePolicySaveDto.HousingValue,
+                HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId,
+                HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false,
+                Height = loanInsurancePolicySaveDto.Height,
+                AssetValue = loanInsurancePolicySaveDto.AssetValue,
+                BirthCityId = loanInsurancePolicySaveDto.BirthCityId,
+                BuiltArea = loanInsurancePolicySaveDto.BuiltArea,
+                BuiltgDate = loanInsurancePolicySaveDto.BuiltgDate,
+                Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries,
+                CityId = loanInsurancePolicySaveDto.CityId,
+                CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId,
+                Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false,
+                CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId,
+                Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false,
+                LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false,
+                MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses,
+                MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome,
+                NumberChildren = loanInsurancePolicySaveDto.NumberChildren,
+                Occupation = loanInsurancePolicySaveDto.Occupation,
+                OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId,
+                PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false,
+                ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId,
+                Weight = loanInsurancePolicySaveDto.Weight,
+                LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
+                ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber,
+                BasementNumber = loanInsurancePolicySaveDto.BasementNumber,
+                IncomeOrigin = loanInsurancePolicySaveDto.IncomeOrigin,
+                BuildingFloorsNumber = loanInsurancePolicySaveDto.BuildingFloorsNumber,
+                DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo,
+                Diseases = loanInsurancePolicySaveDto.Diseases,
+                DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo,
+                PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
+                CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
+                VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
+            };
+
+            await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
+
+            if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0
+                && loanInsurancePolicySaveDto.beneficiary.Count <= 7 && newLoanInsurencePolicy.Beneficiaries.HasValue && newLoanInsurencePolicy.Beneficiaries.Value)
+            {
+                foreach (var b in loanInsurancePolicySaveDto.beneficiary)
                 {
-                    foreach(var b in loanInsurancePolicySaveDto.beneficiary)
+                    var beneficiary = new Repositories.Entities.Beneficiary
+                    {
+                        LoanInsurancePolicyId = newLoanInsurencePolicy.Id,
+                        Name = b.Name,
+                        IdentificationTypeId = b.IdentificationTypeId,
+                        IdentificationNumber = b.IdentificationNumber,
+                        RelationshipId = b.RelationshipId,
+                        PercentInherit = b.PercentInherit
+                    };
+
+                    await _beneficiaryRepository.Create(beneficiary);
+                }
+            }
+        }
+
+        private async Task UpdateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto, LoanInsurancePolicy loanInsurencePolicy)
+        {
+            loanInsurencePolicy.Address = loanInsurancePolicySaveDto.Address;
+            loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false;
+            loanInsurencePolicy.LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue;
+            loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false;
+            loanInsurencePolicy.HousingValue = loanInsurancePolicySaveDto.HousingValue;
+            loanInsurencePolicy.HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId;
+            loanInsurencePolicy.HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false;
+            loanInsurencePolicy.Height = loanInsurancePolicySaveDto.Height;
+            loanInsurencePolicy.AssetValue = loanInsurancePolicySaveDto.AssetValue;
+            loanInsurencePolicy.BirthCityId = loanInsurancePolicySaveDto.BirthCityId;
+            loanInsurencePolicy.BuiltArea = loanInsurancePolicySaveDto.BuiltArea;
+            loanInsurencePolicy.BuiltgDate = loanInsurancePolicySaveDto.BuiltgDate;
+            loanInsurencePolicy.Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries;
+            loanInsurencePolicy.CityId = loanInsurancePolicySaveDto.CityId;
+            loanInsurencePolicy.CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId;
+            loanInsurencePolicy.Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false;
+            loanInsurencePolicy.CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId;
+            loanInsurencePolicy.Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false;
+            loanInsurencePolicy.LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false;
+            loanInsurencePolicy.MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses;
+            loanInsurencePolicy.MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome;
+            loanInsurencePolicy.NumberChildren = loanInsurancePolicySaveDto.NumberChildren;
+            loanInsurencePolicy.Occupation = loanInsurancePolicySaveDto.Occupation;
+            loanInsurencePolicy.OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId;
+            loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false;
+            loanInsurencePolicy.ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId;
+            loanInsurencePolicy.Weight = loanInsurancePolicySaveDto.Weight;
+            loanInsurencePolicy.ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber;
+            loanInsurencePolicy.BasementNumber = loanInsurancePolicySaveDto.BasementNumber;
+            loanInsurencePolicy.IncomeOrigin = loanInsurancePolicySaveDto.IncomeOrigin;
+            loanInsurencePolicy.BuildingFloorsNumber = loanInsurancePolicySaveDto.BuildingFloorsNumber;
+            loanInsurencePolicy.DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
+            loanInsurencePolicy.Diseases = loanInsurancePolicySaveDto.Diseases;
+            loanInsurencePolicy.DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo;
+            loanInsurencePolicy.PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
+            loanInsurencePolicy.CreationDate = DateTime.UtcNow;
+            loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
+            loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
+
+            await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
+
+            if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0 && loanInsurancePolicySaveDto.beneficiary.Count <= 7
+                && loanInsurancePolicySaveDto.Beneficiaries.HasValue && loanInsurancePolicySaveDto.Beneficiaries.Value)
+            {
+                foreach (var b in loanInsurancePolicySaveDto.beneficiary)
+                {
+                    if (b.Id != 0)
+                    {
+                        var beneficiaryInBD = await _beneficiaryRepository.GetById(b.Id);
+                        if (beneficiaryInBD != null)
+                        {
+                            beneficiaryInBD.LoanInsurancePolicyId = loanInsurencePolicy.Id;
+                            beneficiaryInBD.Name = b.Name;
+                            beneficiaryInBD.IdentificationTypeId = b.IdentificationTypeId;
+                            beneficiaryInBD.IdentificationNumber = b.IdentificationNumber;
+                            beneficiaryInBD.RelationshipId = b.RelationshipId;
+                            beneficiaryInBD.PercentInherit = b.PercentInherit;
+                            beneficiaryInBD.CreationDate = DateTime.UtcNow;
+                            await _beneficiaryRepository.Update(beneficiaryInBD);
+                        }
+                    }
+                    else
                     {
                         var beneficiary = new Repositories.Entities.Beneficiary
                         {
-                            LoanInsurancePolicyId = newLoanInsurencePolicy.Id,
+                            LoanInsurancePolicyId = loanInsurencePolicy.Id,
                             Name = b.Name,
                             IdentificationTypeId = b.IdentificationTypeId,
                             IdentificationNumber = b.IdentificationNumber,
                             RelationshipId = b.RelationshipId,
-                            PercentInherit =b.PercentInherit
+                            PercentInherit = b.PercentInherit,
+                            CreationDate = DateTime.UtcNow
                         };
 
                         await _beneficiaryRepository.Create(beneficiary);
                     }
                 }
-                
             }
-            else
-            {
-                loanInsurencePolicy.Address = loanInsurancePolicySaveDto.Address;
-                loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false;
-                loanInsurencePolicy.LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue;
-                loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false;
-                loanInsurencePolicy.HousingValue = loanInsurancePolicySaveDto.HousingValue;
-                loanInsurencePolicy.HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId;
-                loanInsurencePolicy.HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false;
-                loanInsurencePolicy.Height = loanInsurancePolicySaveDto.Height;
-                loanInsurencePolicy.AssetValue = loanInsurancePolicySaveDto.AssetValue;
-                loanInsurencePolicy.BirthCityId = loanInsurancePolicySaveDto.BirthCityId;
-                loanInsurencePolicy.BuiltArea = loanInsurancePolicySaveDto.BuiltArea;
-                loanInsurencePolicy.BuiltgDate = loanInsurancePolicySaveDto.BuiltgDate;
-                loanInsurencePolicy.Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries;
-                loanInsurencePolicy.CityId = loanInsurancePolicySaveDto.CityId;
-                loanInsurencePolicy.CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId;
-                loanInsurencePolicy.Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false;
-                loanInsurencePolicy.CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId;
-                loanInsurencePolicy.Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false;
-                loanInsurencePolicy.LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false;
-                loanInsurencePolicy.MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses;
-                loanInsurencePolicy.MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome;
-                loanInsurencePolicy.NumberChildren = loanInsurancePolicySaveDto.NumberChildren;
-                loanInsurencePolicy.Occupation = loanInsurancePolicySaveDto.Occupation;
-                loanInsurencePolicy.OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId;
-                loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false;
-                loanInsurencePolicy.ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId;
-                loanInsurencePolicy.Weight = loanInsurancePolicySaveDto.Weight;
-                loanInsurencePolicy.ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber;
-                loanInsurencePolicy.BasementNumber = loanInsurancePolicySaveDto.BasementNumber;
-                loanInsurencePolicy.IncomeOrigin = loanInsurancePolicySaveDto.IncomeOrigin; 
-                loanInsurencePolicy.BuildingFloorsNumber = loanInsurancePolicySaveDto.BuildingFloorsNumber;
-                loanInsurencePolicy.DisabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
-                loanInsurencePolicy.Diseases = loanInsurancePolicySaveDto.Diseases;
-                loanInsurencePolicy.DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo;
-                loanInsurencePolicy.PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
-                loanInsurencePolicy.CreationDate = DateTime.UtcNow;
-                loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
-                loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
+        }
 
-                await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
+        private async Task CreateNotification(int loanApplicationId)
+        {
+            //after 23h50m
+            var notification1 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddHours(23).AddMinutes(53) };
+            await _notificationRepository.Create(notification1);
 
-                if (loanInsurancePolicySaveDto.beneficiary.Count > 0 && loanInsurancePolicySaveDto.beneficiary.Count <= 7 && loanInsurencePolicy.Beneficiaries)
-                {
-                    foreach (var b in loanInsurancePolicySaveDto.beneficiary)
-                    {
-                        if (b.Id != 0)
-                        {
-                            var beneficiaryInBD = await _beneficiaryRepository.GetById(b.Id);
-                            if (beneficiaryInBD != null)
-                            {
-                                
-                                beneficiaryInBD.LoanInsurancePolicyId = loanInsurencePolicy.Id;
-                                beneficiaryInBD.Name = b.Name;
-                                beneficiaryInBD.IdentificationTypeId = b.IdentificationTypeId;
-                                beneficiaryInBD.IdentificationNumber = b.IdentificationNumber;
-                                beneficiaryInBD.RelationshipId = b.RelationshipId;
-                                beneficiaryInBD.PercentInherit = b.PercentInherit;
-                                beneficiaryInBD.CreationDate = DateTime.UtcNow;
+            var notification2 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddDays(3) };
+            await _notificationRepository.Create(notification2);
 
-                                await _beneficiaryRepository.Update(beneficiaryInBD);
-                            }
-                            else
-                            {
-                                result.HasErrors = true;
-                                result.Errors.Add($"El Id del Beneficiario no existe: {b.Id}");
-                                return result;
-                            }
-                        }
-                        else
-                        {
-                            
-                            var beneficiary = new Repositories.Entities.Beneficiary
-                            {
-                                LoanInsurancePolicyId = loanInsurencePolicy.Id,
-                                Name = b.Name,
-                                IdentificationTypeId = b.IdentificationTypeId,
-                                IdentificationNumber = b.IdentificationNumber,
-                                RelationshipId = b.RelationshipId,
-                                PercentInherit = b.PercentInherit,
-                                CreationDate = DateTime.UtcNow
-                            };
+            var notification3 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddDays(6) };
+            await _notificationRepository.Create(notification3);
 
-                            await _beneficiaryRepository.Create(beneficiary);
-                        }
-                    }
-                }
-            }
+            var notification4 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddDays(20) };
+            await _notificationRepository.Create(notification4);
 
-            result.Result = await _loanInsurancePolicyRepository.GetAllLoanInsurancePolicyByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
-            return result;
+            var notification5 = new Notification { ApplicationId = loanApplicationId, NotificationType = 2, DateToSendNotification = DateTime.UtcNow.AddDays(30) };
+            await _notificationRepository.Create(notification5);
         }
     }
 }
