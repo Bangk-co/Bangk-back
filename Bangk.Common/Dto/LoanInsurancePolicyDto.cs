@@ -66,5 +66,17 @@ namespace Bangk.Common.Dto
         public string VehicleLicensePlate { get; set; }
         public int? StateVehiculeId { get; set; }
         public int? CountryVehiculeId { get; set; }
+        public List<BeneficiariesDto> Beneficiaries { get; set; }
+    }
+
+    public class BeneficiariesDto
+    {
+        public int Id { get; set; }
+        public int LoanInsurancePolicyId { get; set; }
+        public string Name { get; set; }
+        public int IdentificationTypeId { get; set; }
+        public string IdentificationNumber { get; set; }
+        public int RelationshipId { get; set; }
+        public decimal PercentInherit { get; set; }
     }
 }

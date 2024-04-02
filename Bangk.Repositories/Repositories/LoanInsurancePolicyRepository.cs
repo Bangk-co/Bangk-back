@@ -30,6 +30,8 @@ namespace Bangk.Repositories.Repositories
                         from subic in ci.DefaultIfEmpty()
                         join icv in Context.Cities on sublp.CityVehiculeId equals icv.Id into icvt
                         from subicvt in icvt.DefaultIfEmpty()
+                        join b in Context.Beneficiaries on sublp.Id equals b.LoanInsurancePolicyId into bJoin
+                        from b in bJoin.DefaultIfEmpty()
                         where l.Id == loanApplicationId
                         select new LoanInsurancePolicyDto
                         {
@@ -91,6 +93,23 @@ namespace Bangk.Repositories.Repositories
                             StateVehiculeId = subicvt.StateId,
                             CityVehiculeId = subicvt.Id,
                             VehicleLicensePlate = sublp.VehicleLicensePlate,
+                            Beneficiaries = (
+                            from b in Context.Beneficiaries
+                            where b.LoanInsurancePolicyId == sublp.Id
+                            select new BeneficiariesDto
+
+                            {
+                                Id = b.Id,
+                                Name = b.Name,
+                                LoanInsurancePolicyId = b.LoanInsurancePolicyId,
+                                IdentificationNumber = b.IdentificationNumber,
+                                IdentificationTypeId = b.IdentificationTypeId,
+                                RelationshipId = b.RelationshipId,
+                                PercentInherit = b.PercentInherit
+                            }).ToList()
+
+
+
                         };
 
             return await query.FirstOrDefaultAsync();
