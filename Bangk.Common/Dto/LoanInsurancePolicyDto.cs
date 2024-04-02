@@ -22,6 +22,7 @@ namespace Bangk.Common.Dto
         public string Occupation { get; set; }
         public int? OccupationActivityId { get; set; }
         public bool? IsPublicPerson { get; set; }
+        public bool? HasBondPublicPerson { get; set; }
         public int? ResidenceCityId { get; set; }
         public long? MonthlyIncome { get; set; }
         public long? MonthlyExpenses { get; set; }
@@ -34,7 +35,6 @@ namespace Bangk.Common.Dto
         public bool? Disability { get; set; }
         public bool? LifeEnsure { get; set; }
         public bool? Convicted { get; set; }
-        public bool? Beneficiaries { get; set; }
         public string IncomeOrigin { get; set; }
         public int? BasementNumber { get; set; }
         public int? ApartmentNumber { get; set; }
@@ -51,9 +51,6 @@ namespace Bangk.Common.Dto
         public string DiseasesMoreInfo { get; set; }
         public string PlannedMedicalProcidureMoreInfo { get; set; }
         public string DisabilityMoreInfo { get; set; }
-        public string BeneficiaryName { get; set; }
-        public int? BeneficiaryIdentificationTypeId { get; set; }
-        public string BeneficiaryIdentificationNumber { get; set; }
         public int ClienId { get; set; }
         public DateTime BirthDate { get; set; }
         public int GenderId { get; set; }

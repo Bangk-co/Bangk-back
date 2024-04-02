@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Folder Include="Connected Services\" />
+    <Folder Include="Contract\Beneficiary\" />
   </ItemGroup>
 
 </Project>
