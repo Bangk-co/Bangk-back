@@ -10,12 +10,14 @@ namespace Bangk.Domain.Implementation.Client
     {
         private readonly ILoanInsurancePolicyRepository _loanInsurancePolicyRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
+        private readonly INotificationRepository _notificationRepository;
 
-
-        public ChangeStateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
+        public ChangeStateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, INotificationRepository notificationRepository,
+            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId)
@@ -56,6 +58,12 @@ namespace Bangk.Domain.Implementation.Client
                 Observations = observation,
                 StateId = (int)ApplicationStateHistoryEnum.FormulariosDiligenciados,
             };
+
+            var notifications = await _notificationRepository.GetNotificationByApplicationId(loanApplicationId);
+            if (notifications != null && notifications.Count > 0)
+            {
+                await _notificationRepository.DeleteBulk(notifications);
+            }
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
             return result;

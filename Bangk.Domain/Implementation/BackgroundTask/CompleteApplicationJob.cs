@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using NCrontab;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -46,70 +45,76 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var loanApplicationStateHistoryRepository = scope.ServiceProvider.GetRequiredService<ILoanApplicationStateHistoryRepository>();
-                var loanApplicationList = await loanApplicationStateHistoryRepository.GetLoanApplicationQuoteAccepted();
-                var today = DateTime.Today;
-                var todayDto = loanApplicationList.Where(dto => dto.CreationDate.Date == today).ToList();
-                await SendEmail(todayDto);
-                var results3Days = loanApplicationList.Where(dto => (today - dto.CreationDate.Date).TotalDays == 3).ToList();
-                await SendEmail(results3Days);
-                var results6Days = loanApplicationList.Where(dto => (today - dto.CreationDate.Date).TotalDays == 6).ToList();
-                await SendEmail(results6Days);
-                var results20PlusDays = loanApplicationList.Where(dto => (today - dto.CreationDate.Date).TotalDays == 20).ToList();
-                await SendEmail(results20PlusDays);
-                var results30PlusDays = loanApplicationList.Where(dto => (today - dto.CreationDate.Date).TotalDays >= 30).ToList();
-                await ChangeLoanApplicationState(results30PlusDays);
+                var notificationRepository = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
+                var notifications = await notificationRepository.GetNotificationByDate(DateTime.UtcNow);
+                await ProcessNotification(notifications);
             }
         }
 
-        private async Task SendEmail(List<LoanApplicationStateDto> loanApplicationStateDtos)
+        private async Task ProcessNotification(List<NotificationDto> notifications)
+        {
+            foreach (var notificationDto in notifications)
+            {
+                if (notificationDto.NotificationType == 1)
+                {
+                    await SendNotification(notificationDto);
+                }
+                else
+                {
+                    await ChangeLoanApplicationState(notificationDto);
+                }
+            }
+        }
+
+        private async Task SendNotification(NotificationDto notificationDto)
         {
             var url = _configuration.GetSection("LoanInsurancePolicy:UrlFront").Value;
-            foreach (var l in loanApplicationStateDtos)
+            var sendEmail = new SendGridEmailDto
             {
-                var sendEmail = new SendGridEmailDto
+                email = notificationDto.ClientEmail,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:RememberCompleteApplicationEmail").Value,
+                Data = new
                 {
-                    email = l.ClientEmail,
-                    From = _configuration.GetSection("SendGridEmailSender:From").Value,
-                    Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
-                    Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
-                    TemplateId = _configuration.GetSection("SendGridEmailSender:RememberCompleteApplicationEmail").Value,
-                    Data = new
-                    {
-                        ClientName = $"{l.ClientName + " " + l.ClientLastName}",
-                        UrlCallback = url + $"?loanApplicationId={l.LoanApplicationId}"
-                    }
-                };
+                    ClientName = $"{notificationDto.ClientName + " " + notificationDto.ClientLastName}",
+                    UrlCallback = url + $"?loanApplicationId={notificationDto.ApplicationId}"
+                }
+            };
 
-                await SendGridEmailSender.SendEmailAsync(sendEmail);
-            }
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
 
-        private async Task ChangeLoanApplicationState(List<LoanApplicationStateDto> loanApplicationStateDtos)
+        private async Task ChangeLoanApplicationState(NotificationDto notificationDto)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
+
+                using TransactionScope transactionScope = new(TransactionScopeAsyncFlowOption.Enabled);
                 var loanApplicationStateHistoryRepository = scope.ServiceProvider.GetRequiredService<ILoanApplicationStateHistoryRepository>();
                 var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
-                using TransactionScope transaction = new(TransactionScopeAsyncFlowOption.Enabled);
-
-                foreach (var l in loanApplicationStateDtos)
+                var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
                 {
-                    var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
-                    {
-                        CreationDate = DateTime.UtcNow,
-                        LoanApplicationId = l.LoanApplicationId,
-                        Observations = string.Empty,
-                        StateId = (int)ApplicationStateHistoryEnum.CotizaciónNoRespondida
-                    };
+                    CreationDate = DateTime.UtcNow,
+                    LoanApplicationId = notificationDto.ApplicationId,
+                    Observations = string.Empty,
+                    StateId = (int)ApplicationStateHistoryEnum.CotizaciónNoRespondida
+                };
 
-                    await loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
-                    var client = await clientRepository.GetClientByLoanApplicationId(l.LoanApplicationId);
-                    client.State = (int)ClientStateEnum.PerdidoRechazo;
-                    await clientRepository.Update(client);
+                await loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
+                var client = await clientRepository.GetClientByLoanApplicationId(notificationDto.ApplicationId);
+                client.State = (int)ClientStateEnum.PerdidoRechazo;
+                await clientRepository.Update(client);
+
+                var notificationRepository = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
+                var notifications = await notificationRepository.GetNotificationByApplicationId(notificationDto.ApplicationId);
+                if (notifications != null && notifications.Count > 0)
+                {
+                    await notificationRepository.DeleteBulk(notifications);
                 }
 
-                transaction.Complete();
+                transactionScope.Complete();
             }
         }
     }

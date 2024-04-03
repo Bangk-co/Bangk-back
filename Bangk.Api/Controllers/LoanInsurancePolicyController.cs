@@ -1,10 +1,8 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
-using Bangk.Repositories.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -21,7 +19,6 @@ namespace Bangk.Api.Controllers
             _createLoanInsurancePolicyService = createLoanInsurancePolicyService;
             _changeStateLoanInsurancePolicyService = changeStateLoanInsurancePolicyService;
         }
-      
 
         [HttpGet("GetAllLoanInsurancePolicyByLoanApplication")]
         [AllowAnonymous]

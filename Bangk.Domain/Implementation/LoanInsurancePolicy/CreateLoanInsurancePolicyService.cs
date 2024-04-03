@@ -202,7 +202,6 @@ namespace Bangk.Domain.Implementation.Client
 
         private async Task CreateNotification(int loanApplicationId)
         {
-            //after 23h50m
             var notification1 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddHours(23).AddMinutes(53) };
             await _notificationRepository.Create(notification1);
 

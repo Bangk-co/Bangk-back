@@ -12,5 +12,6 @@ namespace Bangk.Repositories.Repositories
     public interface INotificationRepository : IGenericRepository<Notification, NotificationDto>
     {
         Task<List<Notification>> GetNotificationByApplicationId(int applicationId);
+        Task<List<NotificationDto>> GetNotificationByDate(DateTime dateToSent);
     }
 }
