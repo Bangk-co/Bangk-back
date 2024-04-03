@@ -4,6 +4,7 @@ using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using System;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Bangk.Domain.Implementation.Client
 {
@@ -49,6 +50,7 @@ namespace Bangk.Domain.Implementation.Client
 
         private async Task CreateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
         {
+            using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
             {
                 Address = loanInsurancePolicySaveDto.Address,
@@ -111,10 +113,12 @@ namespace Bangk.Domain.Implementation.Client
                     await _beneficiaryRepository.Create(beneficiary);
                 }
             }
+            scope.Complete();
         }
 
         private async Task UpdateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto, LoanInsurancePolicy loanInsurencePolicy)
         {
+            using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             loanInsurencePolicy.Address = loanInsurancePolicySaveDto.Address;
             loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false;
             loanInsurencePolicy.LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue;
@@ -193,6 +197,7 @@ namespace Bangk.Domain.Implementation.Client
                     }
                 }
             }
+            scope.Complete();
         }
 
         private async Task CreateNotification(int loanApplicationId)
