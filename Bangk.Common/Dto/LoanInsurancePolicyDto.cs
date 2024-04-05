@@ -58,6 +58,7 @@ namespace Bangk.Common.Dto
         public long? MonthlyCostInsurance { get; set; }
         public int? BirthStateId { get; set; }
         public int? BirthCountryId { get; set; }
+        public bool? Beneficiaries { get; set; }
         public int? ResidenceCountryId { get; set; }
         public int? ResidenceStateId { get; set; }
         public int? StateId { get; set; }
@@ -66,7 +67,7 @@ namespace Bangk.Common.Dto
         public string VehicleLicensePlate { get; set; }
         public int? StateVehiculeId { get; set; }
         public int? CountryVehiculeId { get; set; }
-        public List<BeneficiariesDto> Beneficiaries { get; set; }
+        public List<BeneficiariesDto> Beneficiary { get; set; }
     }
 
     public class BeneficiariesDto
@@ -74,6 +75,7 @@ namespace Bangk.Common.Dto
         public int Id { get; set; }
         public int LoanInsurancePolicyId { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
         public int IdentificationTypeId { get; set; }
         public string IdentificationNumber { get; set; }
         public int RelationshipId { get; set; }

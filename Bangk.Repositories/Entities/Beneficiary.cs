@@ -12,6 +12,7 @@ namespace Bangk.Repositories.Entities
         [ForeignKey("LoanApplication")]
         public int LoanInsurancePolicyId { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
 
         [ForeignKey("Setting")]
         public int IdentificationTypeId { get; set; }

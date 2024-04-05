@@ -8,7 +8,8 @@ namespace Bangk.Common.Enums
         Prospecto = 110,
         Activo = 111,
         Inactivo = 116,
-        PerdidoRechazo = 138
+        PerdidoRechazo = 138,
+        NoAsegurable = 689
     }
 
     public enum ApplicationStateHistoryEnum
@@ -30,7 +31,9 @@ namespace Bangk.Common.Enums
         Vencido = 134,
         RechazadoPorLaAseguradora = 135,
         CotizaciónRechazada = 136,
-        CotizaciónNoRespondida = 137
+        CotizaciónNoRespondida = 137,
+        ClienteNoAsegurable = 690
+
 
     }
 

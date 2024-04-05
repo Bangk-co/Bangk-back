@@ -55,6 +55,7 @@ namespace Bangk.Common.Dto
         public int Id { get; set; }
         public int LoanInsurancePolicyId { get; set; }
         public string Name { get; set; }
+        public string LastName { get; set; }
         public int IdentificationTypeId { get; set; }
         public string IdentificationNumber { get; set; }
         public int RelationshipId { get; set; }
