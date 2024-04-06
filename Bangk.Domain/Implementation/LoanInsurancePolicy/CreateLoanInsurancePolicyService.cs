@@ -51,7 +51,7 @@ namespace Bangk.Domain.Implementation.Client
                 await UpdateLoanInsurancePolicy(loanInsurancePolicySaveDto, loanInsurencePolicy);
             }
 
-            var imc = loanInsurancePolicySaveDto.Weight / Math.Pow((double)loanInsurancePolicySaveDto.Height, 2);
+            var imc = loanInsurancePolicySaveDto.Weight ?? 0 / Math.Pow((double)(loanInsurancePolicySaveDto.Height ?? 1), 2);
             var vih = loanInsurancePolicySaveDto.HIVActive;
             var QuestionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
             var QuestionHealth2 = loanInsurancePolicySaveDto.Disability;
