@@ -1,10 +1,15 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 using System.Transactions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Bangk.Domain.Implementation.Client
 {
@@ -13,11 +18,20 @@ namespace Bangk.Domain.Implementation.Client
         private readonly ILoanInsurancePolicyRepository _loanInsurancePolicyRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly INotificationRepository _notificationRepository;
-        public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository, INotificationRepository notificationRepository)
+        private readonly IConfiguration _configuration;
+        private readonly ILoanApplicationRepository _loanApplicationRepository;
+        private readonly IClientRepository _clientRepository;
+        private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
+        public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository, INotificationRepository notificationRepository, IConfiguration configuration, 
+            ILoanApplicationRepository loanApplicationRepository, IClientRepository clientRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _beneficiaryRepository = beneficiaryRepository;
             _notificationRepository = notificationRepository;
+            _configuration = configuration;
+            _loanApplicationRepository = loanApplicationRepository;
+            _clientRepository = clientRepository;
+            _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
         }
 
         public async Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
@@ -35,6 +49,54 @@ namespace Bangk.Domain.Implementation.Client
             else
             {
                 await UpdateLoanInsurancePolicy(loanInsurancePolicySaveDto, loanInsurencePolicy);
+            }
+
+            var imc = loanInsurancePolicySaveDto.Weight / Math.Pow((double)loanInsurancePolicySaveDto.Height, 2);
+            var vih = loanInsurancePolicySaveDto.HIVActive;
+            var QuestionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
+            var QuestionHealth2 = loanInsurancePolicySaveDto.Disability;
+
+            int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(QuestionHealth1) + Convert.ToInt32(QuestionHealth2);
+
+            if (imc < 17 || imc > 32 || vih == true || trueCount >= 2)
+            {
+                using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
+
+                var loanApplicationInfo = await _loanApplicationRepository.GetById(loanInsurancePolicySaveDto.LoanApplicationId);
+                var clientInfo = _clientRepository.GetById(loanApplicationInfo.ClientId);
+                var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
+                var sendEmail = new SendGridEmailDto
+                {
+                    email = clientInfo.Result.Email,
+                    From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                    Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                    Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                    TemplateId = _configuration.GetSection("SendGridEmailSender:PolicyNotIssuedEmail").Value,
+                    Data = new
+                    {
+                        clientname = $"{clientInfo.Result.Name + " " + clientInfo.Result.LastName}",
+                        UrlCallback = url
+                    }
+                };
+
+                await SendGridEmailSender.SendEmailAsync(sendEmail);
+
+                var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
+                {
+                    CreationDate = DateTime.UtcNow,
+                    LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
+                    Observations = string.Empty,
+                    StateId = (int)ApplicationStateHistoryEnum.ClienteNoAsegurable
+                };
+
+                await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
+
+                var client = await _clientRepository.GetClientByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
+                client.State = (int)ClientStateEnum.NoAsegurable;
+                await _clientRepository.Update(client);
+
+                scope.Complete();
+
             }
 
             var notifications = await _notificationRepository.GetNotificationByApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
@@ -104,6 +166,7 @@ namespace Bangk.Domain.Implementation.Client
                     {
                         LoanInsurancePolicyId = newLoanInsurencePolicy.Id,
                         Name = b.Name,
+                        LastName = b.LastName,
                         IdentificationTypeId = b.IdentificationTypeId,
                         IdentificationNumber = b.IdentificationNumber,
                         RelationshipId = b.RelationshipId,
@@ -186,6 +249,7 @@ namespace Bangk.Domain.Implementation.Client
                         {
                             LoanInsurancePolicyId = loanInsurencePolicy.Id,
                             Name = b.Name,
+                            LastName = b.LastName,
                             IdentificationTypeId = b.IdentificationTypeId,
                             IdentificationNumber = b.IdentificationNumber,
                             RelationshipId = b.RelationshipId,

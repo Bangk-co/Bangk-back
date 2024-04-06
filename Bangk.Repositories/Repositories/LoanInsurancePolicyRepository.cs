@@ -41,6 +41,7 @@ namespace Bangk.Repositories.Repositories
                             BirthCityId = sublp.BirthCityId,
                             BuiltArea = sublp.BuiltArea,
                             BuiltgDate = sublp.BuiltgDate,
+                            Beneficiaries = sublp.Beneficiaries,
                             CityId = sublp.CityId,
                             CivilStatusId = sublp.CivilStatusId,
                             Convicted = sublp.Convicted,
@@ -93,7 +94,7 @@ namespace Bangk.Repositories.Repositories
                             StateVehiculeId = subicvt.StateId,
                             CityVehiculeId = subicvt.Id,
                             VehicleLicensePlate = sublp.VehicleLicensePlate,
-                            Beneficiaries = (
+                            Beneficiary = (
                             from b in Context.Beneficiaries
                             where b.LoanInsurancePolicyId == sublp.Id
                             select new BeneficiariesDto
@@ -101,6 +102,7 @@ namespace Bangk.Repositories.Repositories
                             {
                                 Id = b.Id,
                                 Name = b.Name,
+                                LastName = b.LastName,
                                 LoanInsurancePolicyId = b.LoanInsurancePolicyId,
                                 IdentificationNumber = b.IdentificationNumber,
                                 IdentificationTypeId = b.IdentificationTypeId,
