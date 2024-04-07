@@ -13,15 +13,17 @@ namespace Bangk.Domain.Implementation.LoanApplication
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly ILoanQuoteRepository _loanQuoteRepository;
         public AcceptLoanQuoteService(ILoanApplicationRepository loanApplicationRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
-            IClientRepository clientRepository)
+            IClientRepository clientRepository, ILoanQuoteRepository loanQuoteRepository)
         {
             _loanApplicationRepository = loanApplicationRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _clientRepository = clientRepository;
+            _loanQuoteRepository = loanQuoteRepository;
         }
 
-        public async Task<ResponseDto<bool>> Execute(int loanApplicationId)
+        public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote)
         {
             var loanApplication = _loanApplicationRepository.GetById(loanApplicationId);
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
@@ -46,6 +48,10 @@ namespace Bangk.Domain.Implementation.LoanApplication
                 Observations = string.Empty,
                 StateId = (int)ApplicationStateHistoryEnum.CotizaciónAceptada
             };
+
+            var acceptterms = await _loanQuoteRepository.GetLoanQuoteByLoadApplicationId(loanApplicationId);
+            acceptterms.TermsConditionsAcceptanceQuote = termsConditionsAcceptanceQuote;
+            await _loanQuoteRepository.Update(acceptterms);
 
             await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
             var client = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);

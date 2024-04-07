@@ -11,6 +11,7 @@ namespace Bangk.Common.Dto
         public int InsuranceId { get; set; }
         public int LoanApplicationId { get; set; }
         public long YearlyFee { get; set;}
+        public DateTime? TermsConditionsAcceptanceQuote { get; set; }
 
     }
 }
