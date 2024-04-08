@@ -51,14 +51,16 @@ namespace Bangk.Domain.Implementation.Client
                 await UpdateLoanInsurancePolicy(loanInsurancePolicySaveDto, loanInsurencePolicy);
             }
 
-            var imc = loanInsurancePolicySaveDto.Weight ?? 0 / Math.Pow((double)(loanInsurancePolicySaveDto.Height ?? 1), 2);
+            var imc = (loanInsurancePolicySaveDto.Weight ?? 0) / Math.Pow((double)(loanInsurancePolicySaveDto.Height ?? 1), 2);
             var vih = loanInsurancePolicySaveDto.HIVActive;
-            var QuestionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
-            var QuestionHealth2 = loanInsurancePolicySaveDto.Disability;
+            var questionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
+            var questionHealth2 = loanInsurancePolicySaveDto.Disability;
+            var plannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
+            var disabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
 
-            int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(QuestionHealth1) + Convert.ToInt32(QuestionHealth2);
+            int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(questionHealth1) + Convert.ToInt32(questionHealth2);
 
-            if (imc < 17 || imc > 32 || vih == true || trueCount >= 2)
+            if (imc <= 0.0017 || imc >= 0.0032 || vih == true || trueCount >= 2)
             {
                 using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -81,11 +83,34 @@ namespace Bangk.Domain.Implementation.Client
 
                 await SendGridEmailSender.SendEmailAsync(sendEmail);
 
+                string observations = string.Empty;
+
+                if (imc <= 0.0017 || imc >= 0.0032)
+                {
+                    observations += "IMC por fuera de lo normal (" + imc.ToString("F4") + "). ";
+                }
+
+                if (vih.HasValue && vih.Value)
+                {
+                    observations += "Presencia de VIH. ";
+                }
+
+                if (questionHealth1.HasValue && questionHealth1.Value && !string.IsNullOrEmpty(plannedMedicalProcidureMoreInfo))
+                {
+                    observations += plannedMedicalProcidureMoreInfo + ".";
+                }
+
+                if (questionHealth2.HasValue && questionHealth2.Value && !string.IsNullOrEmpty(disabilityMoreInfo))
+                {
+                    observations += disabilityMoreInfo + ".";
+                }
+
+
                 var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
                 {
                     CreationDate = DateTime.UtcNow,
                     LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
-                    Observations = string.Empty,
+                    Observations = observations,
                     StateId = (int)ApplicationStateHistoryEnum.ClienteNoAsegurable
                 };
 
