@@ -8,5 +8,6 @@ namespace Bangk.Repositories.Repositories
     public interface ILoanQuoteRepository : IGenericRepository<LoanQuote, LoanQuoteDto>
     {
         Task<GetLoanQuoteDto> GetLoanQuoteInfoByLoanApplicationId(int loanApplicationId);
+        Task<string> GetInsuraceNameByLoanApplicatioId(int loanApplicationId);
     }
 }

@@ -122,5 +122,25 @@ namespace Bangk.Repositories.Repositories
             var query = Context.LoanInsurancePolicy.Where(l => l.LoanApplicationId  == loanApplicationId);
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<ClientSBSInfoDto> GetClientSBSInfoDtoyByLoanApplicationId(int loanApplicationId)
+        {
+            var query = from lp in Context.LoanInsurancePolicy
+                        join bc in Context.Cities on lp.BirthCityId equals bc.Id into ct
+                        from subbc in ct.DefaultIfEmpty()
+
+                        join rc in Context.Countries on lp.CountryNationalityId equals rc.Id into cr
+                        from subrc in cr.DefaultIfEmpty()
+                        where lp.LoanApplicationId == loanApplicationId
+                        select new ClientSBSInfoDto
+                        {
+                            BirthCountryId = subbc.State.Countries.Id,
+                            CountryNationalityId = subrc.Id,
+                            BirthCountrySBSId = subbc.State.Countries.SBSId,
+                            CountryNationalitySBSId = subrc.SBSId
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

@@ -37,5 +37,14 @@ namespace Bangk.Repositories.Repositories
                         };
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<string> GetInsuraceNameByLoanApplicatioId(int loanApplicationId)
+        {
+            var query = from q in Context.LoanQuote
+                        join s in Context.Settings on q.InsuranceId equals s.Id
+                        where q.LoanApplicationId == loanApplicationId
+                        select s.Name;
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

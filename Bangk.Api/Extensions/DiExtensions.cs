@@ -7,6 +7,7 @@ using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
+using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
@@ -24,6 +25,7 @@ using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
+using Bangk.Domain.Implementation.Integrations;
 using Bangk.Domain.Implementation.LoanApplication;
 using Bangk.Domain.Implementation.LoanApplicationDocument;
 using Bangk.Domain.Implementation.LoanApplicationStateHistory;
@@ -68,7 +70,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ILoanFormRepository, LoanFormRepository>();
             services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
-            
+            services.AddScoped<IValidationSBSLogRepository, ValidationSBSLogRepository>();
+            services.AddScoped<IScheduleIntegrationRepository, ScheduleIntegrationRepository>(); 
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -107,7 +110,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanSaveFormService, LoanSaveFormService>();
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
-            
+            services.AddTransient<IValidationSBSService, ValidationSBSService>(); 
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
