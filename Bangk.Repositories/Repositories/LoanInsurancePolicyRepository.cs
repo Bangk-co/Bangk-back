@@ -119,7 +119,7 @@ namespace Bangk.Repositories.Repositories
 
         public async Task<LoanInsurancePolicy> GetLoanInsurancePolicyByLoadApplicationId(int loanApplicationId)
         {
-            var query = Context.LoanInsurancePolicy.Where(l => l.LoanApplicationId  == loanApplicationId);
+            var query = Context.LoanInsurancePolicy.Where(l => l.LoanApplicationId == loanApplicationId);
             return await query.FirstOrDefaultAsync();
         }
 
@@ -138,6 +138,23 @@ namespace Bangk.Repositories.Repositories
                             CountryNationalityId = subrc.Id,
                             BirthCountrySBSId = subbc.State.Countries.SBSId,
                             CountryNationalitySBSId = subrc.SBSId
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<ClientSarlaftInfoDto> GetClientSarlaftInfoDtoyByLoanApplicationId(int loanApplicationId)
+        {
+            var query = from l in Context.LoanApplication
+                        join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId
+                        join lq in Context.LoanQuote on l.Id equals lq.LoanApplicationId
+                        where lp.LoanApplicationId == loanApplicationId
+                        select new ClientSarlaftInfoDto
+                        {
+                           HasBondPublicPerson = lp.HasBondPublicPerson.HasValue ? lp.HasBondPublicPerson.Value : false,
+                           IsPublicPerson = lp.IsPublicPerson.HasValue ? lp.IsPublicPerson.Value : false,
+                           LoanBalance = l.LoanBalance,
+                           YearlyFee = lq.YearlyFee
                         };
 
             return await query.FirstOrDefaultAsync();

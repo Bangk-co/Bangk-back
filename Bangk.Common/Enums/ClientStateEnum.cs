@@ -33,8 +33,6 @@ namespace Bangk.Common.Enums
         CotizaciónRechazada = 136,
         CotizaciónNoRespondida = 137,
         ClienteNoAsegurable = 690
-
-
     }
 
     public enum DocumentType

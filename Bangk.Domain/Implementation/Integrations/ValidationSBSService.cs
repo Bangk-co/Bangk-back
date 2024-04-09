@@ -1,4 +1,6 @@
-﻿using Bangk.Common.Enums;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
@@ -18,10 +20,10 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IValidationSBSLogRepository _validationSBSLogRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
         private readonly IScheduleIntegrationRepository _scheduleIntegrationRepository;
-
+        private readonly IValidationSarlaftService _validationSarlaftService;
         public ValidationSBSService(IConfiguration configuration, ILoanInsurancePolicyRepository loanInsurancePolicyRepository,
            ILoanQuoteRepository loanQuoteRepository, IClientRepository clientRepository, IValidationSBSLogRepository validationSBSLogRepository,
-           ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IScheduleIntegrationRepository scheduleIntegrationRepository)
+           ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IScheduleIntegrationRepository scheduleIntegrationRepository, IValidationSarlaftService validationSarlaftService)
         {
             _loanQuoteRepository = loanQuoteRepository;
             _configuration = configuration;
@@ -30,6 +32,7 @@ namespace Bangk.Domain.Implementation.Integrations
             _validationSBSLogRepository = validationSBSLogRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _scheduleIntegrationRepository = scheduleIntegrationRepository;
+            _validationSarlaftService = validationSarlaftService;
         }
 
         public async Task Execute(int loanApplicationId)
@@ -49,14 +52,16 @@ namespace Bangk.Domain.Implementation.Integrations
                     var OFACRestriction = responseValidation.TipoRestriccionOfac == 1 ? "Presenta novedad en lista restrictiva" : responseValidation.TipoRestriccionOfac == 0
                         ? "Cliente apto en lista restrictiva" : "Cliente no apto para emisión de póliza";
                     await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS);
-
-                    //llama otro proceso de integracion
+                    await _validationSarlaftService.Execute(loanApplicationId);
                 }
                 else
                 {
-                    var OFACRestriction = responseValidation.DescripcionError;
+                    //var OFACRestriction = responseValidation.DescripcionError;
                     //await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS);
-                    await CreateNextTrySBS(loanApplicationId);
+                    //await CreateNextTrySBS(loanApplicationId);
+                    //await SendPolicyNotIssueNotification(client);
+
+                    await _validationSarlaftService.Execute(loanApplicationId);
                 }
 
                 await SaveValidacionOFACLog(responseValidation);
@@ -78,6 +83,26 @@ namespace Bangk.Domain.Implementation.Integrations
             };
 
             await _validationSBSLogRepository.Create(validationOfac);
+        }
+
+        private async Task SendPolicyNotIssueNotification( Repositories.Entities.Client clientInfo)
+        {
+            var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
+            var sendEmail = new SendGridEmailDto
+            {
+                email = clientInfo.Email,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:PolicyNotIssuedEmail").Value,
+                Data = new
+                {
+                    clientname = $"{clientInfo.Name + " " + clientInfo.LastName}",
+                    UrlCallback = url
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
 
         private async Task SaveLoanHistory(int loanApplicationId, string observation, int state)
