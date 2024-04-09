@@ -54,4 +54,10 @@ namespace Bangk.Common.Enums
     {
         SMLV = 124
     }
+
+    public enum IMCEnum
+    {
+        ImcLower = 691,
+        imcHigher = 692
+    }
 }
