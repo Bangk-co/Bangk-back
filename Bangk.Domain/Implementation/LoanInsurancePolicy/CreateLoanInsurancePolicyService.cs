@@ -22,8 +22,9 @@ namespace Bangk.Domain.Implementation.Client
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IClientRepository _clientRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
+        private readonly ISettingRepository _settingRepository;
         public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository, INotificationRepository notificationRepository, IConfiguration configuration, 
-            ILoanApplicationRepository loanApplicationRepository, IClientRepository clientRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
+            ILoanApplicationRepository loanApplicationRepository, IClientRepository clientRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, ISettingRepository settingRepository)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _beneficiaryRepository = beneficiaryRepository;
@@ -32,6 +33,8 @@ namespace Bangk.Domain.Implementation.Client
             _loanApplicationRepository = loanApplicationRepository;
             _clientRepository = clientRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
+            _settingRepository = settingRepository;
+
         }
 
         public async Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
@@ -57,10 +60,12 @@ namespace Bangk.Domain.Implementation.Client
             var questionHealth2 = loanInsurancePolicySaveDto.Disability;
             var plannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
             var disabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
+            var imcLower = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.ImcLower)).Code);
+            var imcHigher = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.imcHigher)).Code);
 
             int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(questionHealth1) + Convert.ToInt32(questionHealth2);
 
-            if (imc <= 0.0017 || imc >= 0.0032 || vih == true || trueCount >= 2)
+            if (imc <= imcLower || imc >= imcHigher || vih == true || trueCount >= 2)
             {
                 using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
