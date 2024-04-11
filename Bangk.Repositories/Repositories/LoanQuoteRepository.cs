@@ -16,6 +16,8 @@ namespace Bangk.Repositories.Repositories
 
         }
 
+        
+
         public async Task<GetLoanQuoteDto> GetLoanQuoteInfoByLoanApplicationId(int loanApplicationId)
         {
             var query = from l in Context.LoanApplication
@@ -44,6 +46,12 @@ namespace Bangk.Repositories.Repositories
                         join s in Context.Settings on q.InsuranceId equals s.Id
                         where q.LoanApplicationId == loanApplicationId
                         select s.Name;
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<LoanQuote> GetLoanQuoteByLoadApplicationId(int loanApplicationId)
+        {
+            var query = Context.LoanQuote.Where(l => l.LoanApplicationId == loanApplicationId);
             return await query.FirstOrDefaultAsync();
         }
     }

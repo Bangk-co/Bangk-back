@@ -61,10 +61,11 @@ namespace Bangk.Domain.Implementation.Integrations
                     //await CreateNextTrySBS(loanApplicationId);
                     //await SendPolicyNotIssueNotification(client);
 
-                    await _validationSarlaftService.Execute(loanApplicationId);
+                    
                 }
 
-                await SaveValidacionOFACLog(responseValidation);
+                await _validationSarlaftService.Execute(loanApplicationId);
+                //await SaveValidacionOFACLog(responseValidation);
             }
         }
 

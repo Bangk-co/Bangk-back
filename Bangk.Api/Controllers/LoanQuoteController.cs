@@ -1,6 +1,7 @@
 ﻿using Bangk.Domain.Contract.LoanQuote;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -44,9 +45,9 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("AcceptLoanQuote")]
         [AllowAnonymous]
-        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId)
+        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId, DateTime termsConditionsAcceptanceQuote)
         {
-            var result = await _acceptLoanQuoteService.Execute(loanApplicationId);
+            var result = await _acceptLoanQuoteService.Execute(loanApplicationId, termsConditionsAcceptanceQuote);
             return Ok(result);
         }
 
