@@ -12,6 +12,6 @@ namespace Bangk.Repositories.Entities
 
         public LoanApplication LoanApplication { get; set; }
         public Setting State { get; set; }
-        
+        public int? ValidationClientResult { get; set; }
     }
 }

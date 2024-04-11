@@ -19,7 +19,7 @@ namespace Bangk.Common.Dto
         public string StateName { get; set; }
         public int LoanApplicationId { get; set; }
         public DateTime CreationDate { get; set; }
-
+        public int? ValidationClientResult { get; set; }
     }
 
     public class LoanApplicationStateDto

@@ -29,7 +29,9 @@ namespace Bangk.Repositories.Repositories
                         {
                             StateName = Enum.GetName(enumType, history.StateId),
                             CreationDate = history.CreationDate,
-                            Observations = history.Observations
+                            Observations = history.Observations,
+                            ValidationClientResult = history.ValidationClientResult
+                            
                         };
 
             return query.AsQueryable();
