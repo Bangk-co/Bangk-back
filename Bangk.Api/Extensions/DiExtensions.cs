@@ -15,6 +15,7 @@ using Bangk.Domain.Contract.LoanForm;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
+using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.State;
 using Bangk.Domain.Contract.Users;
@@ -32,6 +33,7 @@ using Bangk.Domain.Implementation.LoanApplicationStateHistory;
 using Bangk.Domain.Implementation.LoanForm;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
+using Bangk.Domain.Implementation.ScheduleIntegration;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.State;
 using Bangk.Domain.Implementation.Users;
@@ -111,7 +113,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
             services.AddTransient<IValidationSBSService, ValidationSBSService>();
-            services.AddTransient<IValidationSarlaftService, ValidationSarlaftService>(); 
+            services.AddTransient<IValidationSarlaftService, ValidationSarlaftService>();
+            services.AddTransient<IScheduleIntegrationService, ScheduleIntegrationService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

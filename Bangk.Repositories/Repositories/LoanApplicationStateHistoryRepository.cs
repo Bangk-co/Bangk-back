@@ -31,7 +31,6 @@ namespace Bangk.Repositories.Repositories
                             CreationDate = history.CreationDate,
                             Observations = history.Observations,
                             ValidationClientResult = history.ValidationClientResult
-                            
                         };
 
             return query.AsQueryable();

@@ -14,12 +14,15 @@ namespace Bangk.Domain.Implementation.LoanForm
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IValidationSBSService _validationSBSService;
+        private readonly ILoanQuoteRepository _loanQuoteRepository;
+
         public ChangeStateFormsValidatedService(ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
-            ILoanApplicationRepository loanApplicationRepository, IValidationSBSService validationSBSService)
+            ILoanApplicationRepository loanApplicationRepository, IValidationSBSService validationSBSService, ILoanQuoteRepository loanQuoteRepository)
         {
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _loanApplicationRepository = loanApplicationRepository;
             _validationSBSService = validationSBSService;
+            _loanQuoteRepository = loanQuoteRepository;
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId, string observation)
@@ -44,7 +47,12 @@ namespace Bangk.Domain.Implementation.LoanForm
            
            */
 
-            await _validationSBSService.Execute(loanApplicationId);
+            var insuranceName = await _loanQuoteRepository.GetInsuraceNameByLoanApplicatioId(loanApplicationId);
+            if (string.Equals(insuranceName, "SBS"))
+            {
+                await _validationSBSService.Execute(loanApplicationId);
+            }
+
             scope.Complete();
             return result;
 
@@ -63,6 +71,6 @@ namespace Bangk.Domain.Implementation.LoanForm
             await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
         }
 
-      
+
     }
 }
