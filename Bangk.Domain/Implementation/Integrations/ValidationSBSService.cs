@@ -51,17 +51,20 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     var OFACRestriction = responseValidation.TipoRestriccionOfac == 1 ? "Presenta novedad en lista restrictiva" : responseValidation.TipoRestriccionOfac == 0
                         ? "Cliente apto en lista restrictiva" : "Cliente no apto para emisión de póliza";
-                    await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS);
+                    await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, responseValidation.TipoRestriccionOfac);
+                    if(responseValidation.TipoRestriccionOfac == 2)
+                    {
+                        await SendPolicyNotIssueNotification(client);
+                    }
+
                     await _validationSarlaftService.Execute(loanApplicationId);
+                    
                 }
                 else
                 {
                     //var OFACRestriction = responseValidation.DescripcionError;
-                    //await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS);
+                    //await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
                     //await CreateNextTrySBS(loanApplicationId);
-                    //await SendPolicyNotIssueNotification(client);
-
-                    
                 }
 
                 await _validationSarlaftService.Execute(loanApplicationId);
@@ -106,14 +109,15 @@ namespace Bangk.Domain.Implementation.Integrations
             await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
 
-        private async Task SaveLoanHistory(int loanApplicationId, string observation, int state)
+        private async Task SaveLoanHistory(int loanApplicationId, string observation, int state, int validationResultCode)
         {
             var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
                 CreationDate = DateTime.Now,
                 LoanApplicationId = loanApplicationId,
                 Observations = observation ?? string.Empty,
-                StateId = state
+                StateId = state,
+                ValidationClientResult = validationResultCode
             };
 
             await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
