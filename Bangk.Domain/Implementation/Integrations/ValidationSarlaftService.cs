@@ -31,14 +31,12 @@ namespace Bangk.Domain.Implementation.Integrations
             _clientRepository = clientRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _scheduleIntegrationService = scheduleIntegrationService;
-
         }
 
         public async Task Execute(int loanApplicationId)
         {
             var client = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);
             var clientSarlaftInf = await _loanInsurancePolicyRepository.GetClientSarlaftInfoDtoyByLoanApplicationId(loanApplicationId);
-
             string apiUrl = _configuration.GetSection("Sarlaft:Url").Value;
             var parameter = new SarlaftParametersDto
             {
