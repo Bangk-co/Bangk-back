@@ -111,7 +111,7 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
-            await ValidateStateHealth(loanInsurancePolicySaveDto);
+            
 
             if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0
                 && loanInsurancePolicySaveDto.beneficiary.Count <= 7 && newLoanInsurencePolicy.Beneficiaries.HasValue && newLoanInsurencePolicy.Beneficiaries.Value)
@@ -132,6 +132,8 @@ namespace Bangk.Domain.Implementation.Client
                     await _beneficiaryRepository.Create(beneficiary);
                 }
             }
+
+            await ValidateStateHealth(loanInsurancePolicySaveDto);
             scope.Complete();
         }
 
@@ -178,7 +180,7 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
 
             await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
-            await ValidateStateHealth(loanInsurancePolicySaveDto);
+            
 
             if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0 && loanInsurancePolicySaveDto.beneficiary.Count <= 7
                 && loanInsurancePolicySaveDto.Beneficiaries.HasValue && loanInsurancePolicySaveDto.Beneficiaries.Value)
@@ -218,6 +220,8 @@ namespace Bangk.Domain.Implementation.Client
                     }
                 }
             }
+
+            await ValidateStateHealth(loanInsurancePolicySaveDto);
             scope.Complete();
         }
 
