@@ -53,82 +53,7 @@ namespace Bangk.Domain.Implementation.Client
             {
                 await UpdateLoanInsurancePolicy(loanInsurancePolicySaveDto, loanInsurencePolicy);
             }
-
-            var imc = (loanInsurancePolicySaveDto.Weight ?? 0) / Math.Pow((double)(loanInsurancePolicySaveDto.Height ?? 1), 2);
-            var vih = loanInsurancePolicySaveDto.HIVActive;
-            var questionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
-            var questionHealth2 = loanInsurancePolicySaveDto.Disability;
-            var plannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
-            var disabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
-            var imcLower = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.ImcLower)).Code);
-            var imcHigher = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.imcHigher)).Code);
-
-            int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(questionHealth1) + Convert.ToInt32(questionHealth2);
-
-            if (imc <= imcLower || imc >= imcHigher || vih == true || trueCount >= 2)
-            {
-                using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
-
-                var loanApplicationInfo = await _loanApplicationRepository.GetById(loanInsurancePolicySaveDto.LoanApplicationId);
-                var clientInfo = _clientRepository.GetById(loanApplicationInfo.ClientId);
-                var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
-                var sendEmail = new SendGridEmailDto
-                {
-                    email = clientInfo.Result.Email,
-                    From = _configuration.GetSection("SendGridEmailSender:From").Value,
-                    Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
-                    Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
-                    TemplateId = _configuration.GetSection("SendGridEmailSender:PolicyNotIssuedEmail").Value,
-                    Data = new
-                    {
-                        clientname = $"{clientInfo.Result.Name + " " + clientInfo.Result.LastName}",
-                        UrlCallback = url
-                    }
-                };
-
-                await SendGridEmailSender.SendEmailAsync(sendEmail);
-
-                string observations = string.Empty;
-
-                if (imc <= 0.0017 || imc >= 0.0032)
-                {
-                    observations += "IMC por fuera de lo normal (" + imc.ToString("F4") + "). ";
-                }
-
-                if (vih.HasValue && vih.Value)
-                {
-                    observations += "Presencia de VIH. ";
-                }
-
-                if (questionHealth1.HasValue && questionHealth1.Value && !string.IsNullOrEmpty(plannedMedicalProcidureMoreInfo))
-                {
-                    observations += plannedMedicalProcidureMoreInfo + ".";
-                }
-
-                if (questionHealth2.HasValue && questionHealth2.Value && !string.IsNullOrEmpty(disabilityMoreInfo))
-                {
-                    observations += disabilityMoreInfo + ".";
-                }
-
-
-                var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
-                {
-                    CreationDate = DateTime.UtcNow,
-                    LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
-                    Observations = observations,
-                    StateId = (int)ApplicationStateHistoryEnum.ClienteNoAsegurable
-                };
-
-                await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
-
-                var client = await _clientRepository.GetClientByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
-                client.State = (int)ClientStateEnum.NoAsegurable;
-                await _clientRepository.Update(client);
-
-                scope.Complete();
-
-            }
-
+           
             var notifications = await _notificationRepository.GetNotificationByApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
             if(notifications != null && notifications.Count > 0)
             {
@@ -186,6 +111,7 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
+            await ValidateStateHealth(loanInsurancePolicySaveDto);
 
             if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0
                 && loanInsurancePolicySaveDto.beneficiary.Count <= 7 && newLoanInsurencePolicy.Beneficiaries.HasValue && newLoanInsurencePolicy.Beneficiaries.Value)
@@ -252,6 +178,7 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
 
             await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
+            await ValidateStateHealth(loanInsurancePolicySaveDto);
 
             if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0 && loanInsurancePolicySaveDto.beneficiary.Count <= 7
                 && loanInsurancePolicySaveDto.Beneficiaries.HasValue && loanInsurancePolicySaveDto.Beneficiaries.Value)
@@ -292,6 +219,98 @@ namespace Bangk.Domain.Implementation.Client
                 }
             }
             scope.Complete();
+        }
+
+        private async Task ValidateStateHealth( LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
+        {
+            var hasHealthInfo = !string.IsNullOrEmpty(loanInsurancePolicySaveDto.DisabilityMoreInfo) ||
+                    !string.IsNullOrEmpty(loanInsurancePolicySaveDto.Diseases) ||
+                    !string.IsNullOrEmpty(loanInsurancePolicySaveDto.DiseasesMoreInfo) ||
+                    loanInsurancePolicySaveDto.Weight.HasValue ||
+                    loanInsurancePolicySaveDto.Height.HasValue ||
+                    loanInsurancePolicySaveDto.HIVActive.HasValue ||
+                    loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ||
+                    loanInsurancePolicySaveDto.Disability.HasValue;
+
+            if (hasHealthInfo)
+            {
+                var imc = (loanInsurancePolicySaveDto.Weight ?? 0) / Math.Pow((double)(loanInsurancePolicySaveDto.Height ?? 1), 2);
+                var vih = loanInsurancePolicySaveDto.HIVActive;
+                var questionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
+                var questionHealth2 = loanInsurancePolicySaveDto.Disability;
+                var plannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
+                var disabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
+                var imcLower = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.ImcLower)).Code);
+                var imcHigher = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.imcHigher)).Code);
+
+                int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(questionHealth1) + Convert.ToInt32(questionHealth2);
+
+                if (imc <= imcLower || imc >= imcHigher || vih == true || trueCount >= 2)
+                {
+                    using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
+
+                    var loanApplicationInfo = await _loanApplicationRepository.GetById(loanInsurancePolicySaveDto.LoanApplicationId);
+                    var clientInfo = _clientRepository.GetById(loanApplicationInfo.ClientId);
+                    var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
+                    var sendEmail = new SendGridEmailDto
+                    {
+                        email = clientInfo.Result.Email,
+                        From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                        Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                        Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                        TemplateId = _configuration.GetSection("SendGridEmailSender:PolicyNotIssuedEmail").Value,
+                        Data = new
+                        {
+                            clientname = $"{clientInfo.Result.Name + " " + clientInfo.Result.LastName}",
+                            UrlCallback = url
+                        }
+                    };
+
+                    await SendGridEmailSender.SendEmailAsync(sendEmail);
+
+                    string observations = string.Empty;
+
+                    if (imc <= 0.0017 || imc >= 0.0032)
+                    {
+                        observations += "IMC por fuera de lo normal (" + imc.ToString("F4") + "). ";
+                    }
+
+                    if (vih.HasValue && vih.Value)
+                    {
+                        observations += "Presencia de VIH. ";
+                    }
+
+                    if (questionHealth1.HasValue && questionHealth1.Value && !string.IsNullOrEmpty(plannedMedicalProcidureMoreInfo))
+                    {
+                        observations += plannedMedicalProcidureMoreInfo + ".";
+                    }
+
+                    if (questionHealth2.HasValue && questionHealth2.Value && !string.IsNullOrEmpty(disabilityMoreInfo))
+                    {
+                        observations += disabilityMoreInfo + ".";
+                    }
+
+
+                    var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
+                    {
+                        CreationDate = DateTime.UtcNow,
+                        LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
+                        Observations = observations,
+                        StateId = (int)ApplicationStateHistoryEnum.ClienteNoAsegurable
+                    };
+
+                    await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
+
+                    var client = await _clientRepository.GetClientByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
+                    client.State = (int)ClientStateEnum.NoAsegurable;
+                    await _clientRepository.Update(client);
+
+                    scope.Complete();
+
+                }
+
+            }
+
         }
 
         private async Task CreateNotification(int loanApplicationId)
