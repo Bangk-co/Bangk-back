@@ -72,15 +72,17 @@ namespace Bangk.Domain.Implementation.Client
                 StateId = (int)ApplicationStateHistoryEnum.FormulariosDiligenciados,
             };
 
+            await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
+
 
             var hasHealthInfo = !string.IsNullOrEmpty(loanInsurencePolicy.DisabilityMoreInfo) ||
-        !string.IsNullOrEmpty(loanInsurencePolicy.Diseases) ||
-        !string.IsNullOrEmpty(loanInsurencePolicy.DiseasesMoreInfo) ||
-        loanInsurencePolicy.Weight.HasValue ||
-        loanInsurencePolicy.Height.HasValue ||
-        loanInsurencePolicy.HIVActive.HasValue ||
-        loanInsurencePolicy.PlannedMedicalProcidure.HasValue ||
-        loanInsurencePolicy.Disability.HasValue;
+            !string.IsNullOrEmpty(loanInsurencePolicy.Diseases) ||
+            !string.IsNullOrEmpty(loanInsurencePolicy.DiseasesMoreInfo) ||
+            loanInsurencePolicy.Weight.HasValue ||
+            loanInsurencePolicy.Height.HasValue ||
+            loanInsurencePolicy.HIVActive.HasValue ||
+            loanInsurencePolicy.PlannedMedicalProcidure.HasValue ||
+            loanInsurencePolicy.Disability.HasValue;
 
             if (hasHealthInfo)
             {
@@ -167,7 +169,7 @@ namespace Bangk.Domain.Implementation.Client
                 await _notificationRepository.DeleteBulk(notifications);
             }
 
-            await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
+            
             return result;
         }
     }
