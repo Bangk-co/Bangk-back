@@ -49,26 +49,10 @@ namespace Bangk.Domain.Implementation.Client
                 return result;
             }
 
-            var observation = string.Empty;
-            if (string.IsNullOrEmpty(loanInsurencePolicy.Diseases))
-            {
-               observation = $"Riesgo de salud presente {loanInsurencePolicy.DiseasesMoreInfo}"; 
-            }
-
-            if (loanInsurencePolicy.Disability.HasValue && loanInsurencePolicy.Disability.Value)
-            {
-                observation += !string.IsNullOrEmpty(observation) ?  $",Riesgo de salud presente {loanInsurencePolicy.DisabilityMoreInfo}" : $"Riesgo de salud presente {loanInsurencePolicy.DisabilityMoreInfo}";
-            }
-
-            if (loanInsurencePolicy.PlannedMedicalProcidure.HasValue && loanInsurencePolicy.PlannedMedicalProcidure.Value)
-            {
-                observation += !string.IsNullOrEmpty(observation) ? $",Riesgo de salud presente {loanInsurencePolicy.PlannedMedicalProcidureMoreInfo}" : $"Riesgo de salud presente {loanInsurencePolicy.PlannedMedicalProcidureMoreInfo}";
-            }
-
             var loadApplicationStateHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
                 LoanApplicationId = loanApplicationId,
-                Observations = observation,
+                Observations = string.Empty,
                 StateId = (int)ApplicationStateHistoryEnum.FormulariosDiligenciados,
             };
 
@@ -86,7 +70,7 @@ namespace Bangk.Domain.Implementation.Client
 
             if (hasHealthInfo)
             {
-                var imc = (loanInsurencePolicy.Weight ?? 0) / Math.Pow((double)(loanInsurencePolicy.Height ?? 1), 2);
+                var imc = (double)(loanInsurencePolicy.Weight ?? 0) / Math.Pow(((double)(loanInsurencePolicy.Height ?? 1) / 100), 2);
                 var vih = loanInsurencePolicy.HIVActive;
                 var questionHealth1 = loanInsurencePolicy.PlannedMedicalProcidure;
                 var questionHealth2 = loanInsurencePolicy.Disability;
@@ -122,9 +106,9 @@ namespace Bangk.Domain.Implementation.Client
 
                     string observations = string.Empty;
 
-                    if (imc <= imcLower || imc >= imcHigher)
+                    if (imc <= imcLower || imc >= imcHigher)   
                     {
-                        observations += "IMC por fuera de lo normal (" + imc.ToString("F4") + "). ";
+                        observations += "IMC por fuera de lo normal (" + imc.ToString("F1") + "). ";
                     }
 
                     if (vih.HasValue && vih.Value)
