@@ -1,12 +1,14 @@
-﻿using Bangk.Repositories.Context;
+﻿using Bangk.Common.Dto;
+using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
-using Microsoft.SqlServer.Server;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class UserRepository : GenericRepository<User, UserDto>, IUserRepository
     {
         public UserRepository(AppDbContext context) : base(context)
         {
@@ -15,7 +17,7 @@ namespace Bangk.Repositories.Repositories
         public User GetUserByEmail(string email)
         {
             var user = Context.Users.FirstOrDefault(e => e.Email == email);
-            if(user != null)
+            if (user != null)
             {
                 user.Role = Context.Roles.FirstOrDefault(r => r.Id == user.RoleId);
             }
@@ -27,6 +29,15 @@ namespace Bangk.Repositories.Repositories
         {
             var user = Context.Users.FirstOrDefault(e => e.PasswordResetGuid == hash);
             return user;
+        }
+
+        public async Task<User> GetUserWithLessApplication()
+        {
+            var query = from user in Context.Users
+                        where user.RoleId == 2
+                        orderby user.LoanApplications.Count()
+                        select user;
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

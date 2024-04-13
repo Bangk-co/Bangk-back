@@ -13,12 +13,16 @@ namespace Bangk.Api.Controllers
         private readonly IUserLoginService _userLoginService;
         private readonly IResetPasswordService _resetPasswordService;
         private readonly ISendEmailResetPassword _sendEmailResetPassword;
-
-        public AuthenticationController(IUserLoginService userLoginService, IResetPasswordService resetPasswordService, ISendEmailResetPassword sendEmailResetPassword)
+        private readonly ISendCodeValidationEmailService _sendCodeValidationEmailService;
+        private readonly IReSendCodeValidationEmailService _reSendCodeValidationEmailService; 
+        public AuthenticationController(IUserLoginService userLoginService, IResetPasswordService resetPasswordService, ISendEmailResetPassword sendEmailResetPassword,
+            ISendCodeValidationEmailService sendCodeValidationEmailService, IReSendCodeValidationEmailService reSendCodeValidationEmailService)
         {
             _userLoginService = userLoginService;
             _resetPasswordService = resetPasswordService;
             _sendEmailResetPassword = sendEmailResetPassword;
+            _sendCodeValidationEmailService = sendCodeValidationEmailService;
+            _reSendCodeValidationEmailService = reSendCodeValidationEmailService;
         }
 
         /// <summary>
@@ -51,11 +55,6 @@ namespace Bangk.Api.Controllers
         [HttpPost("SendEmailResetPassword")]
         public async Task<IActionResult> SendEmailResetPassword(string email)
         {
-            if (string.IsNullOrEmpty(email))
-            {
-                return BadRequest("The email is mandatory");
-            }
-
             var result = await _sendEmailResetPassword.Execute(email);
             if (result.HasErrors)
             {
@@ -82,6 +81,46 @@ namespace Bangk.Api.Controllers
 
             Logs.WriteInfoLog($"Reset password successful.");
             return Ok();
+        }
+
+        /// <summary>
+        /// Send Email Reset Password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost("SendCodeValidationEmail")]
+        public async Task<IActionResult> SendCodeValidationEmail(SendCodeValidationEmailDto sendCodeValidationEmailDto)
+        {
+            var result = await _sendCodeValidationEmailService.Execute(sendCodeValidationEmailDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(new
+            {
+                code = result.Result
+            });
+        }
+
+        /// <summary>
+        /// Send Email Reset Password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost("ReSendCodeValidationEmail")]
+        public async Task<IActionResult> ReSendCodeValidationEmail(string email)
+        {
+            var result = await _reSendCodeValidationEmailService.Execute(email);
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(new
+            {
+                code = result.Result
+            });
         }
     }
 }

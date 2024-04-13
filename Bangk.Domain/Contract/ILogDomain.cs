@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Contract
 {
-    public interface ILogDomain : IDomainBase<Log>
+    public interface ILogDomain
     {
     }
 }

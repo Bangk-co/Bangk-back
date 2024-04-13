@@ -1,5 +1,8 @@
 ﻿using FluentValidation;
 using Bangk.Common.Dto;
+using Bangk.Common.Utils;
+using Serilog;
+using System;
 
 namespace Bangk.Common.Validators
 {
@@ -8,13 +11,11 @@ namespace Bangk.Common.Validators
         public ResetPasswordValidator()
         {
             RuleFor(x => x.Hash)
-               .NotEmpty().WithMessage("The hash value is required");
+               .NotEmpty().WithMessage("El has para el cambio de contraseña es obligatorio");
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("The password is required");
+                .NotEmpty().WithMessage("La contraseña es obligatoria");
             RuleFor(x => x.PasswordConfirm)
-              .NotEmpty().WithMessage("The password confirm is required");
-            RuleFor(x => x.PasswordConfirm)
-              .Equal(x => x.Password).WithMessage("Passwords do not match");
+              .NotEmpty().WithMessage("La confirmacion de la contraseña es obligatorio");
         }
     }
 }

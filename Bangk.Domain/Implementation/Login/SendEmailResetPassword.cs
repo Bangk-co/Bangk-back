@@ -2,6 +2,7 @@
 using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.Users;
+using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
@@ -12,38 +13,49 @@ namespace Bangk.Domain.Implementation.Login
     {
         private readonly IConfiguration _configuration;
         private readonly IGetUserByEmailService _getUserByEmailService;
-        private readonly IUserLoginService _userLoginService;
-        public SendEmailResetPassword(IConfiguration configuration, IGetUserByEmailService getUserByEmailService, IUserLoginService userLoginService)
+        private readonly IUserRepository _userRepository;
+        public SendEmailResetPassword(IConfiguration configuration, IGetUserByEmailService getUserByEmailService, IUserRepository userRepository)
         {
             _configuration = configuration;
             _getUserByEmailService = getUserByEmailService;
-            _userLoginService = userLoginService;
+            _userRepository = userRepository;
         }
         public async Task<ResponseDto<bool>> Execute(string email)
         {
             var result = new ResponseDto<bool>();
+            if (string.IsNullOrEmpty(email))
+            {
+                result.HasErrors = true;
+                result.Errors.Add($"El correo es obligatorio");
+                return result;
+            }
+
             var user = _getUserByEmailService.Execute(email);
             if (user == null)
             {
                 result.HasErrors = true;
-                result.Errors.Add($"The email {email} does not exist.");
+                result.Errors.Add($"El correo ingresado no existe");
                 return result;
             }
 
             user.PasswordResetGuid = Guid.NewGuid().ToString();
-            await _userLoginService.Update(user);
-            var url = _configuration.GetSection("ResetPassword:UrlFront").Value + $"?hash={user.PasswordResetGuid}";
+            await _userRepository.Update(user);
+            var url = _configuration.GetSection("ResetPassword:UrlFront").Value + $"?hash={user.PasswordResetGuid}&email={user.Email}";
 
             var sendEmail = new SendGridEmailDto
             {
                 email = email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
-                htmlMessage = $"<a href=\"{url}\">Reset Password</a>",
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
-                subject = "Reset Password Bangk"
+                TemplateId = _configuration.GetSection("SendGridEmailSender:TemplateResetPassword").Value,
+                Data = new
+                {
+                    username = $"{user.Name}",
+                    UrlCallback = url
+                }
             };
-
+               
             await SendGridEmailSender.SendEmailAsync(sendEmail);
             result.Result = true;
             return result;

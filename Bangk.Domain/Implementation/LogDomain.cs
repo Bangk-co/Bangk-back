@@ -4,9 +4,9 @@ using Bangk.Repositories.Repositories;
 
 namespace Bangk.Domain.Implementation
 {
-    public class LogDomain : DomainBase<Log>, ILogDomain
+    public class LogDomain : ILogDomain
     {
-        public LogDomain(ILogRepository logRepository) : base(logRepository)
+        public LogDomain(ILogRepository logRepository)
         {
         }
     }

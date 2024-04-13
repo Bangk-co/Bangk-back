@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Bangk.Common.Dto;
+using Bangk.Repositories.Entities;
 
 namespace Bangk.Api.Profiles
 {
@@ -6,7 +8,8 @@ namespace Bangk.Api.Profiles
     {
         public AutoMapperProfile()
         {
-            
+            CreateMap<Client, ClientUpdateInfoDto>();
+
         }
     }
 }
