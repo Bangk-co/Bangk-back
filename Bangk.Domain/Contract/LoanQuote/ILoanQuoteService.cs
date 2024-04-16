@@ -8,6 +8,6 @@ namespace Bangk.Domain.Contract.LoanQuote
 {
     public interface ILoanQuoteService
     {
-        Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string insuranceName);
+        Task<int> Execute(int insuranceId, int loanApplicationId, decimal yearlyFee, string insuranceName);
     }
 }

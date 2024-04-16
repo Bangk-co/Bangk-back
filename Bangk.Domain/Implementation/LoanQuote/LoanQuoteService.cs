@@ -29,7 +29,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
             _settingRepository = settingRepository;
         }
 
-        public async Task<int> Execute(int insuranceId, int loanApplicationId, long yearlyFee, string insuranceName)
+        public async Task<int> Execute(int insuranceId, int loanApplicationId, decimal yearlyFee, string insuranceName)
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             var loanQuote = new Repositories.Entities.LoanQuote
