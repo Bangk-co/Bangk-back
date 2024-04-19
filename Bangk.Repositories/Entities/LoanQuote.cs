@@ -16,8 +16,10 @@ namespace Bangk.Repositories.Entities
         public int LoanApplicationId { get; set; }
         public decimal YearlyFee { get; set; }
         public DateTime? TermsConditionsAcceptanceQuote { get; set; }
+        public DateTime? AcceptQuoteOtp { get; set; }
         public Setting Insurance { get; set; }
         public LoanApplication LoanApplication { get; set; }
+
 
     }
 }

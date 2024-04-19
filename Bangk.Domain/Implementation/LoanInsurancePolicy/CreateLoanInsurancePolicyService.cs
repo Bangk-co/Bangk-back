@@ -63,6 +63,7 @@ namespace Bangk.Domain.Implementation.Client
             var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
             {
                 Address = loanInsurancePolicySaveDto.Address,
+                AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
                 IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false,
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
                 HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false,
@@ -99,7 +100,8 @@ namespace Bangk.Domain.Implementation.Client
                 DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo,
                 PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
                 CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
-                VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
+                VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate,
+                ResumeFormsOtp = loanInsurancePolicySaveDto.ResumeFormsOtp
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
