@@ -75,6 +75,7 @@ namespace Bangk.Domain.Implementation.Client
                 Name = createClientDto.Name,
                 PhoneNumber = createClientDto.PhoneNumber,
                 PermissionTreatPersonalDataDate = createClientDto.PermissionTreatPersonalDataDate,
+                ValidateClientOtp = createClientDto.ValidateClientOtp,
                 State = (int)ClientStateEnum.Potencial,
             };
 
