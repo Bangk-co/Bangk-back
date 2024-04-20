@@ -17,8 +17,6 @@ namespace Bangk.Common.Dto
         public int GenderId { get; set; }
         public DateTime PermissionTreatPersonalDataDate { get; set; }
         public CreateLoadAplicacionDto LoadAplicacionDto { get; set; }
-        public DateTime ValidateClientOtp { get; set; }
-        
     }
 
     public class CreateLoadAplicacionDto

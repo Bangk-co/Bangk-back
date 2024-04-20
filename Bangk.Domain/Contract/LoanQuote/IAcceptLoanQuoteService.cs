@@ -6,6 +6,6 @@ namespace Bangk.Domain.Contract.LoanQuote
 {
     public interface IAcceptLoanQuoteService
     {
-        Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp);
+        Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote);
     }
 }

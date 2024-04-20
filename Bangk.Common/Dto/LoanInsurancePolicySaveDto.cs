@@ -25,7 +25,6 @@ namespace Bangk.Common.Dto
         public long? MonthlyExpenses { get; set; }
         public long? AssetValue { get; set; }
         public long? LiabilitiesValue { get; set; }
-        public DateTime? AcceptanceOriginOfFunds { get; set; }
         public int? Weight { get; set; }
         public int? Height { get; set; }
         public bool? HIVActive { get; set; }
@@ -44,8 +43,7 @@ namespace Bangk.Common.Dto
         public string DisabilityMoreInfo { get; set; }
         public int? CityVehiculeId { get; set; }
         public string VehicleLicensePlate { get; set; }
-        public DateTime? ResumeFormsOtp { get; set; }
-
+        
 
         public List<BeneficiarySaveDto> beneficiary { get; set;}
 
