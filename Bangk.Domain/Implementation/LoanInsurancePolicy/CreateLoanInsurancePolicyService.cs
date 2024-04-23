@@ -100,8 +100,8 @@ namespace Bangk.Domain.Implementation.Client
                 DiseasesMoreInfo = loanInsurancePolicySaveDto.DiseasesMoreInfo,
                 PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
                 CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
-                VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate,
-                ResumeFormsOtp = loanInsurancePolicySaveDto.ResumeFormsOtp
+                VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
+                
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);

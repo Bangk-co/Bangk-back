@@ -19,7 +19,7 @@ namespace Bangk.Api.Controllers
 
         [HttpGet("GetSettingList")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<SettingListDto>>> GetSettingList(int groupSettingId)
+        public async Task<ActionResult<List<SettingListDto>>> GetSettingList(int groupSettingId, string searchText)
         {
             if (groupSettingId == 0)
             {
@@ -33,7 +33,7 @@ namespace Bangk.Api.Controllers
                 return BadRequest(error);
             }
 
-            var result = await _getSettingListService.Execute(groupSettingId);
+            var result = await _getSettingListService.Execute(groupSettingId, searchText);
             if (result.Count == 0)
             {
                 var error = new ResponseDto<bool>
