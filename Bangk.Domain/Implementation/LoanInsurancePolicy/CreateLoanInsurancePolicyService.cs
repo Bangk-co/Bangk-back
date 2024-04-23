@@ -63,13 +63,14 @@ namespace Bangk.Domain.Implementation.Client
             var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
             {
                 Address = loanInsurancePolicySaveDto.Address,
+                IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
                 AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
-                IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false,
+                
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
-                HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false,
+                HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson,
                 HousingValue = loanInsurancePolicySaveDto.HousingValue,
                 HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId,
-                HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false,
+                HIVActive = loanInsurancePolicySaveDto.HIVActive,
                 Height = loanInsurancePolicySaveDto.Height,
                 AssetValue = loanInsurancePolicySaveDto.AssetValue,
                 BirthCityId = loanInsurancePolicySaveDto.BirthCityId,
@@ -78,16 +79,16 @@ namespace Bangk.Domain.Implementation.Client
                 Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries,
                 CityId = loanInsurancePolicySaveDto.CityId,
                 CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId,
-                Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false,
+                Convicted = loanInsurancePolicySaveDto.Convicted,
                 CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId,
-                Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false,
-                LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false,
+                Disability = loanInsurancePolicySaveDto.Disability,
+                LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure,
                 MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses,
                 MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome,
                 NumberChildren = loanInsurancePolicySaveDto.NumberChildren,
                 Occupation = loanInsurancePolicySaveDto.Occupation,
                 OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId,
-                PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false,
+                PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure,
                 ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId,
                 Weight = loanInsurancePolicySaveDto.Weight,
                 LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
@@ -132,12 +133,12 @@ namespace Bangk.Domain.Implementation.Client
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             loanInsurencePolicy.Address = loanInsurancePolicySaveDto.Address;
-            loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false;
+            loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson;
             loanInsurencePolicy.LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue;
-            loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false;
+            loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson;
             loanInsurencePolicy.HousingValue = loanInsurancePolicySaveDto.HousingValue;
             loanInsurencePolicy.HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId;
-            loanInsurencePolicy.HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false;
+            loanInsurencePolicy.HIVActive = loanInsurancePolicySaveDto.HIVActive;
             loanInsurencePolicy.Height = loanInsurancePolicySaveDto.Height;
             loanInsurencePolicy.AssetValue = loanInsurancePolicySaveDto.AssetValue;
             loanInsurencePolicy.BirthCityId = loanInsurancePolicySaveDto.BirthCityId;
@@ -146,16 +147,16 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries;
             loanInsurencePolicy.CityId = loanInsurancePolicySaveDto.CityId;
             loanInsurencePolicy.CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId;
-            loanInsurencePolicy.Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false;
+            loanInsurencePolicy.Convicted = loanInsurancePolicySaveDto.Convicted;
             loanInsurencePolicy.CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId;
-            loanInsurencePolicy.Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false;
-            loanInsurencePolicy.LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false;
+            loanInsurencePolicy.Disability = loanInsurancePolicySaveDto.Disability;
+            loanInsurencePolicy.LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure;
             loanInsurencePolicy.MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses;
             loanInsurencePolicy.MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome;
             loanInsurencePolicy.NumberChildren = loanInsurancePolicySaveDto.NumberChildren;
             loanInsurencePolicy.Occupation = loanInsurancePolicySaveDto.Occupation;
             loanInsurencePolicy.OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId;
-            loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false;
+            loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
             loanInsurencePolicy.ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId;
             loanInsurencePolicy.Weight = loanInsurancePolicySaveDto.Weight;
             loanInsurencePolicy.ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber;
