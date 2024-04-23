@@ -18,22 +18,14 @@ namespace Bangk.Domain.Implementation.Client
         private readonly ILoanInsurancePolicyRepository _loanInsurancePolicyRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly INotificationRepository _notificationRepository;
-        private readonly IConfiguration _configuration;
-        private readonly ILoanApplicationRepository _loanApplicationRepository;
-        private readonly IClientRepository _clientRepository;
-        private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
-        private readonly ISettingRepository _settingRepository;
-        public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository, INotificationRepository notificationRepository, IConfiguration configuration, 
-            ILoanApplicationRepository loanApplicationRepository, IClientRepository clientRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, ISettingRepository settingRepository)
+ 
+        public CreateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IBeneficiaryRepository beneficiaryRepository,
+            INotificationRepository notificationRepository)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _beneficiaryRepository = beneficiaryRepository;
             _notificationRepository = notificationRepository;
-            _configuration = configuration;
-            _loanApplicationRepository = loanApplicationRepository;
-            _clientRepository = clientRepository;
-            _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
-            _settingRepository = settingRepository;
+            
 
         }
 
@@ -53,82 +45,7 @@ namespace Bangk.Domain.Implementation.Client
             {
                 await UpdateLoanInsurancePolicy(loanInsurancePolicySaveDto, loanInsurencePolicy);
             }
-
-            var imc = (loanInsurancePolicySaveDto.Weight ?? 0) / Math.Pow((double)(loanInsurancePolicySaveDto.Height ?? 1), 2);
-            var vih = loanInsurancePolicySaveDto.HIVActive;
-            var questionHealth1 = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
-            var questionHealth2 = loanInsurancePolicySaveDto.Disability;
-            var plannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo;
-            var disabilityMoreInfo = loanInsurancePolicySaveDto.DisabilityMoreInfo;
-            var imcLower = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.ImcLower)).Code);
-            var imcHigher = float.Parse((await _settingRepository.GetById((int)(float)IMCEnum.imcHigher)).Code);
-
-            int trueCount = Convert.ToInt32(vih) + Convert.ToInt32(questionHealth1) + Convert.ToInt32(questionHealth2);
-
-            if (imc <= imcLower || imc >= imcHigher || vih == true || trueCount >= 2)
-            {
-                using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
-
-                var loanApplicationInfo = await _loanApplicationRepository.GetById(loanInsurancePolicySaveDto.LoanApplicationId);
-                var clientInfo = _clientRepository.GetById(loanApplicationInfo.ClientId);
-                var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
-                var sendEmail = new SendGridEmailDto
-                {
-                    email = clientInfo.Result.Email,
-                    From = _configuration.GetSection("SendGridEmailSender:From").Value,
-                    Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
-                    Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
-                    TemplateId = _configuration.GetSection("SendGridEmailSender:PolicyNotIssuedEmail").Value,
-                    Data = new
-                    {
-                        clientname = $"{clientInfo.Result.Name + " " + clientInfo.Result.LastName}",
-                        UrlCallback = url
-                    }
-                };
-
-                await SendGridEmailSender.SendEmailAsync(sendEmail);
-
-                string observations = string.Empty;
-
-                if (imc <= 0.0017 || imc >= 0.0032)
-                {
-                    observations += "IMC por fuera de lo normal (" + imc.ToString("F4") + "). ";
-                }
-
-                if (vih.HasValue && vih.Value)
-                {
-                    observations += "Presencia de VIH. ";
-                }
-
-                if (questionHealth1.HasValue && questionHealth1.Value && !string.IsNullOrEmpty(plannedMedicalProcidureMoreInfo))
-                {
-                    observations += plannedMedicalProcidureMoreInfo + ".";
-                }
-
-                if (questionHealth2.HasValue && questionHealth2.Value && !string.IsNullOrEmpty(disabilityMoreInfo))
-                {
-                    observations += disabilityMoreInfo + ".";
-                }
-
-
-                var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
-                {
-                    CreationDate = DateTime.UtcNow,
-                    LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
-                    Observations = observations,
-                    StateId = (int)ApplicationStateHistoryEnum.ClienteNoAsegurable
-                };
-
-                await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
-
-                var client = await _clientRepository.GetClientByLoanApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
-                client.State = (int)ClientStateEnum.NoAsegurable;
-                await _clientRepository.Update(client);
-
-                scope.Complete();
-
-            }
-
+           
             var notifications = await _notificationRepository.GetNotificationByApplicationId(loanInsurancePolicySaveDto.LoanApplicationId);
             if(notifications != null && notifications.Count > 0)
             {
@@ -146,12 +63,12 @@ namespace Bangk.Domain.Implementation.Client
             var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
             {
                 Address = loanInsurancePolicySaveDto.Address,
-                IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false,
+                IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
-                HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false,
+                HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson,
                 HousingValue = loanInsurancePolicySaveDto.HousingValue,
                 HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId,
-                HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false,
+                HIVActive = loanInsurancePolicySaveDto.HIVActive,
                 Height = loanInsurancePolicySaveDto.Height,
                 AssetValue = loanInsurancePolicySaveDto.AssetValue,
                 BirthCityId = loanInsurancePolicySaveDto.BirthCityId,
@@ -160,16 +77,16 @@ namespace Bangk.Domain.Implementation.Client
                 Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries,
                 CityId = loanInsurancePolicySaveDto.CityId,
                 CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId,
-                Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false,
+                Convicted = loanInsurancePolicySaveDto.Convicted,
                 CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId,
-                Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false,
-                LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false,
+                Disability = loanInsurancePolicySaveDto.Disability,
+                LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure,
                 MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses,
                 MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome,
                 NumberChildren = loanInsurancePolicySaveDto.NumberChildren,
                 Occupation = loanInsurancePolicySaveDto.Occupation,
                 OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId,
-                PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false,
+                PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure,
                 ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId,
                 Weight = loanInsurancePolicySaveDto.Weight,
                 LoanApplicationId = loanInsurancePolicySaveDto.LoanApplicationId,
@@ -186,6 +103,7 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
+            
 
             if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0
                 && loanInsurancePolicySaveDto.beneficiary.Count <= 7 && newLoanInsurencePolicy.Beneficiaries.HasValue && newLoanInsurencePolicy.Beneficiaries.Value)
@@ -208,17 +126,16 @@ namespace Bangk.Domain.Implementation.Client
             }
             scope.Complete();
         }
-
         private async Task UpdateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto, LoanInsurancePolicy loanInsurencePolicy)
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             loanInsurencePolicy.Address = loanInsurancePolicySaveDto.Address;
-            loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson.HasValue ? loanInsurancePolicySaveDto.IsPublicPerson.Value : false;
+            loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson;
             loanInsurencePolicy.LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue;
-            loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson.HasValue ? loanInsurancePolicySaveDto.HasBondPublicPerson.Value : false;
+            loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson;
             loanInsurencePolicy.HousingValue = loanInsurancePolicySaveDto.HousingValue;
             loanInsurencePolicy.HousingTypeId = loanInsurancePolicySaveDto.HousingTypeId;
-            loanInsurencePolicy.HIVActive = loanInsurancePolicySaveDto.HIVActive.HasValue ? loanInsurancePolicySaveDto.HIVActive.Value : false;
+            loanInsurencePolicy.HIVActive = loanInsurancePolicySaveDto.HIVActive;
             loanInsurencePolicy.Height = loanInsurancePolicySaveDto.Height;
             loanInsurencePolicy.AssetValue = loanInsurancePolicySaveDto.AssetValue;
             loanInsurencePolicy.BirthCityId = loanInsurancePolicySaveDto.BirthCityId;
@@ -227,16 +144,16 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.Beneficiaries = loanInsurancePolicySaveDto.Beneficiaries;
             loanInsurencePolicy.CityId = loanInsurancePolicySaveDto.CityId;
             loanInsurencePolicy.CivilStatusId = loanInsurancePolicySaveDto.CivilStatusId;
-            loanInsurencePolicy.Convicted = loanInsurancePolicySaveDto.Convicted.HasValue ? loanInsurancePolicySaveDto.Convicted.Value : false;
+            loanInsurencePolicy.Convicted = loanInsurancePolicySaveDto.Convicted;
             loanInsurencePolicy.CountryNationalityId = loanInsurancePolicySaveDto.CountryNationalityId;
-            loanInsurencePolicy.Disability = loanInsurancePolicySaveDto.Disability.HasValue ? loanInsurancePolicySaveDto.Disability.Value : false;
-            loanInsurencePolicy.LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure.HasValue ? loanInsurancePolicySaveDto.LifeEnsure.Value : false;
+            loanInsurencePolicy.Disability = loanInsurancePolicySaveDto.Disability;
+            loanInsurencePolicy.LifeEnsure = loanInsurancePolicySaveDto.LifeEnsure;
             loanInsurencePolicy.MonthlyExpenses = loanInsurancePolicySaveDto.MonthlyExpenses;
             loanInsurencePolicy.MonthlyIncome = loanInsurancePolicySaveDto.MonthlyIncome;
             loanInsurencePolicy.NumberChildren = loanInsurancePolicySaveDto.NumberChildren;
             loanInsurencePolicy.Occupation = loanInsurancePolicySaveDto.Occupation;
             loanInsurencePolicy.OccupationActivityId = loanInsurancePolicySaveDto.OccupationActivityId;
-            loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure.HasValue ? loanInsurancePolicySaveDto.PlannedMedicalProcidure.Value : false;
+            loanInsurencePolicy.PlannedMedicalProcidure = loanInsurancePolicySaveDto.PlannedMedicalProcidure;
             loanInsurencePolicy.ResidenceCityId = loanInsurancePolicySaveDto.ResidenceCityId;
             loanInsurencePolicy.Weight = loanInsurancePolicySaveDto.Weight;
             loanInsurencePolicy.ApartmentNumber = loanInsurancePolicySaveDto.ApartmentNumber;
@@ -252,6 +169,7 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
 
             await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
+            
 
             if (loanInsurancePolicySaveDto.beneficiary != null && loanInsurancePolicySaveDto.beneficiary.Count > 0 && loanInsurancePolicySaveDto.beneficiary.Count <= 7
                 && loanInsurancePolicySaveDto.Beneficiaries.HasValue && loanInsurancePolicySaveDto.Beneficiaries.Value)
@@ -291,6 +209,8 @@ namespace Bangk.Domain.Implementation.Client
                     }
                 }
             }
+
+            
             scope.Complete();
         }
 
