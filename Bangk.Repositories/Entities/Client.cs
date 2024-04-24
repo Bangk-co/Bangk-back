@@ -17,7 +17,7 @@ namespace Bangk.Repositories.Entities
         public DateTime PermissionTreatPersonalDataDate { get; set; }
         public virtual ICollection<LoanApplication> LoanApplications { get; set; }
         public DateTime? DocumentIssueDate {  get; set; }
-        public DateTime ValidateClientOtp { get; set; }
+        public DateTime? ValidateClientOtp { get; set; }
 
         public int State {  get; set; }
     }

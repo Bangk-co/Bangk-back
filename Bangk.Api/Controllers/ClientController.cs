@@ -1,6 +1,7 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
+using Bangk.Domain.Contract.Users;
 using Bangk.Repositories.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,12 +20,16 @@ namespace Bangk.Api.Controllers
         private readonly IClientInfoService _getClientInfoService;
         private readonly ICreateClientService _createClientService;
         private readonly IUpdateClientService _updateClientService;
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, IUpdateClientService updateClientService)
+        private readonly ICreateUserService _createUserService;
+
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, 
+            IUpdateClientService updateClientService, ICreateUserService createUserService)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
             _updateClientService = updateClientService;
+            _createUserService = createUserService;
         }
 
         [HttpGet("GetClientService")]
@@ -85,6 +90,19 @@ namespace Bangk.Api.Controllers
             {
                 ClientUpdate = result.Result
             });
+        }
+
+        [HttpPost("CreateUserPassword")]
+        [AllowAnonymous]
+        public async Task<ActionResult<bool>> CreateUserPassword(CreateUserDto createUser)
+        {
+            var result = await _createUserService.Execute(createUser);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result.Result);
         }
 
     }
