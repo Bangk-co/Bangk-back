@@ -107,12 +107,15 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanSaveFormService, LoanSaveFormService>();
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
-            
+            services.AddTransient<IReportExcel, ReportClientsSarlaft>();
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
 
             services.AddHostedService<CompleteApplicationJob>();
+            services.AddHostedService<SFTPConnection>();
+            services.AddHostedService<ReportSarlaftJob>();
         }
     }
 }

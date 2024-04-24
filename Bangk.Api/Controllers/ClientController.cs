@@ -1,4 +1,5 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
 using Bangk.Repositories.Entities;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -19,12 +21,14 @@ namespace Bangk.Api.Controllers
         private readonly IClientInfoService _getClientInfoService;
         private readonly ICreateClientService _createClientService;
         private readonly IUpdateClientService _updateClientService;
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, IUpdateClientService updateClientService)
+        private readonly IReportExcel _reportExcel;
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, IUpdateClientService updateClientService, IReportExcel reportExcel)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
             _updateClientService = updateClientService;
+            _reportExcel = reportExcel;
         }
 
         [HttpGet("GetClientService")]
@@ -87,5 +91,12 @@ namespace Bangk.Api.Controllers
             });
         }
 
+        [HttpPost("generate")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GenerateSarlaftReport()
+        {
+            await _reportExcel.CreateSarlaftReport();
+            return Ok();
+        }
     }
 }

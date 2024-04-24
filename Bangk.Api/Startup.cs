@@ -1,4 +1,6 @@
 using Bangk.Api.Extensions;
+using Bangk.Domain.Contract;
+using Bangk.Domain.Implementation.BackgroundTask;
 using Bangk.Repositories.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Renci.SshNet;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using System;
@@ -48,6 +51,20 @@ namespace Bangk.Api
 
             // Add converter to DI
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            
+
+            services.AddSingleton<SftpClient>(provider =>
+            {
+                var host = "mfxsftp.mfxservices.com";
+                var port = 22;
+                var username = "SBS_BANGK_RW";
+                var password = "Lk@13HgYT";
+
+                var sftpClient = new SftpClient(host, port, username, password);
+                sftpClient.Connect();
+
+                return sftpClient;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

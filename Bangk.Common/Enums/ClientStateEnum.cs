@@ -60,4 +60,10 @@ namespace Bangk.Common.Enums
         ImcLower = 691,
         imcHigher = 692
     }
+
+    public enum DocumenIdentificationTypeEnum
+    {
+        Cc = 76,
+        Ce = 77
+    }
 }
