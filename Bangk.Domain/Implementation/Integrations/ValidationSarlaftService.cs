@@ -90,7 +90,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     {
                         description = jsonObject.descripcion;
                         validationResultCode = 3;
-                        await _scheduleIntegrationService.CreateNextTrySBS(loanApplicationId, 2);
+                        await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
                     }
 
                     await SaveLoanHistory(loanApplicationId, description, (int)ApplicationStateHistoryEnum.EstudioSarlaft, validationResultCode);
@@ -100,7 +100,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     //var OFACRestriction = response.ReasonPhrase;
                     //await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioSarlaft, 3);
-                    //await _scheduleIntegrationService.CreateNextTrySBS(loanApplicationId, 2);
+                    //await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
                 }
             }
         }

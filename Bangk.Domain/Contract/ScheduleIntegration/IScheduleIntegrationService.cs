@@ -4,6 +4,6 @@ namespace Bangk.Domain.Contract.ScheduleIntegration
 {
     public interface IScheduleIntegrationService
     {
-        Task CreateNextTrySBS(int loanApplicationId, int typeValidation);
+        Task CreateNextTrySBSOrSarlaft(int loanApplicationId, int typeValidation);
     }
 }

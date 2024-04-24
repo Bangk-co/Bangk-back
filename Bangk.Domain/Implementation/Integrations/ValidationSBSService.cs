@@ -60,7 +60,7 @@ namespace Bangk.Domain.Implementation.Integrations
             {
                 //var OFACRestriction = responseValidation.DescripcionError;
                 //await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
-                //await _scheduleIntegrationService.CreateNextTrySBS(loanApplicationId, 1);
+                //await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 1);
             }
 
             await _validationSarlaftService.Execute(loanApplicationId);

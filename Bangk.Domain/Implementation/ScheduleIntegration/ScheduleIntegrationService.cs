@@ -14,7 +14,7 @@ namespace Bangk.Domain.Implementation.ScheduleIntegration
             _scheduleIntegrationRepository = scheduleIntegrationRepository;
         }
 
-        public async Task CreateNextTrySBS(int loanApplicationId, int typeValidation)
+        public async Task CreateNextTrySBSOrSarlaft(int loanApplicationId, int typeValidation)
         {
             var scheduler = await _scheduleIntegrationRepository.GetScheduleIntegrationByLoanApplicationId(loanApplicationId, typeValidation);
             if (scheduler == null)
