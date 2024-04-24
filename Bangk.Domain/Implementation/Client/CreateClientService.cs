@@ -65,7 +65,7 @@ namespace Bangk.Domain.Implementation.Client
 
             var client = new Repositories.Entities.Client()
             {
-                Email = createClientDto.Email,
+                Email = createClientDto.Email.Trim(),
                 IdentificationNumber = createClientDto.IdentificationNumber,
                 DocumenIdentificationTypeId = createClientDto.DocumenIdentificationTypeId,
                 BirthDate = createClientDto.BirthDate,

@@ -2,6 +2,7 @@
 using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
+using Bangk.Domain.Contract.Users;
 using Bangk.Repositories.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,17 @@ namespace Bangk.Api.Controllers
         private readonly IClientInfoService _getClientInfoService;
         private readonly ICreateClientService _createClientService;
         private readonly IUpdateClientService _updateClientService;
+        private readonly ICreateUserService _createUserService;
         private readonly IReportExcel _reportExcel;
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, IUpdateClientService updateClientService, IReportExcel reportExcel)
+
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, 
+            IUpdateClientService updateClientService, ICreateUserService createUserService, IReportExcel reportExcel)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
             _updateClientService = updateClientService;
+            _createUserService = createUserService;
             _reportExcel = reportExcel;
         }
 
@@ -89,6 +94,19 @@ namespace Bangk.Api.Controllers
             {
                 ClientUpdate = result.Result
             });
+        }
+
+        [HttpPost("CreateUserPassword")]
+        [AllowAnonymous]
+        public async Task<ActionResult<bool>> CreateUserPassword(CreateUserDto createUser)
+        {
+            var result = await _createUserService.Execute(createUser);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result.Result);
         }
 
         [HttpPost("generate")]

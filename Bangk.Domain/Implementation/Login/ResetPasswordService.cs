@@ -19,7 +19,7 @@ namespace Bangk.Domain.Implementation.Login
         private readonly IGetUserByHashEmailResetService _getUserByHashEmailResetService;
         private readonly IConfiguration _configuration;
         public ResetPasswordService(IValidator<ResetPasswordDto> resetPasswordValidator,
-             IUserRepository userRepository, IGetUserByEmailService getUserByEmailService, IGetUserByHashEmailResetService getUserByHashEmailResetService,
+             IUserRepository userRepository, IGetUserByHashEmailResetService getUserByHashEmailResetService,
             IConfiguration configuration)
         {
             _resetPasswordValidator = resetPasswordValidator;

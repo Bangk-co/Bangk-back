@@ -51,6 +51,7 @@ namespace Bangk.Api.Extensions
             services.AddSingleton<IValidator<CreateClientDto>, CreateClientValidator>();
             services.AddSingleton<IValidator<ClientUpdateInfoDto>, UpdateClientValidator>();
             services.AddSingleton<IValidator<UpdateLoanApplicationDto>, UpdateLoanApplicationValidator>();
+            services.AddSingleton<IValidator<CreateUserDto>, CreateUserValidator>();
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -107,6 +108,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanSaveFormService, LoanSaveFormService>();
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
+            services.AddTransient<ICreateUserService, CreateUserService>(); 
+
             services.AddTransient<IReportExcel, ReportClientsSarlaft>();
 
             // Add AutoMapper
