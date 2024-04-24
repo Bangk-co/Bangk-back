@@ -64,6 +64,8 @@ namespace Bangk.Domain.Implementation.Client
             {
                 Address = loanInsurancePolicySaveDto.Address,
                 IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
+                AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
+                
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
                 HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson,
                 HousingValue = loanInsurancePolicySaveDto.HousingValue,
@@ -100,6 +102,7 @@ namespace Bangk.Domain.Implementation.Client
                 PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
                 CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
                 VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
+                
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);

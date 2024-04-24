@@ -14,9 +14,9 @@ namespace Bangk.Domain.Implementation.Settings
             _settingRepository = settingRepository;
         }
 
-        public async Task<List<SettingListDto>> Execute(int groupSettingId)
+        public async Task<List<SettingListDto>> Execute(int groupSettingId, string searchText)
         {
-            return await _settingRepository.GetSettingList(groupSettingId);
+            return await _settingRepository.GetSettingList(groupSettingId, searchText);
         }
     }
 }
