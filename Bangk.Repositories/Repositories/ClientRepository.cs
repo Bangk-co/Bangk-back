@@ -67,7 +67,6 @@ namespace Bangk.Repositories.Repositories
                         where c.Id == clientId
                         select new ClientInfoDto
                         {
-
                             Name = c.Name,
                             LastName = c.LastName,
                             DocumentType = s.Name,
@@ -79,6 +78,7 @@ namespace Bangk.Repositories.Repositories
                             BirthDate = c.BirthDate,
                             DocumentIssueDate = c.DocumentIssueDate,
                             GenderName = subsg.Name,
+                            GenderId = subsc.Id,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty
                         };
 

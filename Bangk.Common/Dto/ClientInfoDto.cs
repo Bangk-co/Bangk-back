@@ -20,7 +20,7 @@ namespace Bangk.Common.Dto
         public string StateName { get; set; }
         public string GenderName {  get; set; }
         public DateTime? DocumentIssueDate { get; set; }
-
+        public int? GenderId { get; set; }
     }
 
     public class ClientUpdateInfoDto
