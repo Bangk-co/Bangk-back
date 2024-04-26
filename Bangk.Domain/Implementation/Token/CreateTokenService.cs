@@ -27,6 +27,7 @@ namespace Bangk.Domain.Implementation.Login
                 new(ClaimTypes.Surname, user.LastName),
                 new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Role, user.Role.RolName),
+                new("ClientId", $"{user.ClientId}")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Jwt:Token").Value));
