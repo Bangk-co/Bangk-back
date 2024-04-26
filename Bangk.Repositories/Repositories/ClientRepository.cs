@@ -70,6 +70,7 @@ namespace Bangk.Repositories.Repositories
                             Name = c.Name,
                             LastName = c.LastName,
                             DocumentType = s.Name,
+                            DocumentTypeId = s.Id,
                             IdentificationNumber = c.IdentificationNumber,
                             IdClient = c.Id,
                             Email = c.Email,

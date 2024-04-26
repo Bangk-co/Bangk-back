@@ -22,10 +22,11 @@ namespace Bangk.Api.Controllers
         private readonly IUpdateClientService _updateClientService;
         private readonly ICreateUserService _createUserService;
         private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
-
+        private readonly IUpdateProfileService _updateProfileService;
 
         public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
-            IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService)
+            IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
+            IUpdateProfileService updateProfileService)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
@@ -33,6 +34,7 @@ namespace Bangk.Api.Controllers
             _updateClientService = updateClientService;
             _createUserService = createUserService;
             _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
+            _updateProfileService = updateProfileService;
         }
 
         [HttpGet("GetClientService")]
@@ -126,5 +128,20 @@ namespace Bangk.Api.Controllers
             });
         }
 
+        [HttpPut("UpdateProfile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto updatedClient)
+        {
+            var result = await _updateProfileService.Execute(updatedClient);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                result.Result
+            });
+        }
     }
 }
