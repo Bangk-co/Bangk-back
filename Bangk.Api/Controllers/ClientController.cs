@@ -21,15 +21,18 @@ namespace Bangk.Api.Controllers
         private readonly ICreateClientService _createClientService;
         private readonly IUpdateClientService _updateClientService;
         private readonly ICreateUserService _createUserService;
+        private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
 
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, 
-            IUpdateClientService updateClientService, ICreateUserService createUserService)
+
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
+            IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
             _updateClientService = updateClientService;
             _createUserService = createUserService;
+            _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
         }
 
         [HttpGet("GetClientService")]
@@ -75,7 +78,7 @@ namespace Bangk.Api.Controllers
                 ClientId = result.Result
             });
         }
-        
+
         [HttpPut("UpdateClientService")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateClient(int clientId, ClientUpdateInfoDto updatedClient)
@@ -103,6 +106,24 @@ namespace Bangk.Api.Controllers
             }
 
             return Ok(result.Result);
+        }
+
+
+
+        [HttpPost("CreateClient")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<CreateClientNotLoanApplicationDto>>> CreateClient(CreateClientNotLoanApplicationDto createClientDto)
+        {
+            var result = await _createClientNotLoanApplicationService.Execute(createClientDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                result.Result
+            });
         }
 
     }

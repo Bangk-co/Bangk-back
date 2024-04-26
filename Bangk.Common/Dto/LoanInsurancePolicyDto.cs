@@ -44,7 +44,7 @@ namespace Bangk.Common.Dto
         public DateTime? DocumentIssueDate { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }
-        public int CountryCodePhoneId { get; set; }
+        public int? CountryCodePhoneId { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set;}
         public string Diseases { get; set; }
@@ -52,8 +52,8 @@ namespace Bangk.Common.Dto
         public string PlannedMedicalProcidureMoreInfo { get; set; }
         public string DisabilityMoreInfo { get; set; }
         public int ClienId { get; set; }
-        public DateTime BirthDate { get; set; }
-        public int GenderId { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public int? GenderId { get; set; }
         public long LoanBalance { get; set; }
         public long? MonthlyCostInsurance { get; set; }
         public int? BirthStateId { get; set; }

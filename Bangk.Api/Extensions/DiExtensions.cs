@@ -52,6 +52,7 @@ namespace Bangk.Api.Extensions
             services.AddSingleton<IValidator<ClientUpdateInfoDto>, UpdateClientValidator>();
             services.AddSingleton<IValidator<UpdateLoanApplicationDto>, UpdateLoanApplicationValidator>();
             services.AddSingleton<IValidator<CreateUserDto>, CreateUserValidator>();
+            services.AddSingleton<IValidator<CreateClientNotLoanApplicationDto>, CreateClientNotLoanApplicationValidator>();
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -108,8 +109,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanSaveFormService, LoanSaveFormService>();
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
-            services.AddTransient<ICreateUserService, CreateUserService>(); 
-
+            services.AddTransient<ICreateUserService, CreateUserService>();
+            services.AddTransient<ICreateClientNotLoanApplicationService, CreateClientNotLoanApplicationService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

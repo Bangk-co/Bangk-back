@@ -16,7 +16,7 @@ namespace Bangk.Common.Dto
         public string Email {  get; set; }
         public int CountryCode { get; set; }
         public string  PhoneNumber {  get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string StateName { get; set; }
         public string GenderName {  get; set; }
         public DateTime? DocumentIssueDate { get; set; }

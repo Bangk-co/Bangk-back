@@ -57,8 +57,13 @@ namespace Bangk.Repositories.Repositories
             var query = from c in Context.Clients
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         join s in Context.Settings on c.DocumenIdentificationTypeId equals s.Id
-                        join sg in Context.Settings on c.GenderId equals sg.Id
-                        join sc in Context.Settings on c.CountryCodePhoneId equals sc.Id
+
+                        join sg in Context.Settings on c.GenderId equals sg.Id into t
+                        from subsg in t.DefaultIfEmpty()
+
+                        join sc in Context.Settings on c.CountryCodePhoneId equals sc.Id into r
+                        from subsc in r.DefaultIfEmpty()
+
                         where c.Id == clientId
                         select new ClientInfoDto
                         {
@@ -69,11 +74,11 @@ namespace Bangk.Repositories.Repositories
                             IdentificationNumber = c.IdentificationNumber,
                             IdClient = c.Id,
                             Email = c.Email,
-                            CountryCode = sc.Id,
+                            CountryCode = subsc.Id,
                             PhoneNumber = c.PhoneNumber,
                             BirthDate = c.BirthDate,
                             DocumentIssueDate = c.DocumentIssueDate,
-                            GenderName = sg.Name,
+                            GenderName = subsg.Name,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty
                         };
 
