@@ -45,7 +45,7 @@ namespace Bangk.Domain.Implementation.Users
             }
 
             var currentPassword = PasswordUtils.DecryptPassword(updatePasswordDto.CurrentPassword, key, iv);
-            var isCorrectLogin = PasswordUtils.IsValidPassword(currentPassword);
+            var isCorrectLogin = PasswordUtils.VerifyPasswordHash(currentPassword, user.PasswordHash, user.PasswordSalt);
             if (!isCorrectLogin)
             {
                 result.HasErrors = true;
