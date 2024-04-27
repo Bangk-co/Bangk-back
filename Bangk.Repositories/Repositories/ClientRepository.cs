@@ -79,7 +79,7 @@ namespace Bangk.Repositories.Repositories
                             BirthDate = c.BirthDate,
                             DocumentIssueDate = c.DocumentIssueDate,
                             GenderName = subsg.Name,
-                            GenderId = subsc.Id,
+                            GenderId = subsg.Id,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty
                         };
 
