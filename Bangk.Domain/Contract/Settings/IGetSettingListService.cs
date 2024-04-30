@@ -6,6 +6,6 @@ namespace Bangk.Domain.Contract.Settings
 {
     public interface IGetSettingListService
     {
-        Task<List<SettingListDto>> Execute(int groupSettingId);
+        Task<List<SettingListDto>> Execute(int groupSettingId, string searchText);
     }
 }

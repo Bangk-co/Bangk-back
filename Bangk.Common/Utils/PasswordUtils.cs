@@ -83,5 +83,13 @@ namespace Bangk.Common.Utils
             // Return true if the email matches the pattern, otherwise false
             return match.Success;
         }
+
+
+        public static bool IsValidPassword(string password)
+        {
+            string passwordPattern = @"^(?=.*[A-Z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$";
+            var regex = new Regex(passwordPattern);
+            return regex.IsMatch(password);
+        }
     }
 }

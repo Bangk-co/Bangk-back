@@ -64,6 +64,8 @@ namespace Bangk.Domain.Implementation.Client
             {
                 Address = loanInsurancePolicySaveDto.Address,
                 IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
+                AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
+                
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
                 HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson,
                 HousingValue = loanInsurancePolicySaveDto.HousingValue,
@@ -100,6 +102,7 @@ namespace Bangk.Domain.Implementation.Client
                 PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
                 CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
                 VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
+                
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
@@ -216,6 +219,9 @@ namespace Bangk.Domain.Implementation.Client
 
         private async Task CreateNotification(int loanApplicationId)
         {
+            var notification = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddHours(1) };
+            await _notificationRepository.Create(notification);
+
             var notification1 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddHours(23).AddMinutes(53) };
             await _notificationRepository.Create(notification1);
 
