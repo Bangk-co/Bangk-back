@@ -20,25 +20,42 @@ namespace Bangk.Domain.Implementation.BackgroundTask
     {
         private readonly IClientRepository _clientRepository;
         private readonly SftpClient _sftpClient;
+        private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
 
 
-        public ReportClientsSarlaft(IClientRepository clientRepository, SftpClient sftpClient)
+        public ReportClientsSarlaft(IClientRepository clientRepository, SftpClient sftpClient, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
         {
             _clientRepository = clientRepository;
             _sftpClient = sftpClient;
+            _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
         }
 
         public async Task CreateSarlaftReport()
         {
             
-            string dateFile = DateTime.Now.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
+            string dateFile = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
             string localFilePath = Path.Combine( dateFile);
             var stateloanApplication = ApplicationStateHistoryEnum.FormulariosValidados;
             var eligibleClients = _clientRepository.GetReportClientsSarlaft(stateloanApplication);
             await GenerateExcel(localFilePath, eligibleClients);
-
             string remoteDirectory = "/Reporte_Sarlaft/"; 
             await UploadFileToSftp(localFilePath, remoteDirectory);
+
+            var loanApplicationIds = _clientRepository.GetLoanApplicationIdsWithState(stateloanApplication);
+            var clientListId = loanApplicationIds.ToList();
+            foreach (var loanApplicationId in loanApplicationIds)
+            {
+                var newLoanApplicationStateHistory = new Repositories.Entities.LoanApplicationStateHistory
+                {
+                    CreationDate = DateTime.UtcNow,
+                    LoanApplicationId = loanApplicationId,
+                    Observations = string.Empty,
+                    StateId = (int)ApplicationStateHistoryEnum.PolizaEmitida
+
+                };
+
+                await _loanApplicationStateHistoryRepository.Create(newLoanApplicationStateHistory);
+            }
         }
 
         public async Task GenerateExcel(string dateFile, IQueryable<ClientReportDto> clients)
@@ -80,8 +97,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     }
 
                     int row = 2;
+                    var clientList = clients.ToList();
                     int lastConsecutive = GetLastConsecutive();
-
 
                     foreach (var client in clients)
                     {
@@ -113,8 +130,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, 46].Value = "AP";
                         worksheet.Cells[row, 50].Value = "BUILDING LIFE TECHNOLOGIES S.A.S. - 901647130-5";
                         worksheet.Cells[row, 51].Value = client.CreationDatePolicy.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 52].Value = DateTime.Now.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 53].Value = DateTime.Now.AddYears(1).ToString("yyyyMMdd");
+                        worksheet.Cells[row, 52].Value = DateTime.UtcNow.ToString("yyyyMMdd");
+                        worksheet.Cells[row, 53].Value = DateTime.UtcNow.AddYears(1).ToString("yyyyMMdd");
                         worksheet.Cells[row, 56].Value = "1A";
                         worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
                         worksheet.Cells[row, 58].Value = "Oneroso";
@@ -142,7 +159,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error en el método Crear Excel -> {ex}");
+                throw new Exception($"Error en el método Crear Ingesta Bangk Polizas  -> {ex}");
             }
         }
 
@@ -175,6 +192,131 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             File.WriteAllText(filePathC, lastConsecutive.ToString());
         }
 
+
+        public async Task CreateSarlaftReportLogs()
+        {
+            string dateFile = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logs de aceptacion BangK.xlsx";
+            string localFilePath = Path.Combine(dateFile);
+            var stateloanApplication = ApplicationStateHistoryEnum.FormulariosValidados;
+            var eligibleClients = _clientRepository.GetReportClientsSarlaftLogs(stateloanApplication);
+            await GenerateExcelLogs(localFilePath, eligibleClients);
+            string remoteDirectory = "/Reporte_Sarlaft/";
+            await UploadFileToSftp(localFilePath, remoteDirectory);
+
+        }
+
+
+        public async Task GenerateExcelLogs (string dateFile, IQueryable<ClientReport2Dto> clients)
+        {
+            try
+            {
+                string path = dateFile;
+
+                using (var package = new ExcelPackage(new FileInfo(path)))
+                {
+
+                    var worksheet = package.Workbook.Worksheets.Add("Ingesta con logs de aceptacion");
+
+                    Console.WriteLine("Generando Titulos");
+
+
+                    string[] titles = { "Fecha de Aceptacion de PTD","Fecha de Aceptacion de TyC", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP (Si aplica)",
+                    "Fecha de aceptacion de origen de fondos ( si aplica)", "Nombres","Apellidos","Tipo de documento","Numero de documento","Codigo del pais","Numero de telefono","Correo Electronico",
+                    "País de nacimiento","Departamento/Estado de nacimiento","Ciudad de nacimiento","Nacionalidad","Estado civil","Número de hijos","Profesión","Actividad económica","Persona PPE",
+                    "Familiares PPE","País de residencia","Departamento de residencia","Ciudad de residencia","Ingresos mensuales","Gastos mensuales","Valor de tus activos","Valor de tus pasivos",
+                    "Origen de mis fondos","Cuál es tu peso en kilos? (kg)","¿Cuál es tu estatura en centímetros? (cm)","Te han diagnosticado alguna(s) de estas enfermedades, circunstancias o eventos?","Ampliar informacion de diagnosticos",
+                    "¿Te han detectado la presencia de anticuerpos contra el virus V.I.H. productor del SIDA?","¿Te encuentras actualmente en exámenes, estudios, investigación o te han indicado la necesidad de alguna cirugía o tratamiento que no te hayas realizado aún?",
+                    "Ampliar informacion de examanes","Tienes algún tipo de discapacidad, incapacidad o limitación física o mental?","Ampliar informacion de discapacidad",
+                    "Has sido indiciado, investigado, procesado, inculpado, imputado, detenido y/o condenado por algún delito?","Tienes algún seguro de vida individual o de accidentes personales con Allianz o con cualquier aseguradora diferentes a aquellos que respaldan deudas en entidades financieras?",
+                    "NOMBRE BENEFICIARIO 1","TIPO DE DOCUMENTO BENEFICIARIO 1","NUMERO DOCUMENTO BENEFICIARIO 1","PARENTESCO 1","% PARTICIPACION 1","NOMBRE BENEFICIARIO 2",
+                    "TIPO DE DOCUMENTO BENEFICIARIO 2","NUMERO DOCUMENTO BENEFICIARIO 2","PARENTESCO 2","% PARTICIPACION 2","NOMBRE BENEFICIARIO 3","TIPO DE DOCUMENTO BENEFICIARIO 3",
+                    "NUMERO DOCUMENTO BENEFICIARIO 3", "PARENTESCO 3","% PARTICIPACION 3","NOMBRE BENEFICIARIO 4","TIPO DE DOCUMENTO BENEFICIARIO 4","NUMERO DOCUMENTO BENEFICIARIO 4","PARENTESCO 4",
+                    "% PARTICIPACION 4","NOMBRE BENEFICIARIO 5","TIPO DE DOCUMENTO BENEFICIARIO 5","NUMERO DOCUMENTO BENEFICIARIO 5","PARENTESCO 5","% PARTICIPACION 5","NOMBRE BENEFICIARIO 6",
+                    "TIPO DE DOCUMENTO BENEFICIARIO 6", "NUMERO DOCUMENTO BENEFICIARIO 6","PARENTESCO 6","% PARTICIPACION 6","NOMBRE BENEFICIARIO 7","TIPO DE DOCUMENTO BENEFICIARIO 7",
+                    "NUMERO DOCUMENTO BENEFICIARIO 7","PARENTESCO 7", "% PARTICIPACION 7","NOMBRE BENEFICIARIO 8","TIPO DE DOCUMENTO BENEFICIARIO 8","NUMERO DOCUMENTO BENEFICIARIO 8","PARENTESCO 8","% PARTICIPACION 8" };
+
+
+                    for (int i = 0; i < titles.Length; i++)
+                    {
+                        worksheet.Cells[1, i + 1].Value = titles[i];
+                    }
+
+                    int row = 2;
+                    var clientList = clients.ToList();
+
+                    foreach (var client in clientList)
+                    {
+                        worksheet.Cells[row, 1].Value = client.PermissionTreatPersonalDataDate.ToString("yyyyMMdd");
+                        worksheet.Cells[row, 2].Value = client.TermsConditionsAcceptanceQuote?.ToString("yyyyMMdd");
+                        worksheet.Cells[row, 3].Value = client.ValidateClientOtp?.ToString("yyyyMMdd");
+                        worksheet.Cells[row, 4].Value = client.AcceptQuoteOtp?.ToString("yyyyMMdd");
+                        //Tercer otp pendiente
+                        worksheet.Cells[row, 6].Value = client.AcceptanceOriginOfFunds?.ToString("yyyyMMdd");
+                        worksheet.Cells[row, 7].Value = client.Name;
+                        worksheet.Cells[row, 8].Value = client.LastName;
+                        worksheet.Cells[row, 9].Value = client.DocumenIdentificationTypeId;
+                        worksheet.Cells[row, 10].Value = client.IdentificationNumber;
+                        worksheet.Cells[row, 11].Value = client.CountryCodePhoneId;
+                        worksheet.Cells[row, 12].Value = client.PhoneNumber;
+                        worksheet.Cells[row, 13].Value = client.Email;
+                        worksheet.Cells[row, 14].Value = client.CountryName;
+                        worksheet.Cells[row, 15].Value = client.StateName;
+                        worksheet.Cells[row, 16].Value = client.CityName;
+                        worksheet.Cells[row, 17].Value = client.CountryNationality;
+                        worksheet.Cells[row, 18].Value = client.CivilStatus;
+                        worksheet.Cells[row, 19].Value = client.NumberChildren;
+                        worksheet.Cells[row, 20].Value = client.Occupation;
+                        worksheet.Cells[row, 21].Value = client.OccupationActivity;
+                        worksheet.Cells[row, 22].Value = client.IsPublicPerson.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : ""; 
+                        worksheet.Cells[row, 23].Value = client.HasBondPublicPerson.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                        worksheet.Cells[row, 24].Value = client.ResidenceCountry;
+                        worksheet.Cells[row, 25].Value = client.ResidenceState;
+                        worksheet.Cells[row, 26].Value = client.ResidenceCity;
+                        worksheet.Cells[row, 27].Value = client.MonthlyIncome;
+                        worksheet.Cells[row, 28].Value = client.MonthlyExpenses;
+                        worksheet.Cells[row, 29].Value = client.AssetValue;
+                        worksheet.Cells[row, 30].Value = client.LiabilitiesValue;
+                        worksheet.Cells[row, 31].Value = client.IncomeOrigin;
+                        worksheet.Cells[row, 32].Value = client.Weight;
+                        worksheet.Cells[row, 33].Value = client.Height;
+                        worksheet.Cells[row, 34].Value =  _clientRepository.GetDiseasesNames(client.Diseases);
+                        worksheet.Cells[row, 35].Value = client.DisabilityMoreInfo;
+                        worksheet.Cells[row, 36].Value = client.HIVActive.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                        worksheet.Cells[row, 37].Value = client.PlannedMedicalProcidure.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                        worksheet.Cells[row, 38].Value = client.PlannedMedicalProcidureMoreInfo;
+                        worksheet.Cells[row, 39].Value = client.Disability.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                        worksheet.Cells[row, 40].Value = client.DisabilityMoreInfo;
+                        worksheet.Cells[row, 41].Value = client.Convicted.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                        worksheet.Cells[row, 42].Value = client.LifeEnsure.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                        worksheet.Cells[row, 43].Value = client.NameBank;
+                        worksheet.Cells[row, 44].Value = "NIT";
+                        worksheet.Cells[row, 45].Value = client.NitBank;
+                        worksheet.Cells[row, 46].Value = "Oneroso";
+                        worksheet.Cells[row, 47].Value = "100%";
+
+
+                        int beneficiaryColumn = 48;
+
+                        foreach (var beneficiary in client.Beneficiary)
+                        {
+                            worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
+                            worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.DocumenIdentificationTypeB;
+                            worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.IdentificationNumberB;
+                            worksheet.Cells[row, beneficiaryColumn + 3].Value = beneficiary.Relationship;
+                            worksheet.Cells[row, beneficiaryColumn + 4].Value = beneficiary.PercentInherit;
+                            beneficiaryColumn += 5;
+                        }
+                        row++;
+                        
+                    }
+                    package.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error en el método Crear Ingesta con logs de aceptacion  -> {ex}");
+            }
+        }
         public async Task UploadFileToSftp(string localFilePath, string remoteDirectory)
         {
             try

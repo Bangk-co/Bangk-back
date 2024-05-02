@@ -32,7 +32,9 @@ namespace Bangk.Common.Enums
         RechazadoPorLaAseguradora = 135,
         CotizaciónRechazada = 136,
         CotizaciónNoRespondida = 137,
-        ClienteNoAsegurable = 690
+        ClienteNoAsegurable = 690,
+        SolicitudEmisionPoliza = 693
+
 
 
     }

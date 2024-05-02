@@ -11,7 +11,10 @@ namespace Bangk.Domain.Contract
     {
         Task CreateSarlaftReport();
         Task GenerateExcel(string dateFile, IQueryable<ClientReportDto> clients);
-       
+        Task CreateSarlaftReportLogs();
+        Task GenerateExcelLogs(string dateFile, IQueryable<ClientReport2Dto> clients);
+
+
 
     }
 }

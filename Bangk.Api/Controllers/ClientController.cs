@@ -113,6 +113,7 @@ namespace Bangk.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GenerateSarlaftReport()
         {
+            await _reportExcel.CreateSarlaftReportLogs();
             await _reportExcel.CreateSarlaftReport();
             return Ok();
         }

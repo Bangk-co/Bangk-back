@@ -26,7 +26,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     Console.WriteLine($"Error: {ex.Message}");
                 }
                 
-                // Espera un tiempo antes de volver a intentar la conexión
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }
@@ -46,7 +45,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     if (client.IsConnected)
                     {
                         Console.WriteLine("Conexión establecida correctamente.");
-                        // Aquí puedes realizar otras operaciones relacionadas con la conexión
+                        
                     }
                     else
                     {

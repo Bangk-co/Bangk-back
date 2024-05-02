@@ -35,15 +35,17 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             return Task.CompletedTask;
         }
 
-        private void DoWork(object state)
+        private async void DoWork(object state)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var scopedServices = scope.ServiceProvider;
                 var reportExcel = scopedServices.GetRequiredService<IReportExcel>();
 
+
+               await reportExcel.CreateSarlaftReportLogs();
+               await reportExcel.CreateSarlaftReport();
                 
-                reportExcel.CreateSarlaftReport();
             }
         }
 
@@ -55,6 +57,11 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             if (currentTime.DayOfWeek == DayOfWeek.Saturday)
             {
                 nextRun = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 12, 0, 0); 
+            }
+            else if (currentTime.DayOfWeek == DayOfWeek.Sunday)
+            {
+                nextRun = nextRun.AddDays(1);
+
             }
             else if (currentTime.Hour >= 18 || (currentTime.Hour == 17 && currentTime.Minute >= 30))
             {

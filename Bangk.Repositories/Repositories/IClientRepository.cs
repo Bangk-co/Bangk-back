@@ -18,7 +18,8 @@ namespace Bangk.Repositories.Repositories
         IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
         Task<Client> GetClientByLoanApplicationId(int loanApplicationId);
         IQueryable<ClientReportDto> GetReportClientsSarlaft(ApplicationStateHistoryEnum stateloanApplication);
-
-
+        IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication);
+        IQueryable<ClientReport2Dto> GetReportClientsSarlaftLogs(ApplicationStateHistoryEnum stateloanApplication);
+        string GetDiseasesNames(string diseaseIds);
     }
 }
