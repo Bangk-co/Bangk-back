@@ -18,7 +18,7 @@ namespace Bangk.Common.Dto
         public string CountryName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public DateTime CreationDatePolicy { get; set;}
         public string NameBank { get; set; }
         public string NitBank { get; set; }

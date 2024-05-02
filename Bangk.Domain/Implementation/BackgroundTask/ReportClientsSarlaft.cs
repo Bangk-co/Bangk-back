@@ -122,7 +122,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, 21].Value = client.CountryName;
                         worksheet.Cells[row, 24].Value = client.PhoneNumber;
                         worksheet.Cells[row, 25].Value = client.Email;
-                        worksheet.Cells[row, 26].Value = client.BirthDate.ToString("yyyyMMdd");
+                        worksheet.Cells[row, 26].Value = client.BirthDate?.ToString("yyyyMMdd");
                         worksheet.Cells[row, 30].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
                         worksheet.Cells[row, 31].Value = client.IdentificationNumber;
                         worksheet.Cells[row, 32].Value = client.Name;
