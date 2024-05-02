@@ -23,16 +23,21 @@ namespace Bangk.Api.Controllers
         private readonly ICreateClientService _createClientService;
         private readonly IUpdateClientService _updateClientService;
         private readonly ICreateUserService _createUserService;
+        private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
+        private readonly IUpdateProfileService _updateProfileService;
         private readonly IReportExcel _reportExcel;
 
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, 
-            IUpdateClientService updateClientService, ICreateUserService createUserService, IReportExcel reportExcel)
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
+            IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
+            IUpdateProfileService updateProfileService, IReportExcel reportExcel)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
             _updateClientService = updateClientService;
             _createUserService = createUserService;
+            _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
+            _updateProfileService = updateProfileService;
             _reportExcel = reportExcel;
         }
 
@@ -51,7 +56,6 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpGet("GetClientInfoService")]
-        [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -79,7 +83,7 @@ namespace Bangk.Api.Controllers
                 ClientId = result.Result
             });
         }
-        
+
         [HttpPut("UpdateClientService")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateClient(int clientId, ClientUpdateInfoDto updatedClient)
@@ -109,6 +113,39 @@ namespace Bangk.Api.Controllers
             return Ok(result.Result);
         }
 
+
+
+        [HttpPost("CreateClient")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<CreateClientNotLoanApplicationDto>>> CreateClient(CreateClientNotLoanApplicationDto createClientDto)
+        {
+            var result = await _createClientNotLoanApplicationService.Execute(createClientDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                result.Result
+            });
+        }
+
+        [HttpPut("UpdateProfile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto updatedClient)
+        {
+            var result = await _updateProfileService.Execute(updatedClient);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                result.Result
+            });
+        }
         [HttpPost("generate")]
         [AllowAnonymous]
         public async Task<IActionResult> GenerateSarlaftReport()
