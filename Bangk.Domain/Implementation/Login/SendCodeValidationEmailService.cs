@@ -60,6 +60,7 @@ namespace Bangk.Domain.Implementation.Login
                 TemplateId = _configuration.GetSection("SendGridEmailSender:ValidationCodeEmail").Value,
                 Data = new
                 {
+                    clientname = $"{sendCodeValidationEmailDto.Name}",
                     code = $"{code}"
                 }
             };

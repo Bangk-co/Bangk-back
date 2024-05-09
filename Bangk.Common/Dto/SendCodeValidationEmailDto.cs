@@ -4,6 +4,7 @@
     {
         public string Email { get; set; }
         public string IdentificationNumber { get; set; }
+        public string Name { get; set; }
 
     }
 }
