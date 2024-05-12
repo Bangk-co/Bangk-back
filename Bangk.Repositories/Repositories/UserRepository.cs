@@ -39,5 +39,10 @@ namespace Bangk.Repositories.Repositories
                         select user;
             return await query.FirstOrDefaultAsync();
         }
+
+        public User GetByClientId(int clientId)
+        {
+            return Context.Users.FirstOrDefault(u => u.ClientId == clientId);
+        }
     }
 }
