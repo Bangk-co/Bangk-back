@@ -57,7 +57,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
 
             await _loanApplicationStateHistoryRepository.Create(loanApplicationStatusHistory);
             var clientInfo = _clientRepository.GetById(loanApplicationInfo.ClientId);
-            var url = _configuration.GetSection("LoanQuote:UrlFront").Value + $"?requestId={loanApplicationInfo.Id}";
+            var url = _configuration.GetSection("LoanQuote:UrlFront").Value + $"?requestId={loanApplicationInfo.Id}&email={clientInfo.Result.Email}";
             var sendEmail = new SendGridEmailDto
             {
                 email = clientInfo.Result.Email,

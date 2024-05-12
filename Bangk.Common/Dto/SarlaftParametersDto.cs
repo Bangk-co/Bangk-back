@@ -11,7 +11,7 @@
         public bool EsPPE { get; set; }
         public bool VinculosPPE { get; set; }
         public long ValorAsegurado { get; set; }
-        public long PrimaKMs { get; set; }
+        public decimal PrimaKMs { get; set; }
         public string TipoParticipante { get; set; }
         public string VinculoLaboral { get; set; }
         public string Intermediario { get; set; }
