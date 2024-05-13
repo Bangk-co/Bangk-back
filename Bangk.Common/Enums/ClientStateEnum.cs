@@ -59,4 +59,10 @@ namespace Bangk.Common.Enums
         ImcLower = 691,
         imcHigher = 692
     }
+
+    public enum InsuranceEnum
+    {
+        SBS = 114,
+        Allianz = 115
+    }
 }
