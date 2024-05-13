@@ -1,39 +1,47 @@
-﻿using Bangk.Common.Dto;
-using Bangk.Domain.Contract.City;
-using Bangk.Domain.Contract.Integrations;
+﻿using Bangk.Domain.Contract.Integrations;
+using Bangk.Domain.Contract.LoanApplicationStateHistory;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
     public class IntegrationsController : BaseController
     {
         private readonly IValidationSarlaftService _validationSarlaftService;
         private readonly IValidationSBSService _validationSBSService;
-        public IntegrationsController(IValidationSarlaftService validationSarlaftService, IValidationSBSService validationSBSService)
+        private readonly IAddCommentService _addCommentService;
+        public IntegrationsController(IValidationSarlaftService validationSarlaftService, IValidationSBSService validationSBSService, IAddCommentService addCommentService)
         {
             _validationSBSService = validationSBSService;
             _validationSarlaftService = validationSarlaftService;
+            _addCommentService = addCommentService;
         }
 
-        [HttpGet("ValidationSarlaft")]
-        [AllowAnonymous]
+        [HttpPost("ValidationSarlaft")]
 
-        public async Task<ActionResult> ValidationSarlaft(int loanApplicationId)
+        public async Task<IActionResult> ValidationSarlaft(int loanApplicationId)
         {
             await _validationSarlaftService.Execute(loanApplicationId, true);
             return Ok();
         }
 
-        [HttpGet("ValidationSBSService")]
-        [AllowAnonymous]
-
-        public async Task<ActionResult> ValidationSBSService(int loanApplicationId)
+        [HttpPost("ValidationSBS")]
+        public async Task<IActionResult> ValidationSBS(int loanApplicationId)
         {
             await _validationSBSService.Execute(loanApplicationId, true);
             return Ok();
+        }
+
+
+        [HttpPost("AddCommentToLoanApplicationHistory")]
+        public async Task<IActionResult> AddCommentToLoanApplicationHistory(int loanApplicationId, string comment)
+        {
+            var result = await _addCommentService.Execute(loanApplicationId, comment);
+            return Ok(result);
         }
     }
 }
