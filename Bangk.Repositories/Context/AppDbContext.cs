@@ -37,5 +37,7 @@ namespace Bangk.Repositories.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ValidationSBSLog> ValidationSBSLogs { get; set; }
         public DbSet<ScheduleIntegration> ScheduleIntegrations { get; set; }
+        public DbSet<ValidationSarlaftLog> ValidationSarlaftLogs { get; set; }
+        
     }
 }

@@ -77,7 +77,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IValidationSBSLogRepository, ValidationSBSLogRepository>();
-            services.AddScoped<IScheduleIntegrationRepository, ScheduleIntegrationRepository>(); 
+            services.AddScoped<IScheduleIntegrationRepository, ScheduleIntegrationRepository>();
+            services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>(); 
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();

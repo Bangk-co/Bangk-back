@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bangk.Repositories.Entities
+namespace Bangk.Common.Dto
 {
-    internal class ValidationSarlaftLogs
+    public class ValidationSarlaftLogDto
     {
     }
 }

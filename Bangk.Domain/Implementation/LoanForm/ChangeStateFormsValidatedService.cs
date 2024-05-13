@@ -1,13 +1,11 @@
 ﻿using Bangk.Business.Extension.SenderGrid;
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
+using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.LoanForm;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.LoanForm
@@ -19,22 +17,22 @@ namespace Bangk.Domain.Implementation.LoanForm
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
         private readonly IClientRepository _clientRepository;
+        private readonly IValidationSBSService _validationSBSService;
 
         public ChangeStateFormsValidatedService(ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, ILoanApplicationRepository loanApplicationRepository, 
-            IUserRepository userRepository, IConfiguration configuration, IClientRepository clientRepository )
+            IUserRepository userRepository, IConfiguration configuration, IClientRepository clientRepository, IValidationSBSService validationSBSService)
         {
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _loanApplicationRepository = loanApplicationRepository;
             _userRepository = userRepository;
             _configuration = configuration;
             _clientRepository = clientRepository;
-            
+            _validationSBSService = validationSBSService;
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId, string observation)
         {
             var loanApplication = _loanApplicationRepository.GetById(loanApplicationId);
-
             var result = new ResponseDto<bool>
             {
                 Result = true
@@ -57,7 +55,6 @@ namespace Bangk.Domain.Implementation.LoanForm
             };
 
             await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
-
             var userWithClientId = _userRepository.GetByClientId(loanApplication.Result.ClientId);
             var client = _clientRepository.GetById(loanApplication.Result.ClientId);
             if (userWithClientId == null)
@@ -80,8 +77,8 @@ namespace Bangk.Domain.Implementation.LoanForm
                 await SendGridEmailSender.SendEmailAsync(sendEmail);
             }
 
+            await _validationSBSService.Execute(loanApplicationId);
             return result;
-
         }
     }
 }

@@ -6,9 +6,12 @@ using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using ValidacionOFAC;
+//using ValidacionOFAC;
+using ValidationOFACTest;
 
 namespace Bangk.Domain.Implementation.Integrations
 {
@@ -21,10 +24,12 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
         private readonly IValidationSarlaftService _validationSarlaftService;
         private readonly IScheduleIntegrationService _scheduleIntegrationService;
+        private readonly IScheduleIntegrationRepository _scheduleIntegrationRepository;
+
         public ValidationSBSService(IConfiguration configuration, ILoanInsurancePolicyRepository loanInsurancePolicyRepository,
            IClientRepository clientRepository, IValidationSBSLogRepository validationSBSLogRepository,
            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IValidationSarlaftService validationSarlaftService,
-           IScheduleIntegrationService scheduleIntegrationService)
+           IScheduleIntegrationService scheduleIntegrationService, IScheduleIntegrationRepository scheduleIntegrationRepository)
         {
             _configuration = configuration;
             _clientRepository = clientRepository;
@@ -33,39 +38,53 @@ namespace Bangk.Domain.Implementation.Integrations
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _validationSarlaftService = validationSarlaftService;
             _scheduleIntegrationService = scheduleIntegrationService;
+            _scheduleIntegrationRepository = scheduleIntegrationRepository;
         }
 
         public async Task Execute(int loanApplicationId)
         {
-            ValidacionOFACClient clientOFAC = new ValidacionOFACClient(ValidacionOFACClient.EndpointConfiguration.BasicHttpsBinding_IValidacionOFAC);
-            var client = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);
-            var clientSBSInf = await _loanInsurancePolicyRepository.GetClientSBSInfoDtoyByLoanApplicationId(loanApplicationId);
-            var responseValidation = clientOFAC.ValidarOFAC(_configuration.GetSection("IntegrationSBS:Token").Value, _configuration.GetSection("IntegrationSBS:ApplicationName").Value,
-                client.DocumenIdentificationTypeId == 76 ? TipoDocumento.Cedula : TipoDocumento.Cedula_Extranjeria, client.IdentificationNumber, client.Name, client.LastName,
-                clientSBSInf.BirthCountrySBSId, clientSBSInf.CountryNationalitySBSId);
-
-            if (responseValidation.RegistroValidado)
+            try
             {
-                var OFACRestriction = responseValidation.TipoRestriccionOfac == 1 ? "Presenta novedad en lista restrictiva" : responseValidation.TipoRestriccionOfac == 0
-                    ? "Cliente apto en lista restrictiva" : "Cliente no apto para emisión de póliza";
-                await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, responseValidation.TipoRestriccionOfac);
-                if (responseValidation.TipoRestriccionOfac == 2)
+                //ValidacionOFACClient clientOFAC = new ValidacionOFACClient(ValidacionOFACClient.EndpointConfiguration.BasicHttpsBinding_IValidacionOFAC);
+                ValidacionOFACClient clientOFAC = new ValidacionOFACClient(ValidacionOFACClient.EndpointConfiguration.BasicHttpsBinding_IValidacionOFAC);
+                var client = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);
+                var clientSBSInf = await _loanInsurancePolicyRepository.GetClientSBSInfoDtoyByLoanApplicationId(loanApplicationId);
+                var responseValidation = await clientOFAC.ValidarOFACAsync(_configuration.GetSection("IntegrationSBS:Token").Value, _configuration.GetSection("IntegrationSBS:ApplicationName").Value,
+                    client.DocumenIdentificationTypeId == 76 ? TipoDocumento.Cedula : TipoDocumento.Cedula_Extranjeria, client.IdentificationNumber, client.Name, client.LastName,
+                    clientSBSInf.BirthCountrySBSId, clientSBSInf.CountryNationalitySBSId);
+
+                await SaveValidacionOFACLog(responseValidation);
+                if (responseValidation.RegistroValidado)
                 {
-                    await SendPolicyNotIssueNotification(client);
+                    if (responseValidation.TipoRestriccionOfac == 2)//no apto
+                    {
+                        await DeleteRetryJob(loanApplicationId);
+                        await SendPolicyNotIssueNotification(client);
+                        await SaveLoanHistory(loanApplicationId, "Cliente no apto para emisión de póliza", (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, responseValidation.TipoRestriccionOfac);
+                    }
+                    else if (responseValidation.TipoRestriccionOfac == 1)//presenta novedad
+                    {
+                        await DeleteRetryJob(loanApplicationId);
+                        await SaveLoanHistory(loanApplicationId, "Presenta novedad en lista restrictiva", (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, responseValidation.TipoRestriccionOfac);
+                    }
+                    else//apto
+                    {
+                        await DeleteRetryJob(loanApplicationId);
+                        await SaveLoanHistory(loanApplicationId, "Cliente apto en lista restrictiva", (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, responseValidation.TipoRestriccionOfac);
+                        await _validationSarlaftService.Execute(loanApplicationId);
+                    }
                 }
-
-                await _validationSarlaftService.Execute(loanApplicationId);
+                else
+                {
+                    await SaveLoanHistory(loanApplicationId, responseValidation.DescripcionError, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
+                    await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 1);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                //var OFACRestriction = responseValidation.DescripcionError;
-                //await SaveLoanHistory(loanApplicationId, OFACRestriction, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
-                //await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 1);
+                await SaveLoanHistory(loanApplicationId, ex.Message, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
+                await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 1);
             }
-
-            await _validationSarlaftService.Execute(loanApplicationId);
-            //await SaveValidacionOFACLog(responseValidation);
-
         }
 
         private async Task SaveValidacionOFACLog(clsResultadoValidacion clsResultadoValidacion)
@@ -119,6 +138,14 @@ namespace Bangk.Domain.Implementation.Integrations
             await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
         }
 
+        private async Task DeleteRetryJob(int loanApplicationId)
+        {
+            var scheduler = await _scheduleIntegrationRepository.GetScheduleIntegrationByLoanApplicationId(loanApplicationId, 1);
+            if(scheduler != null)
+            {
+                await _scheduleIntegrationRepository.Delete(scheduler);
+            }
 
+        }
     }
 }
