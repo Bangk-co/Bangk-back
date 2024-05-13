@@ -47,9 +47,8 @@ namespace Bangk.Repositories.Repositories
 
         public async Task<UserInfoDto> GetUserInfoByClientId(int clientId)
         {
-            var query = from user in Context.Users
-                        join cl in Context.Clients on user.ClientId equals cl.Id
-                        where user.ClientId == clientId
+            var query = from cl in Context.Clients
+                        where cl.Id == clientId
                         select new UserInfoDto
                         {
                             IdentificationNumber = cl.IdentificationNumber,
