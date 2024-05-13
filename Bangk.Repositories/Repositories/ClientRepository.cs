@@ -100,5 +100,7 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
+
+        
     }
 }

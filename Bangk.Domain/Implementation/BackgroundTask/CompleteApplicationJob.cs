@@ -90,7 +90,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-
                 using TransactionScope transactionScope = new(TransactionScopeAsyncFlowOption.Enabled);
                 var loanApplicationStateHistoryRepository = scope.ServiceProvider.GetRequiredService<ILoanApplicationStateHistoryRepository>();
                 var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();

@@ -32,9 +32,8 @@ namespace Bangk.Common.Enums
         RechazadoPorLaAseguradora = 135,
         CotizaciónRechazada = 136,
         CotizaciónNoRespondida = 137,
-        ClienteNoAsegurable = 690
-
-
+        ClienteNoAsegurable = 690,
+        SolicitudEmisionPoliza = 693
     }
 
     public enum DocumentType
@@ -59,5 +58,11 @@ namespace Bangk.Common.Enums
     {
         ImcLower = 691,
         imcHigher = 692
+    }
+
+    public enum InsuranceEnum
+    {
+        SBS = 114,
+        Allianz = 115
     }
 }
