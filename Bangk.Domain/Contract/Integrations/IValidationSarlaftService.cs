@@ -4,6 +4,6 @@ namespace Bangk.Domain.Contract.Integrations
 {
     public interface IValidationSarlaftService
     {
-        Task Execute(int loanApplicationId);
+        Task Execute(int loanApplicationId, bool isCallFromApi = false);
     }
 }

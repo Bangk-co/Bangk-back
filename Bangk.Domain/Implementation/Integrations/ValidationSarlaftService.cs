@@ -39,7 +39,7 @@ namespace Bangk.Domain.Implementation.Integrations
             _scheduleIntegrationRepository = scheduleIntegrationRepository;
         }
 
-        public async Task Execute(int loanApplicationId)
+        public async Task Execute(int loanApplicationId, bool isCallFromApi = false)
         {
             var client = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);
             var clientSarlaftInf = await _loanInsurancePolicyRepository.GetClientSarlaftInfoDtoyByLoanApplicationId(loanApplicationId);
@@ -97,20 +97,20 @@ namespace Bangk.Domain.Implementation.Integrations
                         }
                         else
                         {
-                            await SaveLoanHistory(loanApplicationId, jsonObject.descripcion, (int)ApplicationStateHistoryEnum.EstudioSarlaft, 3);
+                            await SaveLoanHistory(loanApplicationId, jsonObject.descripcion, (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
                             await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
                         }
                     }
                     else
                     {
-                        await SaveLoanHistory(loanApplicationId, response.ReasonPhrase, (int)ApplicationStateHistoryEnum.EstudioSarlaft, 3);
+                        await SaveLoanHistory(loanApplicationId, response.ReasonPhrase, (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
                         await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
                     }
                 }
             }
             catch (Exception ex)
             {
-                await SaveLoanHistory(loanApplicationId, ex.Message, (int)ApplicationStateHistoryEnum.EstudioSarlaft, 3);
+                await SaveLoanHistory(loanApplicationId, ex.Message, (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
                 await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
             }
         }

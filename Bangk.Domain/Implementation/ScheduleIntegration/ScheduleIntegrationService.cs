@@ -38,17 +38,13 @@ namespace Bangk.Domain.Implementation.ScheduleIntegration
                     scheduler.NextTryDate = DateTime.UtcNow.AddMinutes(scheduler.CountFails == 1 ? 30 : 60);
                     scheduler.CountFails += 1;
                     await _scheduleIntegrationRepository.Update(scheduler);
-                    await SaveLoanHistory(loanApplicationId, string.Empty, scheduler.IntegrationType == 1 ? (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS :
-                         (int)ApplicationStateHistoryEnum.EstudioSarlaft, 3);
                 }
                 else
                 {
-                    await _scheduleIntegrationRepository.Delete(scheduler);
                     await SaveLoanHistory(loanApplicationId, string.Empty, scheduler.IntegrationType == 1 ? (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS :
                         (int)ApplicationStateHistoryEnum.EstudioSarlaft, 4);
                 }
             }
-
         }
 
         private async Task SaveLoanHistory(int loanApplicationId, string observation, int state, int validationResultCode)

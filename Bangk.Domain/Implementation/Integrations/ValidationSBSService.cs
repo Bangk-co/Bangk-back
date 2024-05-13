@@ -41,7 +41,7 @@ namespace Bangk.Domain.Implementation.Integrations
             _scheduleIntegrationRepository = scheduleIntegrationRepository;
         }
 
-        public async Task Execute(int loanApplicationId)
+        public async Task Execute(int loanApplicationId, bool isCallFromApi = false)
         {
             try
             {
@@ -76,13 +76,13 @@ namespace Bangk.Domain.Implementation.Integrations
                 }
                 else
                 {
-                    await SaveLoanHistory(loanApplicationId, responseValidation.DescripcionError, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
+                    await SaveLoanHistory(loanApplicationId, responseValidation.DescripcionError, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, isCallFromApi ? 4 : 3);
                     await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 1);
                 }
             }
             catch (Exception ex)
             {
-                await SaveLoanHistory(loanApplicationId, ex.Message, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, 3);
+                await SaveLoanHistory(loanApplicationId, ex.Message, (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, isCallFromApi ? 4 : 3);
                 await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 1);
             }
         }
