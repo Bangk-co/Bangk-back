@@ -16,6 +16,7 @@ namespace Bangk.Repositories.Repositories
 
         IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
         Task<Client> GetClientByLoanApplicationId(int loanApplicationId);
+        IQueryable<ClientPolicyDto> GetPolicyClient(int clientId);
 
 
     }

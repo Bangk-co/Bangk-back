@@ -101,6 +101,24 @@ namespace Bangk.Repositories.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        
+        public IQueryable<ClientPolicyDto> GetPolicyClient(int clientId)
+        {
+            var query = from lp in Context.LoanInsurancePolicy
+                        join l in Context.LoanApplication on lp.LoanApplicationId equals l.Id
+                        join c in Context.Clients on l.ClientId equals c.Id
+                        join s in Context.Settings on l.LoanTypeId equals s.Id
+                        where c.Id == clientId
+                        select new ClientPolicyDto
+                        {
+                            PolicyId = lp.Id,
+                            LoanType = s.Name,
+                            ApplicationDate =  l.CreationDate,
+                            StateName = Context.LoanApplicationStateHistory.Where(m => m.LoanApplicationId == l.Id).OrderByDescending(lh => lh.CreationDate).FirstOrDefault().State.Name
+                        };
+
+            return query;
+        }
+
+
     }
 }
