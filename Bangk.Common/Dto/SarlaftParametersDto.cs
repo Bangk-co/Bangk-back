@@ -8,14 +8,12 @@
         public string DigitoVerificacion { get; set; }
         public string FechaExpedicion { get; set; }
         public string NumeroCelular { get; set; }
-        public bool EsPPE { get; set; }
-        public bool VinculosPPE { get; set; }
+        public string EsPPE { get; set; }
+        public string VinculosPPE { get; set; }
         public long ValorAsegurado { get; set; }
-        public decimal PrimaKMs { get; set; }
+        public decimal ValorPrimaKMs { get; set; }
+        public long Intermediario { get; set; }
         public string TipoParticipante { get; set; }
         public string VinculoLaboral { get; set; }
-        public string Intermediario { get; set; }
-        public string Sponsor { get; set; }
-        public string Ramo { get; set; }
     }
 }
