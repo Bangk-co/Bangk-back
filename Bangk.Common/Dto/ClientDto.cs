@@ -28,9 +28,11 @@ namespace Bangk.Common.Dto
 
     public class ClientPolicyDto
     {
-        public int PolicyId { get; set; }
+        public int LoanApplicationId { get; set; }
+        public int? PolicyId { get; set; }
         public string LoanType { get; set; }
         public string StateName { get; set; }
-        public DateTime ApplicationDate { get; set; }
+        public DateTime? CreationDatePolicy { get; set; }
+        public DateTime CreationDateLoanApplication { get; set; }
     }
 }
