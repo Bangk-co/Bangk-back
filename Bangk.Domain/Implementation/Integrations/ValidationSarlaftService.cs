@@ -8,9 +8,12 @@ using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,25 +47,26 @@ namespace Bangk.Domain.Implementation.Integrations
             var client = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);
             var clientSarlaftInf = await _loanInsurancePolicyRepository.GetClientSarlaftInfoDtoyByLoanApplicationId(loanApplicationId);
             string apiUrl = _configuration.GetSection("Sarlaft:Url").Value;
+            var listParameter = new List<SarlaftParametersDto>();
             var parameter = new SarlaftParametersDto
             {
-                DigitoVerificacion = string.Empty,
-                EsPPE = clientSarlaftInf.IsPublicPerson,
-                FechaExpedicion = client.DocumentIssueDate.HasValue ? client.DocumentIssueDate.Value.ToString("yyyyMMdd") : string.Empty,
-                NumeroCelular = client.PhoneNumber,
-                NumeroDocumento = client.IdentificationNumber,
-                PrimaKMs = clientSarlaftInf.YearlyFee,
                 TipoConsulta = "1",
                 TipoDocumento = client.DocumenIdentificationTypeId == 76 ? "1" : "2",
-                TipoParticipante = string.Empty,
+                NumeroDocumento = client.IdentificationNumber,
+                DigitoVerificacion = string.Empty,
+                FechaExpedicion = client.DocumentIssueDate.HasValue ? client.DocumentIssueDate.Value.ToString("yyyyMMdd") : string.Empty,
+                NumeroCelular = client.PhoneNumber,
+                EsPPE = clientSarlaftInf.IsPublicPerson ? "1" : "0",
+                VinculosPPE = clientSarlaftInf.HasBondPublicPerson ? "1" : "0",
                 ValorAsegurado = clientSarlaftInf.LoanBalance,
-                VinculoLaboral = string.Empty,
-                VinculosPPE = clientSarlaftInf.HasBondPublicPerson,
-                Intermediario = _configuration.GetSection("Sarlaft:Intermediario").Value,
-                Ramo = string.Empty,
-                Sponsor = string.Empty
+                ValorPrimaKMs = clientSarlaftInf.YearlyFee,
+                Intermediario = long.Parse(_configuration.GetSection("Sarlaft:Intermediario").Value),
+                TipoParticipante = string.Empty,
+                VinculoLaboral = string.Empty    
             };
-            string jsonBody = JsonConvert.SerializeObject(parameter);
+
+            listParameter.Add(parameter);
+            string jsonBody = JsonConvert.SerializeObject(listParameter);
             var byteArray = new UTF8Encoding().GetBytes($"{_configuration.GetSection("Sarlaft:User").Value}:{_configuration.GetSection("Sarlaft:Password").Value}");
             try
             {
@@ -71,11 +75,10 @@ namespace Bangk.Domain.Implementation.Integrations
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
                     StringContent content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await httpClient.PostAsync(apiUrl, content);
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    await CreateValidationSarlaftLog(loanApplicationId, responseBody);
-                    if (response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode )
                     {
-
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        await CreateValidationSarlaftLog(loanApplicationId, responseBody);
                         dynamic jsonObject = JsonConvert.DeserializeObject<ExpandoObject[]>(responseBody)[0];
                         if (string.Equals(jsonObject.estadoSarlaft.estado, "V"))//apto
                         {

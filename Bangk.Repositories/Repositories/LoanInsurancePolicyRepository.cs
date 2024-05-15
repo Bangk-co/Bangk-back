@@ -154,7 +154,7 @@ namespace Bangk.Repositories.Repositories
                            HasBondPublicPerson = lp.HasBondPublicPerson.HasValue ? lp.HasBondPublicPerson.Value : false,
                            IsPublicPerson = lp.IsPublicPerson.HasValue ? lp.IsPublicPerson.Value : false,
                            LoanBalance = l.LoanBalance,
-                           YearlyFee = lq.YearlyFee
+                           YearlyFee = ((long)lq.YearlyFee)
                         };
 
             return await query.FirstOrDefaultAsync();
