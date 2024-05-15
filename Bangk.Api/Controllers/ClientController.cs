@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,10 +24,11 @@ namespace Bangk.Api.Controllers
         private readonly ICreateUserService _createUserService;
         private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
         private readonly IUpdateProfileService _updateProfileService;
+        private readonly IGetClientPolicyService _getClientPolicyService;
 
         public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
             IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
-            IUpdateProfileService updateProfileService)
+            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
@@ -35,6 +37,7 @@ namespace Bangk.Api.Controllers
             _createUserService = createUserService;
             _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
             _updateProfileService = updateProfileService;
+            _getClientPolicyService = getClientPolicy;
         }
 
         [HttpGet("GetClientService")]
@@ -140,6 +143,17 @@ namespace Bangk.Api.Controllers
             return Ok(new
             {
                 result.Result
+            });
+        }
+
+        [HttpGet("GetClientPolicy")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ClientInfoDto>>> GetClientPolicy(int clientId)
+        {
+            var result = await _getClientPolicyService.Execute(clientId);
+            return Ok(new
+            {
+                ClientPolicyInfo = result
             });
         }
     }
