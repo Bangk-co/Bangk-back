@@ -18,7 +18,6 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpGet("GetLoanApplicationStateHistoryService")]
-        [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
