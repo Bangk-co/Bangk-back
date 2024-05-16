@@ -1,4 +1,5 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Users;
@@ -25,6 +26,7 @@ namespace Bangk.Api.Controllers
         private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
         private readonly IUpdateProfileService _updateProfileService;
         private readonly IGetClientPolicyService _getClientPolicyService;
+        
 
         public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
             IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
@@ -38,6 +40,7 @@ namespace Bangk.Api.Controllers
             _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
             _updateProfileService = updateProfileService;
             _getClientPolicyService = getClientPolicy;
+            
         }
 
         [HttpGet("GetClientService")]
@@ -156,5 +159,6 @@ namespace Bangk.Api.Controllers
                 ClientPolicyInfo = result
             });
         }
+
     }
 }

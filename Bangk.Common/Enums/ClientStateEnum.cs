@@ -65,4 +65,10 @@ namespace Bangk.Common.Enums
         SBS = 114,
         Allianz = 115
     }
+
+    public enum DocumenIdentificationTypeEnum
+    {
+        Cc = 76,
+        Ce = 77
+    }
 }
