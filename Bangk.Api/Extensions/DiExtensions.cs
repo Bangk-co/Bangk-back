@@ -127,7 +127,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetUserInfoByClientIdService, GetUserInfoByClientIdService>();
             services.AddTransient<IAddCommentService, AddCommentService>();
             services.AddTransient<IGetClientPolicyService, GetClientPolicyService>();
-            
+            services.AddTransient<IGetLoanApplicationInfoByLoanApplicationIdService, GetLoanApplicationInfoByLoanApplicationIdService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

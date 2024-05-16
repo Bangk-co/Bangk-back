@@ -79,5 +79,32 @@ namespace Bangk.Repositories.Repositories
             return await query.FirstOrDefaultAsync();
 
         }
+
+
+        public async Task<List<LoanApplicationDto>> GetLoanApplicationInfoByLoanApplicationId(int loanApplicationId)
+        {
+            var query = from l in Context.LoanApplication
+                        join b in Context.Settings on l.BankId equals b.Id
+                        join lt in Context.Settings on l.LoanTypeId equals lt.Id
+                        join u in Context.Users on l.ReviewerId equals u.Id
+                        join lq in Context.LoanQuote on l.Id equals lq.LoanApplicationId into tlq
+                        from sublq in tlq.DefaultIfEmpty()
+                        where l.Id == loanApplicationId
+                        select new LoanApplicationDto
+                        {
+                            LoanTypeName = lt.Name,
+                            LoanApplicationId = l.Id,
+                            BankName = b.Name,
+                            IconsBanksUrl = b.IconsBanksUrl,
+                            CreationDate = l.CreationDate,
+                            LoanBalance = l.LoanBalance,
+                            StateName = Context.LoanApplicationStateHistory.Where(m => m.LoanApplicationId == l.Id).OrderByDescending(lh => lh.CreationDate).FirstOrDefault().State.Name,
+                            ReviewerName = string.Format("{0} {1}", u.Name, u.LastName),
+                            YearlyFee = sublq.YearlyFee
+                        };
+
+            return await query.ToListAsync();
+
+        }
     }
 }

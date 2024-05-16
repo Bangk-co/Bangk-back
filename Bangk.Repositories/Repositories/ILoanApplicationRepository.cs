@@ -10,5 +10,6 @@ namespace Bangk.Repositories.Repositories
     {
         List<LoanApplicationDto> GetLoanApplicationInfo(int ClientId);
         Task<LoanApplicationInfoDto> GetLoanApplicationById(int loanApplicationId);
+        Task<List<LoanApplicationDto>> GetLoanApplicationInfoByLoanApplicationId(int loanApplicationId);
     }
 }
