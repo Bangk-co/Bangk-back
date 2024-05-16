@@ -35,7 +35,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             
             string dateFile = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
             string localFilePath = Path.Combine( dateFile);
-            var stateloanApplication = ApplicationStateHistoryEnum.FormulariosValidados;
+            var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaft(stateloanApplication);
             await GenerateExcel(localFilePath, eligibleClients);
             string remoteDirectory = "/Reporte_Sarlaft/"; 
@@ -99,6 +99,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     int row = 2;
                     var clientList = clients.ToList();
                     int lastConsecutive = GetLastConsecutive();
+                    
 
                     foreach (var client in clients)
                     {
@@ -106,10 +107,55 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
                         worksheet.Cells[row, 3].Value = "128";
                         worksheet.Cells[row, 4].Value = "VIDA GRUPO";
-                        worksheet.Cells[row, 7].Value = "BK00001";
+                        worksheet.Cells[row, 7].Value = "BK00002";
                         worksheet.Cells[row, 8].Value = "VIDA GRUPO BANGK";
-                        worksheet.Cells[row, 9].Value = "1";
-                        worksheet.Cells[row, 10].Value = "Vida I ";
+
+                        DateTime birthDate = client.BirthDate ?? DateTime.Today;
+                        int age = DateTime.Today.Year - birthDate.Year;
+
+                        if (birthDate.Date > DateTime.Today.AddYears(-age))
+                        {
+                            age--;
+                        }
+                        string plan;
+                        if (age >= 18 && age <= 50)
+                        {
+                            plan = "1";
+                        }
+                        else if (age >= 51 && age <= 64)
+                        {
+                            plan = "2";
+                        }
+                        else
+                        {
+
+                            plan = "Plan sin definir";
+                        }
+
+                        worksheet.Cells[row, 9].Value = plan;
+
+                        
+                        if (birthDate.Date > DateTime.Today.AddYears(-age))
+                        {
+                            age--;
+                        }
+
+                        string planName;
+                        if (age >= 18 && age <= 50)
+                        {
+                            planName = "Vida I";
+                        }
+                        else if (age >= 51 && age <= 64)
+                        {
+                            planName = "Vida II";
+                        }
+                        else
+                        {
+
+                            planName = "Plan sin definir";
+                        }
+                        worksheet.Cells[row, 10].Value = planName;
+
                         worksheet.Cells[row, 11].Value = $"BK128{lastConsecutive}";
                         worksheet.Cells[row, 12].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
                         worksheet.Cells[row, 13].Value = client.IdentificationNumber;
@@ -197,7 +243,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         {
             string dateFile = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logs de aceptacion BangK.xlsx";
             string localFilePath = Path.Combine(dateFile);
-            var stateloanApplication = ApplicationStateHistoryEnum.FormulariosValidados;
+            var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaftLogs(stateloanApplication);
             await GenerateExcelLogs(localFilePath, eligibleClients);
             string remoteDirectory = "/Reporte_Sarlaft/";

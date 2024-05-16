@@ -26,11 +26,11 @@ namespace Bangk.Api.Controllers
         private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
         private readonly IUpdateProfileService _updateProfileService;
         private readonly IGetClientPolicyService _getClientPolicyService;
-        private readonly IReportExcel _reportExcel;
+        
 
         public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
             IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
-            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy, IReportExcel reportExcel)
+            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
@@ -40,7 +40,7 @@ namespace Bangk.Api.Controllers
             _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
             _updateProfileService = updateProfileService;
             _getClientPolicyService = getClientPolicy;
-            _reportExcel = reportExcel;
+            
         }
 
         [HttpGet("GetClientService")]
@@ -159,13 +159,6 @@ namespace Bangk.Api.Controllers
                 ClientPolicyInfo = result
             });
         }
-        [HttpPost("generate")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GenerateSarlaftReport()
-        {
-            await _reportExcel.CreateSarlaftReportLogs();
-            await _reportExcel.CreateSarlaftReport();
-            return Ok();
-        }
+
     }
 }
