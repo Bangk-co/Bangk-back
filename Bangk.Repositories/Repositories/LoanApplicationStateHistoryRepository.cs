@@ -27,11 +27,11 @@ namespace Bangk.Repositories.Repositories
                         orderby history.StateId descending
                         select new LoanApplicationStateHistoryDto
                         {
+                            Id = history.Id,
                             StateName = Enum.GetName(enumType, history.StateId),
                             CreationDate = history.CreationDate,
                             Observations = history.Observations,
                             ValidationClientResult = history.ValidationClientResult
-                            
                         };
 
             return query.AsQueryable();

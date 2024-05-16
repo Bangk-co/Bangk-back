@@ -25,11 +25,12 @@ namespace Bangk.Api.Controllers
         private readonly ICreateUserService _createUserService;
         private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
         private readonly IUpdateProfileService _updateProfileService;
+        private readonly IGetClientPolicyService _getClientPolicyService;
         private readonly IReportExcel _reportExcel;
 
         public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
             IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
-            IUpdateProfileService updateProfileService, IReportExcel reportExcel)
+            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy, IReportExcel reportExcel)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
@@ -38,6 +39,7 @@ namespace Bangk.Api.Controllers
             _createUserService = createUserService;
             _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
             _updateProfileService = updateProfileService;
+            _getClientPolicyService = getClientPolicy;
             _reportExcel = reportExcel;
         }
 
@@ -144,6 +146,17 @@ namespace Bangk.Api.Controllers
             return Ok(new
             {
                 result.Result
+            });
+        }
+
+        [HttpGet("GetClientPolicy")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ClientInfoDto>>> GetClientPolicy(int clientId)
+        {
+            var result = await _getClientPolicyService.Execute(clientId);
+            return Ok(new
+            {
+                ClientPolicyInfo = result
             });
         }
         [HttpPost("generate")]

@@ -21,5 +21,6 @@ namespace Bangk.Common.Dto
         public string IconsBanksUrl { get; set; }
 
         public DateTime CreationDate { get; set; }
+        public decimal? YearlyFee { get; set; }
     }
 }

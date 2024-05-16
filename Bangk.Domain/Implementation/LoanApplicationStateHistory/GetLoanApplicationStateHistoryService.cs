@@ -1,12 +1,9 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
-using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.LoanApplicationStateHistory
@@ -20,10 +17,20 @@ namespace Bangk.Domain.Implementation.LoanApplicationStateHistory
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
         }
 
-        public async Task<IQueryable<LoanApplicationStateHistoryDto>> Execute(int loanApplicationId)
+        public async Task<LoanApplicationStateHistoryResultDto> Execute(int loanApplicationId)
         {
             var query =  _loanApplicationStateHistoryRepository.GetLoanApplicationStateHistory(loanApplicationId);
-            return query;
+            var response = new LoanApplicationStateHistoryResultDto();
+            List<string> nameStates = new List<string>();
+            foreach (var state in Enum.GetValues(typeof(ApplicationStateHistoryEnum)))
+            {
+                nameStates.Add(state.ToString());
+            }
+
+            response.States = new List<string>();
+            response.States.AddRange(nameStates);
+            response.LoanApplicationHistory = query;
+            return response;
 
         }
     }

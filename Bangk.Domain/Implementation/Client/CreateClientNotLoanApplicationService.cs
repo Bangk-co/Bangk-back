@@ -55,6 +55,7 @@ namespace Bangk.Domain.Implementation.Client
                 DocumenIdentificationTypeId = createClientDto.DocumenIdentificationTypeId,
                 LastName = createClientDto.LastName,
                 Name = createClientDto.Name,
+                AcceptTermsDate = createClientDto.AcceptTermsDate,
                 PermissionTreatPersonalDataDate = createClientDto.PermissionTreatPersonalDataDate,
                 ValidateClientOtp = createClientDto.ValidateClientOtp,
                 State = (int)ClientStateEnum.Potencial,

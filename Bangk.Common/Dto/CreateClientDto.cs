@@ -39,6 +39,7 @@ namespace Bangk.Common.Dto
         public string Email { get; set; }
         public string IdentificationNumber { get; set; }
         public int DocumenIdentificationTypeId { get; set; }
+        public DateTime AcceptTermsDate { get; set; }
         public DateTime PermissionTreatPersonalDataDate { get; set; }
         public DateTime ValidateClientOtp { get; set; }
 

@@ -39,5 +39,26 @@ namespace Bangk.Repositories.Repositories
                         select user;
             return await query.FirstOrDefaultAsync();
         }
+
+        public User GetByClientId(int clientId)
+        {
+            return Context.Users.FirstOrDefault(u => u.ClientId == clientId);
+        }
+
+        public async Task<UserInfoDto> GetUserInfoByClientId(int clientId)
+        {
+            var query = from cl in Context.Clients
+                        where cl.Id == clientId
+                        select new UserInfoDto
+                        {
+                            IdentificationNumber = cl.IdentificationNumber,
+                            DocumenIdentificationTypeId = cl.DocumenIdentificationTypeId,
+                            Email = cl.Email,
+                            LastName = cl.LastName,
+                            Name = cl.Name
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

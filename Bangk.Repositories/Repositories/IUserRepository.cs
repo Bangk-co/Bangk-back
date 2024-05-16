@@ -10,5 +10,7 @@ namespace Bangk.Repositories.Repositories
         User GetUserByEmail(string email);
         User GetUserByHashEmailReset(string hash);
         Task<User> GetUserWithLessApplication();
+        User GetByClientId(int clientId);
+        Task<UserInfoDto> GetUserInfoByClientId(int clientId);
     }
 }
