@@ -4,6 +4,7 @@ using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -80,7 +81,8 @@ namespace Bangk.Repositories.Repositories
                             DocumentIssueDate = c.DocumentIssueDate,
                             GenderName = subsg.Name,
                             GenderId = subsg.Id,
-                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty
+                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty,
+                            ClientAge = c.BirthDate != null ? ((DateTime.Now.Year - c.BirthDate.Value.Year) >= 65 && (DateTime.Now.Year - c.BirthDate.Value.Year) <= 74) : false
                         };
 
             return query;
