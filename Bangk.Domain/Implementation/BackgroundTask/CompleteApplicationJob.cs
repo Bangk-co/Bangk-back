@@ -79,7 +79,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 Data = new
                 {
                     ClientName = $"{notificationDto.ClientName + " " + notificationDto.ClientLastName}",
-                    UrlCallback = url + $"?loanApplicationId={notificationDto.ApplicationId}"
+                    UrlCallback = url + $"&loanApplicationId={notificationDto.ApplicationId}"
                 }
             };
 

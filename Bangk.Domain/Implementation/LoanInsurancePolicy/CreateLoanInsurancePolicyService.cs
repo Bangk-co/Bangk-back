@@ -65,7 +65,7 @@ namespace Bangk.Domain.Implementation.Client
                 Address = loanInsurancePolicySaveDto.Address,
                 IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
                 AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
-                
+                OtpDateForms = loanInsurancePolicySaveDto.OtpDateForms,
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
                 HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson,
                 HousingValue = loanInsurancePolicySaveDto.HousingValue,
@@ -170,6 +170,7 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.CreationDate = DateTime.UtcNow;
             loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
             loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
+            loanInsurencePolicy.OtpDateForms = loanInsurancePolicySaveDto.OtpDateForms;
 
             await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             

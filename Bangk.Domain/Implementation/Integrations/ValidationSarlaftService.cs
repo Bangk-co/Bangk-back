@@ -89,7 +89,7 @@ namespace Bangk.Domain.Implementation.Integrations
                         else if (string.Equals(jsonObject.estadoSarlaft.estado, "F") || string.Equals(jsonObject.estadoSarlaft.estado, "N") ||
                             string.Equals(jsonObject.estadoSarlaft.estado, "P"))//novedad
                         {
-                            await SaveLoanHistory(loanApplicationId, "Presenta novedad en lista restrictiva", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 1);
+                            await SaveLoanHistory(loanApplicationId, "Presenta novedad en Sarlaft", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 1);
                             await DeleteRetryJob(loanApplicationId);
                         }
                         else if (string.Equals(jsonObject.estadoSarlaft.estado, "R")) //error
