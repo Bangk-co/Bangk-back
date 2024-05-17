@@ -56,7 +56,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
             if (currentTime.DayOfWeek == DayOfWeek.Saturday)
             {
-                nextRun = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 12, 0, 0); 
+                nextRun = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 12, 0, 0);
             }
             else if (currentTime.DayOfWeek == DayOfWeek.Sunday)
             {

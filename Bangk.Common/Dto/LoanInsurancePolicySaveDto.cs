@@ -44,7 +44,8 @@ namespace Bangk.Common.Dto
         public string DisabilityMoreInfo { get; set; }
         public int? CityVehiculeId { get; set; }
         public string VehicleLicensePlate { get; set; }
-        
+        public DateTime? OtpDateForms { get; set; }
+
 
 
         public List<BeneficiarySaveDto> beneficiary { get; set;}
