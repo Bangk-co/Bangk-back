@@ -241,7 +241,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task CreateSarlaftReportLogs()
         {
-            string dateFile = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logs de aceptacion BangK.xlsx";
+            string dateFile = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logss de aceptacion BangK.xlsx";
             string localFilePath = Path.Combine(dateFile);
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaftLogs(stateloanApplication);
