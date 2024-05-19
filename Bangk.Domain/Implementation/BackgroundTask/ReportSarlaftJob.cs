@@ -12,77 +12,26 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.BackgroundTask
 {
-    public class ReportSarlaftJob : BackgroundService
+    public class ReportSarlaftJob
     {
         private readonly IServiceProvider _serviceProvider;
-        private Timer _timer;
 
         public ReportSarlaftJob(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            
-            var currentTime = DateTime.Now;
-            var nextRun = GetNextRunTime(currentTime);
-            var delay = nextRun - currentTime;
-
-            
-            _timer = new Timer(DoWork, null, delay, TimeSpan.FromHours(1));
-
-            return Task.CompletedTask;
-        }
-
-        private async void DoWork(object state)
+        public void Execute()
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var scopedServices = scope.ServiceProvider;
                 var reportExcel = scopedServices.GetRequiredService<IReportExcel>();
 
-
-               await reportExcel.CreateSarlaftReportLogs();
-               await reportExcel.CreateSarlaftReport();
-                
+                reportExcel.CreateSarlaftReportLogs().Wait();
+                reportExcel.CreateSarlaftReport().Wait();
             }
         }
-
-        private DateTime GetNextRunTime(DateTime currentTime)
-        {
-            
-            var nextRun = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 17, 0, 0); 
-
-            if (currentTime.DayOfWeek == DayOfWeek.Saturday)
-            {
-                nextRun = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 12, 0, 0);
-            }
-            else if (currentTime.DayOfWeek == DayOfWeek.Sunday)
-            {
-                nextRun = nextRun.AddDays(1);
-
-            }
-            else if (currentTime.Hour >= 18 || (currentTime.Hour == 17 && currentTime.Minute >= 30))
-            {
-                
-                nextRun = nextRun.AddDays(1);
-            }
-
-            return nextRun;
-        }
-
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Change(Timeout.Infinite, 0);
-            await base.StopAsync(cancellationToken);
-        }
-
-        public override void Dispose()
-        {
-            _timer?.Dispose();
-            base.Dispose();
-        }
-
     }
+
 }

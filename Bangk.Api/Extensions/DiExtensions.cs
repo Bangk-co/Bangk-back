@@ -135,7 +135,7 @@ namespace Bangk.Api.Extensions
 
             services.AddHostedService<CompleteApplicationJob>();
             services.AddHostedService<SFTPConnection>();
-            services.AddHostedService<ReportSarlaftJob>();
+            
         }
     }
 }

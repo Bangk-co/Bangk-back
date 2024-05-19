@@ -2,6 +2,7 @@ using Bangk.Api.Extensions;
 using Bangk.Domain.Contract;
 using Bangk.Domain.Implementation.BackgroundTask;
 using Bangk.Repositories.Context;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -65,6 +66,12 @@ namespace Bangk.Api
 
                 return sftpClient;
             });
+
+            services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddHangfireServer(options => {
+                
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,6 +121,51 @@ namespace Bangk.Api
             {
                 endpoints.MapControllers();
             });
+
+            // Definir la tarea periódica
+            RecurringJob.AddOrUpdate<ReportSarlaftJob>(
+                "ReportSarlaft",
+                x => x.Execute(),
+                Cron.Weekly(DayOfWeek.Monday, 17),    // Lunes a las 17:00
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local }
+            );
+
+            RecurringJob.AddOrUpdate<ReportSarlaftJob>(
+            "ReportSarlaft",
+            x => x.Execute(),
+            Cron.Weekly(DayOfWeek.Tuesday, 17),   // Martes a las 17:00
+            new RecurringJobOptions { TimeZone = TimeZoneInfo.Local }
+
+            );
+
+            RecurringJob.AddOrUpdate<ReportSarlaftJob>(
+                "ReportSarlaft",
+                x => x.Execute(),
+                Cron.Weekly(DayOfWeek.Wednesday, 17), // Miércoles a las 17:00
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local }
+            );
+
+            RecurringJob.AddOrUpdate<ReportSarlaftJob>(
+                "ReportSarlaft",
+                x => x.Execute(),
+                Cron.Weekly(DayOfWeek.Thursday, 17),  // Jueves a las 17:00
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local }
+            );
+
+            RecurringJob.AddOrUpdate<ReportSarlaftJob>(
+                "ReportSarlaft",
+                x => x.Execute(),
+                Cron.Weekly(DayOfWeek.Friday, 17),    // Viernes a las 17:00
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local }
+            );
+
+            RecurringJob.AddOrUpdate<ReportSarlaftJob>(
+                "ReportSarlaft",
+                x => x.Execute(),
+                Cron.Weekly(DayOfWeek.Saturday, 12),  // Sábado a las 12:00
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local }
+            );
+
         }
     }
 }
