@@ -134,8 +134,8 @@ namespace Bangk.Api.Extensions
             //Azure Blob Storage
 
             services.AddHostedService<CompleteApplicationJob>();
-            services.AddHostedService<SFTPConnection>();
-            services.AddHostedService<ReportSarlaftJob>();
+            //services.AddHostedService<SFTPConnection>();
+            //services.AddHostedService<ReportSarlaftJob>();
         }
     }
 }
