@@ -122,7 +122,7 @@ namespace Bangk.Api
                 endpoints.MapControllers();
             });
 
-            // Definir la tarea periódica
+            // Tareas periódica ingesta
             RecurringJob.AddOrUpdate<ReportSarlaftJob>(
                 "ReportSarlaft",
                 x => x.Execute(),

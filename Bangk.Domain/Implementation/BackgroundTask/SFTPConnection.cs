@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,12 +46,18 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     if (client.IsConnected)
                     {
                         Console.WriteLine("Conexión establecida correctamente.");
-                        
                     }
                     else
                     {
                         Console.WriteLine("No se pudo establecer la conexión.");
+                        throw new SftpConnectionException("No se pudo establecer la conexión al servidor SFTP.");
                     }
+                }
+                catch (SshAuthenticationException ex)
+                {
+                    Console.WriteLine($"Error de autenticación: {ex.Message}");
+                    
+                    throw; 
                 }
                 finally
                 {
@@ -59,5 +66,12 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             }
         }
 
+    }
+
+    public class SftpConnectionException : Exception
+    {
+        public SftpConnectionException(string message) : base(message)
+        {
+        }
     }
 }

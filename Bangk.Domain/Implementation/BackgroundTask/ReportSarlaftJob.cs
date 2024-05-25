@@ -21,17 +21,28 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             _serviceProvider = serviceProvider;
         }
 
-        public void Execute()
+        public async Task Execute()
         {
-            using (var scope = _serviceProvider.CreateScope())
+            try
             {
-                var scopedServices = scope.ServiceProvider;
-                var reportExcel = scopedServices.GetRequiredService<IReportExcel>();
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var scopedServices = scope.ServiceProvider;
+                    var sftpConnection = scopedServices.GetRequiredService<SFTPConnection>();
+                    await sftpConnection.BangkConnection(CancellationToken.None);
 
-                reportExcel.CreateSarlaftReportLogs().Wait();
-                reportExcel.CreateSarlaftReport().Wait();
+                    var reportExcel = scopedServices.GetRequiredService<IReportExcel>();
+                    await reportExcel.CreateSarlaftReportLogs();
+                    await reportExcel.CreateSarlaftReport();
+                }
+            }
+            catch (SftpConnectionException ex)
+            {
+                Console.WriteLine($"Error al establecer conexión con el servidor SFTP: {ex.Message}");
+                
             }
         }
+
     }
 
 }

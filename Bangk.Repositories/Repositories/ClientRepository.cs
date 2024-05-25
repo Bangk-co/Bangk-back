@@ -215,6 +215,7 @@ namespace Bangk.Repositories.Repositories
                             TermsConditionsAcceptanceQuote = lq.TermsConditionsAcceptanceQuote,
                             ValidateClientOtp= c.ValidateClientOtp,
                             AcceptQuoteOtp = lq.AcceptQuoteOtp,
+                            OtpDateForms = lp.OtpDateForms,
                             AcceptanceOriginOfFunds = lp.AcceptanceOriginOfFunds,
                             Name = c.Name,
                             LastName = c.LastName,
