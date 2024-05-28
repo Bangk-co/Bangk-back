@@ -192,6 +192,7 @@ namespace Bangk.Domain.Implementation.Client
                             beneficiaryInBD.RelationshipId = b.RelationshipId;
                             beneficiaryInBD.PercentInherit = b.PercentInherit;
                             beneficiaryInBD.CreationDate = DateTime.UtcNow;
+                            beneficiaryInBD.LastName = b.LastName;
                             await _beneficiaryRepository.Update(beneficiaryInBD);
                         }
                     }
