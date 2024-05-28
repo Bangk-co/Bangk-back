@@ -38,9 +38,9 @@ namespace Bangk.Api.Controllers
 
 
         [HttpPost("AddCommentToLoanApplicationHistory")]
-        public async Task<IActionResult> AddCommentToLoanApplicationHistory(int loanApplicationId, string comment)
+        public async Task<IActionResult> AddCommentToLoanApplicationHistory(int historicalLoanApplicationId, string comment)
         {
-            var result = await _addCommentService.Execute(loanApplicationId, comment);
+            var result = await _addCommentService.Execute(historicalLoanApplicationId, comment);
             return Ok(result);
         }
     }
