@@ -2,6 +2,7 @@ using Bangk.Api.Extensions;
 using Bangk.Domain.Contract;
 using Bangk.Domain.Implementation.BackgroundTask;
 using Bangk.Repositories.Context;
+using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -51,7 +52,8 @@ namespace Bangk.Api
 
             // Add converter to DI
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-            
+
+            services.AddScheduler();
 
             services.AddSingleton<SftpClient>(provider =>
             {
@@ -68,7 +70,7 @@ namespace Bangk.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
@@ -113,6 +115,12 @@ namespace Bangk.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            // Use Coravel's Scheduler
+            serviceProvider.UseScheduler(scheduler =>
+            {
+                //scheduler.Schedule<DeleteUserTokensJob>().Hourly().PreventOverlapping(nameof(DeleteUserTokensJob));
             });
         }
     }
