@@ -63,8 +63,6 @@ namespace Bangk.Api
                 var password = "Lk@13HgYT";
 
                 var sftpClient = new SftpClient(host, port, username, password);
-                sftpClient.Connect();
-
                 return sftpClient;
             });
         }
@@ -121,6 +119,13 @@ namespace Bangk.Api
             serviceProvider.UseScheduler(scheduler =>
             {
                 //scheduler.Schedule<DeleteUserTokensJob>().Hourly().PreventOverlapping(nameof(DeleteUserTokensJob));
+            });
+
+            serviceProvider.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<ReportSarlaftJob>().DailyAt(17, 0).Monday().Tuesday().Wednesday().Thursday().Friday(); 
+                scheduler.Schedule<ReportSarlaftJob>().DailyAt(12, 0).Saturday(); 
+
             });
         }
     }

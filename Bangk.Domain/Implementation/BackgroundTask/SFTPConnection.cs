@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 {
     public class SFTPConnection : BackgroundService
     {
-        
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -25,8 +24,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 {
                     Console.WriteLine($"Error: {ex.Message}");
                 }
-                
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+
+                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }
 
@@ -41,16 +40,22 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             {
                 try
                 {
-                    await Task.Run(() => client.Connect());
+                    client.Connect();
                     if (client.IsConnected)
                     {
                         Console.WriteLine("Conexión establecida correctamente.");
-                        
                     }
                     else
                     {
                         Console.WriteLine("No se pudo establecer la conexión.");
+                        throw new SftpConnectionException("No se pudo establecer la conexión al servidor SFTP.");
                     }
+                }
+                catch (SshAuthenticationException ex)
+                {
+                    Console.WriteLine($"Error de autenticación: {ex.Message}");
+
+                    throw;
                 }
                 finally
                 {
@@ -58,6 +63,12 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 }
             }
         }
-
     }
+    public class SftpConnectionException : Exception
+    {
+        public SftpConnectionException(string message) : base(message)
+        {
+        }
+    }
+
 }
