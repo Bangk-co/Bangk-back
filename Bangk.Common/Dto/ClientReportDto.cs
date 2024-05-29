@@ -34,6 +34,7 @@ namespace Bangk.Common.Dto
         public DateTime? TermsConditionsAcceptanceQuote {  get; set; }
         public DateTime? ValidateClientOtp { get; set; }
         public DateTime? AcceptQuoteOtp { get; set; }
+        public DateTime? OtpDateForms { get; set; }
         public DateTime? AcceptanceOriginOfFunds { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }

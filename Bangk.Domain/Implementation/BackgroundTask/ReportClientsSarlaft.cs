@@ -296,7 +296,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, 2].Value = client.TermsConditionsAcceptanceQuote?.ToString("yyyyMMdd");
                         worksheet.Cells[row, 3].Value = client.ValidateClientOtp?.ToString("yyyyMMdd");
                         worksheet.Cells[row, 4].Value = client.AcceptQuoteOtp?.ToString("yyyyMMdd");
-                        //Tercer otp pendiente
+                        worksheet.Cells[row, 5].Value = client.OtpDateForms?.ToString("yyyyMMdd");
                         worksheet.Cells[row, 6].Value = client.AcceptanceOriginOfFunds?.ToString("yyyyMMdd");
                         worksheet.Cells[row, 7].Value = client.Name;
                         worksheet.Cells[row, 8].Value = client.LastName;
