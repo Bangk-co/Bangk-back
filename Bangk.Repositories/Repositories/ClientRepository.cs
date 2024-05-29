@@ -214,6 +214,7 @@ namespace Bangk.Repositories.Repositories
                             PermissionTreatPersonalDataDate = c.PermissionTreatPersonalDataDate,
                             TermsConditionsAcceptanceQuote = lq.TermsConditionsAcceptanceQuote,
                             ValidateClientOtp= c.ValidateClientOtp,
+                            OtpDateForms = lp.OtpDateForms,
                             AcceptQuoteOtp = lq.AcceptQuoteOtp,
                             AcceptanceOriginOfFunds = lp.AcceptanceOriginOfFunds,
                             Name = c.Name,
