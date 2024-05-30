@@ -1,4 +1,5 @@
-﻿using Bangk.Domain.Contract;
+﻿using Bangk.Common;
+using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.Sftp;
 using Coravel.Invocable;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,12 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task Invoke()
         {
+            Logs.WriteInfoLog($"Running Scheduled Task: ReportSarlaftJob");
+            await Execute();
+        }
+
+        public async Task Execute()
+        {
             try
             {
                 using (var scope = _serviceProvider.CreateScope())
@@ -36,7 +43,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             }
             catch (SftpConnectionException ex)
             {
-                Console.WriteLine($"Error al establecer conexión con el servidor SFTP: {ex.Message}");
+                Logs.WriteErrorLog($"Error al establecer conexión con el servidor SFTP: {ex.Message}");
             }
         }
     }

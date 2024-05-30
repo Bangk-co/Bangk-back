@@ -139,7 +139,7 @@ namespace Bangk.Api.Extensions
 
             //Add Service Jobs
 
-            //services.AddTransient<ReportSarlaftJob>();
+            services.AddTransient<ReportSarlaftJob>();
             services.AddTransient<RetryIntegrationsJob>();
             services.AddTransient<CompleteApplicationJob>();
         }
