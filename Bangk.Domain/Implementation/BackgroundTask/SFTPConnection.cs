@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Bangk.Common;
+using Bangk.Domain.Contract.Sftp;
+using Microsoft.Extensions.Hosting;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
@@ -10,65 +12,59 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.BackgroundTask
 {
-    public class SFTPConnection : BackgroundService
+    public class SFTPConnection : ISFTPConnection
     {
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await BangkConnection(stoppingToken);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
+        private readonly SftpClient _client;
 
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
-            }
+        public SFTPConnection(SftpClient client)
+        {
+            _client = client;
         }
 
-        public async Task BangkConnection(CancellationToken cancellationToken)
+        public Task ConnectAsync(CancellationToken cancellationToken)
         {
-            string host = "mfxsftp.mfxservices.com";
-            string username = "SBS_BANGK_RW";
-            string password = "Lk@13HgYT";
-            int port = 22;
-
-            using (var client = new SftpClient(host, port, username, password))
+            try
             {
-                try
+                _client.Connect();
+                if (_client.IsConnected)
                 {
-                    client.Connect();
-                    if (client.IsConnected)
-                    {
-                        Console.WriteLine("Conexión establecida correctamente.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("No se pudo establecer la conexión.");
-                        throw new SftpConnectionException("No se pudo establecer la conexión al servidor SFTP.");
-                    }
+                    Logs.WriteInfoLog("Conexión establecida correctamente.");
                 }
-                catch (SshAuthenticationException ex)
+                else
                 {
-                    Console.WriteLine($"Error de autenticación: {ex.Message}");
+                    throw new SftpConnectionException("No se pudo establecer la conexión al servidor SFTP.");
+                }
+            }
+            catch (SshAuthenticationException ex)
+            {
+                Logs.WriteErrorLog($"Error de autenticación: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logs.WriteErrorLog($"Error de conexión: {ex.Message}");
+                throw;
+            }
 
-                    throw;
-                }
-                finally
-                {
-                    client.Disconnect();
-                }
+            return Task.CompletedTask;
+        }
+
+        public void Disconnect()
+        {
+            if (_client.IsConnected)
+            {
+                _client.Disconnect();
+                Logs.WriteInfoLog("Conexión cerrada correctamente.");
             }
         }
     }
+
     public class SftpConnectionException : Exception
     {
         public SftpConnectionException(string message) : base(message)
         {
         }
     }
+
 
 }

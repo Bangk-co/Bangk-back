@@ -123,9 +123,19 @@ namespace Bangk.Api
 
             serviceProvider.UseScheduler(scheduler =>
             {
-                scheduler.Schedule<ReportSarlaftJob>().DailyAt(17, 0).Monday().Tuesday().Wednesday().Thursday().Friday(); 
-                scheduler.Schedule<ReportSarlaftJob>().DailyAt(12, 0).Saturday(); 
+                scheduler.Schedule<ReportSarlaftJob>()
+                         .DailyAt(17, 0)
+                         .Monday()
+                         .Tuesday()
+                         .Wednesday()
+                         .Thursday()
+                         .Friday()
+                         .PreventOverlapping(nameof(ReportSarlaftJob));
 
+                scheduler.Schedule<ReportSarlaftJob>()
+                         .DailyAt(12, 0)
+                         .Saturday()
+                         .PreventOverlapping(nameof(ReportSarlaftJob));
             });
         }
     }

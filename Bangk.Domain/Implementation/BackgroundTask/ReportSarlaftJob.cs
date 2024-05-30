@@ -1,4 +1,5 @@
 ﻿using Bangk.Domain.Contract;
+using Bangk.Domain.Contract.Sftp;
 using Coravel.Invocable;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -24,11 +25,13 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 {
                     var scopedServices = scope.ServiceProvider;
                     var sftpConnection = scopedServices.GetRequiredService<SFTPConnection>();
-                    await sftpConnection.BangkConnection(CancellationToken.None);
+                    await sftpConnection.ConnectAsync(CancellationToken.None);
 
                     var reportExcel = scopedServices.GetRequiredService<IReportExcel>();
                     await reportExcel.CreateSarlaftReportLogs();
                     await reportExcel.CreateSarlaftReport();
+
+                    sftpConnection.Disconnect();
                 }
             }
             catch (SftpConnectionException ex)

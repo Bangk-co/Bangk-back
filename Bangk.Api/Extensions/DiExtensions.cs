@@ -17,6 +17,7 @@ using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Domain.Contract.Settings;
+using Bangk.Domain.Contract.Sftp;
 using Bangk.Domain.Contract.State;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
@@ -129,12 +130,12 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetClientPolicyService, GetClientPolicyService>();
             services.AddTransient<IGetLoanApplicationInfoByLoanApplicationIdService, GetLoanApplicationInfoByLoanApplicationIdService>();
             services.AddTransient<IReportExcel, ReportClientsSarlaft>();
+            services.AddTransient<ISFTPConnection, SFTPConnection>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
 
             services.AddHostedService<CompleteApplicationJob>();
-            services.AddHostedService<SFTPConnection>();
             services.AddTransient<ReportSarlaftJob>();
         }
     }
