@@ -6,9 +6,7 @@ using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 //using ValidacionOFAC;
 using ValidationOFACTest;
@@ -61,6 +59,9 @@ namespace Bangk.Domain.Implementation.Integrations
                         await DeleteRetryJob(loanApplicationId);
                         await SendPolicyNotIssueNotification(client);
                         await SaveLoanHistory(loanApplicationId, "Cliente no apto para emisión de póliza", (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS, responseValidation.TipoRestriccionOfac);
+                        await SaveLoanHistory(loanApplicationId, null, (int)ApplicationStateHistoryEnum.ClienteNoAsegurable, null);
+                        client.State = (int)ClientStateEnum.NoAsegurable;
+                        await _clientRepository.Update(client);
                     }
                     else if (responseValidation.TipoRestriccionOfac == 1)//presenta novedad
                     {
@@ -124,7 +125,7 @@ namespace Bangk.Domain.Implementation.Integrations
             await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
 
-        private async Task SaveLoanHistory(int loanApplicationId, string observation, int state, int validationResultCode)
+        private async Task SaveLoanHistory(int loanApplicationId, string observation, int state, int? validationResultCode)
         {
             var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
