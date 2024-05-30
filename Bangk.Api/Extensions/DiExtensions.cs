@@ -135,8 +135,13 @@ namespace Bangk.Api.Extensions
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
 
-            services.AddHostedService<CompleteApplicationJob>();
-            services.AddTransient<ReportSarlaftJob>();
+            //services.AddHostedService<SFTPConnection>();
+
+            //Add Service Jobs
+
+            //services.AddTransient<ReportSarlaftJob>();
+            services.AddTransient<RetryIntegrationsJob>();
+            services.AddTransient<CompleteApplicationJob>();
         }
     }
 }

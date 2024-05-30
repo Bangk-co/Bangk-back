@@ -10,10 +10,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -96,6 +94,9 @@ namespace Bangk.Domain.Implementation.Integrations
                         {
                             await SaveLoanHistory(loanApplicationId, "Cliente no apto para emisión de póliza", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 2);
                             await SendPolicyNotIssueNotification(client);
+                            await SaveLoanHistory(loanApplicationId, null, (int)ApplicationStateHistoryEnum.ClienteNoAsegurable, null);
+                            client.State = (int)ClientStateEnum.NoAsegurable;
+                            await _clientRepository.Update(client);
                             await DeleteRetryJob(loanApplicationId);
                         }
                         else

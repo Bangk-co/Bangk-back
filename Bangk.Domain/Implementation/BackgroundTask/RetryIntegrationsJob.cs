@@ -1,42 +1,28 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Common;
+using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Repositories.Repositories;
-using Microsoft.Extensions.Configuration;
+using Coravel.Invocable;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using NCrontab;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.BackgroundTask
 {
-    public class RetryIntegrationsJob : BackgroundService
+    public class RetryIntegrationsJob : IInvocable
     {
-        private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly CrontabSchedule _schedule;
 
-        public RetryIntegrationsJob(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory)
+        public RetryIntegrationsJob(IServiceScopeFactory serviceScopeFactory)
         {
-            _configuration = configuration;
-            _schedule = CrontabSchedule.Parse(_configuration.GetSection("RetryIntegrationsJob").Value);
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public async Task Invoke()
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                var nextOccurrence = _schedule.GetNextOccurrence(DateTime.UtcNow);
-                var delay = nextOccurrence - DateTime.UtcNow;
-
-                if (delay.TotalMilliseconds > 0)
-                    await Task.Delay(delay, stoppingToken);
-
-                await Execute();
-            }
+            Logs.WriteInfoLog($"Running Scheduled Task: RetryIntegrationsJob");
+            await Execute();
         }
 
         private async Task Execute()
