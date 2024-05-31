@@ -64,6 +64,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         public SftpConnectionException(string message) : base(message)
         {
         }
+
+        
     }
 
 

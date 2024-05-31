@@ -10,5 +10,6 @@ namespace Bangk.Domain.Contract.Sftp
     public interface ISFTPConnection
     {
         Task ConnectAsync(CancellationToken cancellationToken);
+        void Disconnect();
     }
 }
