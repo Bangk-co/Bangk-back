@@ -33,7 +33,8 @@ namespace Bangk.Common.Enums
         CotizaciónRechazada = 136,
         CotizaciónNoRespondida = 137,
         ClienteNoAsegurable = 690,
-        SolicitudEmisionPoliza = 693
+        SolicitudEmisionPoliza = 693,
+        PagoRechazado = 699
     }
 
     public enum DocumentType
