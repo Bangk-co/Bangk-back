@@ -83,7 +83,8 @@ namespace Bangk.Repositories.Repositories
                             GenderName = subsg.Name,
                             GenderId = subsg.Id,
                             StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty,
-                            ClientAge = c.BirthDate != null ? ((DateTime.Now.Year - c.BirthDate.Value.Year) >= 65 && (DateTime.Now.Year - c.BirthDate.Value.Year) <= 74) : false
+                            ClientAge = c.BirthDate != null && ((DateTime.Now.Year - c.BirthDate.Value.Year) >= 65 && (DateTime.Now.Year - c.BirthDate.Value.Year) <= 74),
+                            ClientMayorToFifty = c.BirthDate != null && ((DateTime.Now.Year - c.BirthDate.Value.Year) >= 50 && (DateTime.Now.Year - c.BirthDate.Value.Year) <= 64),
                         };
 
             return query;
