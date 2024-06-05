@@ -21,7 +21,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             _client = client;
         }
 
-        public Task ConnectAsync(CancellationToken cancellationToken)
+        public Task ConnectAsync()
         {
             try
             {

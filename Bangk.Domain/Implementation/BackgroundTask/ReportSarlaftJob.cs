@@ -25,18 +25,17 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         public async Task Invoke()
         {
             Logs.WriteInfoLog($"Running Scheduled Task: ReportSarlaftJob");
-            var cancellationToken = new CancellationTokenSource().Token;
-            await Execute(cancellationToken);
+            await Execute();
         }
 
-        public async Task Execute(CancellationToken cancellationToken)
+        public async Task Execute()
         {
             try
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var scopedServices = scope.ServiceProvider;
-                    await _sftpConnection.ConnectAsync(cancellationToken);
+                    await _sftpConnection.ConnectAsync();
 
                     var reportExcel = scopedServices.GetRequiredService<IReportExcel>();
                     await reportExcel.CreateSarlaftReportLogs();

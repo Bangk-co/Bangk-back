@@ -10,9 +10,9 @@ namespace Bangk.Domain.Contract
     public interface IReportExcel
     {
         Task CreateSarlaftReport();
-        Task GenerateExcel(string dateFile, IQueryable<ClientReportDto> clients);
+        Task GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients);
         Task CreateSarlaftReportLogs();
-        Task GenerateExcelLogs(string dateFile, IQueryable<ClientReport2Dto> clients);
+        Task GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients);
 
 
 
