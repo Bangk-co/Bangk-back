@@ -52,6 +52,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'fraktal-bangk-stg-api'
-          slot-name: 'Staging'
           package: .
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_STG }}
