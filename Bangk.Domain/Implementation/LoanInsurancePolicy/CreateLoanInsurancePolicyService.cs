@@ -171,7 +171,7 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
             loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
             loanInsurencePolicy.OtpDateForms = loanInsurancePolicySaveDto.OtpDateForms;
-
+            loanInsurencePolicy.AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds;
             await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             
 
