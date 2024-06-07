@@ -1,15 +1,10 @@
-﻿using Bangk.Business.Extension.SenderGrid;
-using Bangk.Common.Dto;
-using Bangk.Common.Enums;
+﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 using System.Transactions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Bangk.Domain.Implementation.Client
 {
@@ -25,8 +20,6 @@ namespace Bangk.Domain.Implementation.Client
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _beneficiaryRepository = beneficiaryRepository;
             _notificationRepository = notificationRepository;
-            
-
         }
 
         public async Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
