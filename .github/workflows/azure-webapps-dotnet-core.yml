@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - fraktal-bangk-stg-api
 on:
   push:
     branches:
-      - main
+      - staging
   workflow_dispatch:
 
 jobs:
