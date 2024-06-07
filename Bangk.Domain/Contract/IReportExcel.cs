@@ -13,6 +13,7 @@ namespace Bangk.Domain.Contract
         Task GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients);
         Task CreateSarlaftReportLogs();
         Task GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients);
+        Task SaveLastConsecutive(int consecutive, int loanPolicyId);
 
 
 

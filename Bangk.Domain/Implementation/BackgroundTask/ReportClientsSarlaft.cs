@@ -22,13 +22,18 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         private readonly IClientRepository _clientRepository;
         private readonly SftpClient _sftpClient;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
+        private readonly ILoanInsurancePolicyRepository _loanInsurancePolicyRepository;
+        private readonly ISettingRepository _settingRepository;
 
 
-        public ReportClientsSarlaft(IClientRepository clientRepository, SftpClient sftpClient, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
+        public ReportClientsSarlaft(IClientRepository clientRepository, SftpClient sftpClient, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
+            ILoanInsurancePolicyRepository loanInsurancePolicyRepository, ISettingRepository settingRepository)
         {
             _clientRepository = clientRepository;
             _sftpClient = sftpClient;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
+            _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
+            _settingRepository = settingRepository;
         }
 
         public async Task CreateSarlaftReport()
@@ -55,6 +60,18 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
                 await _loanApplicationStateHistoryRepository.Create(newLoanApplicationStateHistory);
             }
+        }
+
+        public async Task SaveLastConsecutive(int consecutive, int loanPolicyId)
+        {
+            var loanPolicy = await _loanInsurancePolicyRepository.GetById(loanPolicyId);
+            
+            {
+                loanPolicy.Consecutive = consecutive;
+
+            };
+
+            await _loanInsurancePolicyRepository.Update(loanPolicy);
         }
 
         public async Task GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients)
@@ -95,7 +112,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
                     int row = 2;
                     var clientList = clients.ToList();
-                    int lastConsecutive = GetLastConsecutive();
+                    
                     
 
                     foreach (var client in clients)
@@ -146,9 +163,10 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         {
                             planName = "Plan sin definir";
                         }
-                        worksheet.Cells[row, 10].Value = planName;
-
-                        worksheet.Cells[row, 11].Value = $"BK128{lastConsecutive}";
+                        worksheet.Cells[row, 10].Value = planName; 
+                        int lastConsecutive = _loanInsurancePolicyRepository.GetLastConsecutive();
+                        int consecutive = lastConsecutive == 0 ? int.Parse((await _settingRepository.GetById((int)ConsecutiveEnum.ConsecutiveNumber)).Code) : lastConsecutive+1;
+                        worksheet.Cells[row, 11].Value = $"BK128{consecutive}";
                         worksheet.Cells[row, 12].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
                         worksheet.Cells[row, 13].Value = client.IdentificationNumber;
                         worksheet.Cells[row, 14].Value = client.Name;
@@ -189,13 +207,13 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, 85].Value = client.YearlyFee;
 
                         row++;
-                        lastConsecutive++;
-                        SaveLastConsecutive(lastConsecutive);
+                        await SaveLastConsecutive(consecutive, client.LoanPolicyId);
                     }
                     var result = await package.GetAsByteArrayAsync();
                     using (MemoryStream stream = new MemoryStream(result))
                     {
                         _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+
                     }
                 }
             }
@@ -206,38 +224,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 
             }
         }
-
-        private int GetLastConsecutive()
-        {
-            string filePathC = "consecutivo.txt";
-
-            if (File.Exists(filePathC))
-            {
-                string lastConsecutiveText = File.ReadAllText(filePathC);
-                if (int.TryParse(lastConsecutiveText, out int lastConsecutive))
-                {
-                    return lastConsecutive;
-                }
-            }
-            else
-            {
-                SaveLastConsecutive(10002);
-                return 10002;
-
-            }
-            
-            return 10002; 
-        }
-
-        
-        private void SaveLastConsecutive(int lastConsecutive)
-        {
-            string filePathC = "consecutivo.txt";
-            File.WriteAllText(filePathC, lastConsecutive.ToString());
-        }
-
-
-
 
         public async Task CreateSarlaftReportLogs()
         {

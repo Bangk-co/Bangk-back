@@ -11,5 +11,6 @@ namespace Bangk.Repositories.Repositories
         Task<LoanInsurancePolicy> GetLoanInsurancePolicyByLoadApplicationId(int loanApplicationId);
         Task<ClientSBSInfoDto> GetClientSBSInfoDtoyByLoanApplicationId(int loanApplicationId);
         Task<ClientSarlaftInfoDto> GetClientSarlaftInfoDtoyByLoanApplicationId(int loanApplicationId);
+        int GetLastConsecutive();
     }
 }
