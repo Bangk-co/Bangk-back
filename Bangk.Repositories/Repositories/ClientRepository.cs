@@ -129,6 +129,7 @@ namespace Bangk.Repositories.Repositories
                         lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
                         select new ClientReportDto
                         {
+                            LoanPolicyId = sublp.Id,
                             DocumenIdentificationTypeId = c.DocumenIdentificationTypeId != 0 ? c.DocumenIdentificationTypeId : 0,
                             IdentificationNumber = c.IdentificationNumber != null ? c.IdentificationNumber : string.Empty,
                             Name = c.Name != null ? c.Name : string.Empty,
