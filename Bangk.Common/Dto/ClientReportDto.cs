@@ -8,6 +8,7 @@ namespace Bangk.Common.Dto
 {
     public class ClientReportDto
     {
+        public int LoanPolicyId { get; set; }
         public int DocumenIdentificationTypeId { get; set; }
         public string IdentificationNumber { get; set; }
         public string Name { get; set; }

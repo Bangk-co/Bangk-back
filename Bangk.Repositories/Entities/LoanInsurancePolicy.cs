@@ -44,6 +44,7 @@ namespace Bangk.Repositories.Entities
         public int? CityVehiculeId { get; set; }
         public string VehicleLicensePlate { get; set; }
         public DateTime? OtpDateForms { get; set; }
+        public int? Consecutive { get; set; }
 
     }
 }

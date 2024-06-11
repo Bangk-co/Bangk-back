@@ -3,6 +3,7 @@ using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -156,6 +157,12 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return await query.FirstOrDefaultAsync();
+        }
+
+        public int GetLastConsecutive()
+        {
+            var query = Context.LoanInsurancePolicy.OrderByDescending(p => p.Consecutive).FirstOrDefault();
+            return query?.Consecutive ?? 0;
         }
     }
 }

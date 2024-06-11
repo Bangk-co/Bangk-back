@@ -72,4 +72,9 @@ namespace Bangk.Common.Enums
         Cc = 76,
         Ce = 77
     }
+
+    public enum ConsecutiveEnum
+    {
+        ConsecutiveNumber = 700
+    }
 }
