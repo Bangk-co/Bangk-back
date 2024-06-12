@@ -19,7 +19,7 @@ namespace Bangk.Api.Controllers
         [HttpGet("GetCitiesList")]
         [AllowAnonymous]
 
-        public async Task<ActionResult<List<CityDto>>> GetCitiesList(int stateId)
+        public async Task<ActionResult> GetCitiesList(int stateId)
         {
             if (stateId == 0)
             {
@@ -33,22 +33,34 @@ namespace Bangk.Api.Controllers
                 return BadRequest(error);
             }
 
-            var result = await _cityService.Execute(stateId);
-            if (result.Count == 0)
-            {
-                var error = new ResponseDto<bool>
-                {
-                    HasErrors = true,
-                    Result = false
-                };
+            var (cities, stateName) = await _cityService.Execute(stateId);
 
-                error.Errors.Add("No hay lista creada.");
-                return BadRequest(error);
+            if (cities.Count == 0)
+            {
+                if (stateName != null)
+                {
+                    return Ok(new
+                    {
+                        StateName = stateName,
+                        Cities = cities
+                    });
+                }
+                else
+                {
+                    var error = new ResponseDto<bool>
+                    {
+                        HasErrors = true,
+                        Result = false
+                    };
+
+                    error.Errors.Add("No hay lista creada y el estado no existe.");
+                    return BadRequest(error);
+                }
             }
 
             return Ok(new
             {
-                Cities = result
+                Cities = cities
             });
         }
     }
