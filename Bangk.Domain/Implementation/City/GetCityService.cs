@@ -19,7 +19,7 @@ namespace Bangk.Domain.Implementation.City
             _cityRepository = cityRepository;
         }
 
-        public async Task<List<CityDto>> Execute(int stateId)
+        public async Task<(List<CityDto>, string)> Execute(int stateId)
         {
             return await _cityRepository.GetByIdCities(stateId);
         }

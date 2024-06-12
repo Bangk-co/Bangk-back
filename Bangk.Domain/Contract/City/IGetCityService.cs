@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.City
 {
     public interface IGetCityService
     {
-        Task<List<CityDto>> Execute(int stateId);
+        Task<(List<CityDto>, string)> Execute(int stateId);
     }
 }

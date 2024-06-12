@@ -18,14 +18,31 @@ namespace Bangk.Repositories.Repositories
 
         }
 
-        public async Task<List<CityDto>> GetByIdCities(int stateId)
+        public async Task<(List<CityDto>, string)> GetByIdCities(int stateId)
         {
-            return await Context.Cities.Where(c => c.StateId == stateId).Select(c => new CityDto
-            {
-                Id = c.Id,
-                Name = c.Name
+            var cities = await Context.Cities
+                .Where(c => c.StateId == stateId)
+                .Select(c => new CityDto {
 
-            }).OrderBy(x => x.Name).ToListAsync();
+                    Id = c.Id,
+                    Name = c.Name,
+                
+                
+                })
+                .OrderBy( x => x.Name)
+                .ToListAsync();
+
+            string stateName = null;
+            if(cities.Count == 0)
+            {
+                stateName = await Context.State
+                    .Where(s => s.Id == stateId)
+                    .Select(s => s.Name)
+                    .FirstOrDefaultAsync();
+            }
+
+            return (cities, stateName);
+
         }
 
     }

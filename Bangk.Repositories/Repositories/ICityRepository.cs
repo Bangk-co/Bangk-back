@@ -11,6 +11,6 @@ namespace Bangk.Repositories.Repositories
 {
     public interface ICityRepository: IGenericRepository<City, CityDto>
     {
-        Task<List<CityDto>> GetByIdCities(int stateId);
+        Task<(List<CityDto>, string)> GetByIdCities(int stateId);
     }
 }
