@@ -16,13 +16,16 @@ namespace Bangk.Api.Controllers
         private readonly IGetLoadApplicationByIdService _getLoadApplicationByIdService;
         private readonly IUpdateLoanApplicationService _updateLoanApplicationService;
         private readonly IGetLoanApplicationInfoByLoanApplicationIdService _getLoanApplicationInfoByLoanApplicationIdService;
+        private readonly IGetLoanApplicationFirstThreeService _getLoanApplicationFirstThreeService; 
         public LoanApplicationController(ILoanApplicationServices getLoanApplicationServices, IGetLoadApplicationByIdService getLoadApplicationByIdService, 
-            IUpdateLoanApplicationService updateLoanApplicationService, IGetLoanApplicationInfoByLoanApplicationIdService getLoanApplicationInfoByLoanApplicationIdService)
+            IUpdateLoanApplicationService updateLoanApplicationService, IGetLoanApplicationInfoByLoanApplicationIdService getLoanApplicationInfoByLoanApplicationIdService,
+            IGetLoanApplicationFirstThreeService getLoanApplicationFirstThreeService)
         {
             _getLoanApplicationServices = getLoanApplicationServices;
             _getLoadApplicationByIdService = getLoadApplicationByIdService;
             _updateLoanApplicationService = updateLoanApplicationService;
             _getLoanApplicationInfoByLoanApplicationIdService = getLoanApplicationInfoByLoanApplicationIdService;
+            _getLoanApplicationFirstThreeService = getLoanApplicationFirstThreeService;
         }
 
         [HttpGet("GetLoanApplicationService")]
@@ -78,6 +81,17 @@ namespace Bangk.Api.Controllers
             return Ok(new
             {
                 result
+            });
+        }
+
+        [HttpGet("GetLoanApplicationFirstThree")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<LoanApplicationDto>>> GetLoanApplicationFirstThree(int ClientId)
+        {
+            var result = await _getLoanApplicationFirstThreeService.Execute(ClientId);
+            return Ok(new
+            {
+                loanApplications = result
             });
         }
     }
