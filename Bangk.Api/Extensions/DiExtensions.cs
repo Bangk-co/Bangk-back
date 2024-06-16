@@ -132,6 +132,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IReportExcel, ReportClientsSarlaft>();
             services.AddTransient<ISFTPConnection, SFTPConnection>();
             services.AddTransient<IGetLoanApplicationFirstThreeService, GetLoanApplicationFirstThreeService>();
+            services.AddTransient<IValidateLoanApplicationQouteService, ValidateLoanApplicationQouteService>();
 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

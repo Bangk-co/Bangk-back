@@ -12,13 +12,15 @@ namespace Bangk.Api.Controllers
         private readonly IGetLoanQuoteInfoByLoanApplicationIdService _getLoanQuoteInfoByLoanApplicationIdService;
         private readonly IAcceptLoanQuoteService _acceptLoanQuoteService;
         private readonly IRejectLoanQuoteService _rejectLoanQuoteService;
+        private readonly IValidateLoanApplicationQouteService _validateLoanApplicationQouteService;
         public LoanQuoteController(ILoanQuoteService loanQuoteService, IGetLoanQuoteInfoByLoanApplicationIdService getLoanQuoteInfoByLoanApplicationIdService,
-            IAcceptLoanQuoteService acceptLoanQuoteService, IRejectLoanQuoteService rejectLoanQuoteService)
+            IAcceptLoanQuoteService acceptLoanQuoteService, IRejectLoanQuoteService rejectLoanQuoteService, IValidateLoanApplicationQouteService validateLoanApplicationQouteService)
         {
             _loanQuoteService = loanQuoteService;
             _getLoanQuoteInfoByLoanApplicationIdService = getLoanQuoteInfoByLoanApplicationIdService;
             _acceptLoanQuoteService = acceptLoanQuoteService;
             _rejectLoanQuoteService = rejectLoanQuoteService;
+            _validateLoanApplicationQouteService = validateLoanApplicationQouteService;
         }
 
         [HttpPost("CreateLoanQuote")]
@@ -27,7 +29,7 @@ namespace Bangk.Api.Controllers
         public async Task<IActionResult> CreateLoanQuote(int insuranceId, int loanApplicationId, decimal yearlyFee, string insuranceName)
         {
             int loanQuoteId = await _loanQuoteService.Execute(insuranceId, loanApplicationId, yearlyFee, insuranceName);
-            if (loanQuoteId == 0) 
+            if (loanQuoteId == 0)
             {
                 return BadRequest("No se pudo crear la cotización del préstamo.");
             }
@@ -58,5 +60,14 @@ namespace Bangk.Api.Controllers
             var result = await _rejectLoanQuoteService.Execute(loanApplicationId, observations);
             return Ok(result);
         }
+
+        [HttpPost("ValidateLoanStateQuote")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ValidateLoanStateQuote([FromQuery] int loanApplicationId)
+        {
+            var result = await _validateLoanApplicationQouteService.Execute(loanApplicationId);
+            return Redirect(result);
+        }
+
     }
 }

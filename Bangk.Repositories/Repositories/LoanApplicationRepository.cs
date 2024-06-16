@@ -43,7 +43,6 @@ namespace Bangk.Repositories.Repositories
             }
 
             return await query.ToListAsync();
-
         }
 
         public async Task<LoanApplicationInfoDto> GetLoanApplicationById(int loanApplicationId)
@@ -82,9 +81,7 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return await query.FirstOrDefaultAsync();
-
         }
-
 
         public async Task<List<LoanApplicationDto>> GetLoanApplicationInfoByLoanApplicationId(int loanApplicationId)
         {
@@ -109,7 +106,6 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return await query.ToListAsync();
-
         }
     }
 }
