@@ -9,11 +9,13 @@ namespace Bangk.Domain.Contract
 {
     public interface IReportExcel
     {
-        Task CreateSarlaftReport();
-        Task GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients);
-        Task CreateSarlaftReportLogs();
-        Task GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients);
+        Task<byte[]> CreateSarlaftReport();
+        Task<byte[]> GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients);
+        Task<byte[]> CreateSarlaftReportLogs();
+        Task<byte[]> GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients);
         Task SaveLastConsecutive(int consecutive, int loanPolicyId);
+        Task<byte[]> CreateExcel(IQueryable<ClientReportDto> clients);
+        Task<byte[]> CreateExcelLogs(IQueryable<ClientReport2Dto> clients);
 
 
 

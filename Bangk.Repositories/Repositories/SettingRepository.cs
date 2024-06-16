@@ -36,5 +36,14 @@ namespace Bangk.Repositories.Repositories
             }).OrderBy(x => x.Name).ToListAsync();
 
         }
+
+        public List<string> GetEmailNames()
+        {
+            int settingGroupId = 19;
+            var emailNames = from setting in Context.Settings
+                             where setting.SettingGroupId == settingGroupId
+                             select setting.Name;
+            return emailNames.ToList();
+        }
     }
 }
