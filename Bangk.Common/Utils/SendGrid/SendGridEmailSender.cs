@@ -21,6 +21,14 @@ namespace Bangk.Business.Extension.SenderGrid
             var msg = MailHelper.CreateSingleTemplateEmail(new EmailAddress(sendGridEmailDto.From, sendGridEmailDto.Name), new EmailAddress(sendGridEmailDto.email.Trim()),
                 sendGridEmailDto.TemplateId, sendGridEmailDto.Data);
 
+            if (sendGridEmailDto.Attachments != null && sendGridEmailDto.Attachments.Count > 0)
+            {
+                foreach (var attachment in sendGridEmailDto.Attachments)
+                {
+                    msg.AddAttachment(attachment.Filename, attachment.Content, attachment.Type);
+                }
+            }
+
             var response = await client.SendEmailAsync(msg);
             Logs.WriteInfoLog(response.IsSuccessStatusCode
                                ? $"Email to {sendGridEmailDto.email} queued successfully!"

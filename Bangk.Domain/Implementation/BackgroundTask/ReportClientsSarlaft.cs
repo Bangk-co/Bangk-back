@@ -36,14 +36,14 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             _settingRepository = settingRepository;
         }
 
-        public async Task CreateSarlaftReport()
+        public async Task<byte[]> CreateSarlaftReport()
         {
 
             string fileName = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
             string remoteDirectory = "/Ingestas/";
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaft(stateloanApplication);
-            await GenerateExcel(remoteDirectory, fileName, eligibleClients);
+            var fileContent = await GenerateExcel(remoteDirectory, fileName, eligibleClients);
 
             var loanApplicationIds = _clientRepository.GetLoanApplicationIdsWithState(stateloanApplication);
             var clientListId = loanApplicationIds.ToList();
@@ -60,6 +60,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
                 await _loanApplicationStateHistoryRepository.Create(newLoanApplicationStateHistory);
             }
+
+            return fileContent;
         }
 
         public async Task SaveLastConsecutive(int consecutive, int loanPolicyId)
@@ -74,19 +76,38 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             await _loanInsurancePolicyRepository.Update(loanPolicy);
         }
 
-        public async Task GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients)
+        public async Task<byte[]> GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients)
         {
+            var result = new byte[0];
             try
             {
-                using (var package = new ExcelPackage())
+                result = await CreateExcel(clients);
+                using (MemoryStream stream = new MemoryStream(result))
                 {
+                    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
 
-                    var worksheet = package.Workbook.Worksheets.Add("Reporte Sarlaft");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = await CreateExcel(clients);
+                Logs.WriteErrorLog($"Error en el método Crear Ingesta Bangk Polizas  -> {ex.Message}");
+                return result;
+            }
+        }
 
-                    Console.WriteLine("Generando Titulos");
+        public async Task<byte[]> CreateExcel(IQueryable<ClientReportDto> clients)
+        {
+            using (var package = new ExcelPackage())
+            {
+
+                var worksheet = package.Workbook.Worksheets.Add("Reporte Sarlaft");
+
+                Console.WriteLine("Generando Titulos");
 
 
-                    string[] titles = {  "COD.ASEG.","NOMBRE ASEGURADORA","RAMO","NOMBRE RAMO","CLASE","NOMBRE CLASE","CARATULA","NOMBRE CARATULA",
+                string[] titles = {  "COD.ASEG.","NOMBRE ASEGURADORA","RAMO","NOMBRE RAMO","CLASE","NOMBRE CLASE","CARATULA","NOMBRE CARATULA",
                         "PLAN","NOMBRE PLAN","CODIGO UNICO DE POLIZA","TIPO DOC.CLI.BANCO","NUM. DOC.CLI.BANCO","NOMBRE CLI. BANCO","APELLIDO CLI. BANCO",
                         "DIRECCION OFICINA.","DIRECCION RESIDENCIA","BARRIO","CIUDAD","DEPARTAMENTO","PAIS","TEL. OFICINA","TEL. RESIDENCIA","NUM. CELULAR",
                         "EMAIL","FECHA DE NACIMIENTO","SEXO","ESTADO CIVIL","No. DE HIJOS","TIPO DOC.ASEGURADO","NUM. DOC.ASEGURADO","NOMBRE ASEGURADO",
@@ -105,147 +126,157 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         "FECHA DE PAGO","MOTIVO CIERRE","ID LLAMADA","POLIZA SYNERGY","COD. PLAN ANT","PLAN ANTERIOR","PRIMA ANTERIOR","PRIMA NO CAUSADA",
                         "PRIMA REINTEGRAR","TIPO DE CONSTRUCCIÓN"};
 
-                    for (int i = 0; i < titles.Length; i++)
-                    {
-                        worksheet.Cells[1, i + 1].Value = titles[i];
-                    }
-
-                    int row = 2;
-                    var clientList = clients.ToList();
-                    
-                    
-
-                    foreach (var client in clients)
-                    {
-                        worksheet.Cells[row, 1].Value = "3";
-                        worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
-                        worksheet.Cells[row, 3].Value = "128";
-                        worksheet.Cells[row, 4].Value = "VIDA GRUPO";
-                        worksheet.Cells[row, 7].Value = "BK00001";
-                        worksheet.Cells[row, 8].Value = "VIDA GRUPO BANGK";
-
-                        DateTime birthDate = client.BirthDate ?? DateTime.Today;
-                        DateTime today = DateTime.Today;
-                        int age = DateTime.Today.Year - birthDate.Year;
-
-                        if (birthDate > today.AddYears(-age))
-                        {
-                            age--;
-                        }
-                        string plan;
-                        if (age >= 18 && age <= 50)
-                        {
-                            plan = "1";
-                        }
-                        else if (age >= 51 && age <= 64)
-                        {
-                            plan = "2";
-                        }
-                        else
-                        {
-
-                            plan = "Plan sin definir";
-                        }
-
-                        worksheet.Cells[row, 9].Value = plan;
-
-
-                        string planName;
-                        if (age >= 18 && age <= 50)
-                        {
-                            planName = "Vida I";
-                        }
-                        else if (age >= 51 && age <= 64)
-                        {
-                            planName = "Vida II";
-                        }
-                        else
-                        {
-                            planName = "Plan sin definir";
-                        }
-                        worksheet.Cells[row, 10].Value = planName; 
-                        int lastConsecutive = _loanInsurancePolicyRepository.GetLastConsecutive();
-                        int consecutive = lastConsecutive == 0 ? int.Parse((await _settingRepository.GetById((int)ConsecutiveEnum.ConsecutiveNumber)).Code) : lastConsecutive+1;
-                        worksheet.Cells[row, 11].Value = $"BK128{consecutive}";
-                        worksheet.Cells[row, 12].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
-                        worksheet.Cells[row, 13].Value = client.IdentificationNumber;
-                        worksheet.Cells[row, 14].Value = client.Name;
-                        worksheet.Cells[row, 15].Value = client.LastName;
-                        worksheet.Cells[row, 17].Value = client.Address;
-                        worksheet.Cells[row, 18].Value = client.CityName;
-                        worksheet.Cells[row, 19].Value = client.CityName;
-                        worksheet.Cells[row, 20].Value = client.StateName;
-                        worksheet.Cells[row, 21].Value = client.CountryName;
-                        worksheet.Cells[row, 24].Value = client.PhoneNumber;
-                        worksheet.Cells[row, 25].Value = client.Email;
-                        worksheet.Cells[row, 26].Value = client.BirthDate?.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 30].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
-                        worksheet.Cells[row, 31].Value = client.IdentificationNumber;
-                        worksheet.Cells[row, 32].Value = client.Name;
-                        worksheet.Cells[row, 33].Value = client.LastName;
-                        worksheet.Cells[row, 46].Value = "AP";
-                        worksheet.Cells[row, 50].Value = "BUILDING LIFE TECHNOLOGIES S.A.S. - 901647130-5";
-                        worksheet.Cells[row, 51].Value = client.CreationDatePolicy.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 52].Value = DateTime.UtcNow.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 53].Value = DateTime.UtcNow.AddYears(1).ToString("yyyyMMdd");
-                        worksheet.Cells[row, 56].Value = "1A";
-                        worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
-                        worksheet.Cells[row, 58].Value = "Oneroso";
-                        worksheet.Cells[row, 59].Value = "100%";
-
-                        int beneficiaryColumn = 60;
-
-                        foreach (var beneficiary in client.Beneficiary)
-                        {
-                            worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
-                            worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.RelationshipId;
-                            worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.PercentInherit;
-                            beneficiaryColumn += 3;
-                        }
-
-                        worksheet.Cells[row, 84].Value = client.LoanBalance;
-                        worksheet.Cells[row, 85].Value = client.YearlyFee;
-
-                        row++;
-                        await SaveLastConsecutive(consecutive, client.LoanPolicyId);
-                    }
-                    var result = await package.GetAsByteArrayAsync();
-                    using (MemoryStream stream = new MemoryStream(result))
-                    {
-                        _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
-
-                    }
+                for (int i = 0; i < titles.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = titles[i];
                 }
+
+                int row = 2;
+                var clientList = clients.ToList();
+
+
+
+                foreach (var client in clients)
+                {
+                    worksheet.Cells[row, 1].Value = "3";
+                    worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
+                    worksheet.Cells[row, 3].Value = "128";
+                    worksheet.Cells[row, 4].Value = "VIDA GRUPO";
+                    worksheet.Cells[row, 7].Value = "BK00001";
+                    worksheet.Cells[row, 8].Value = "VIDA GRUPO BANGK";
+
+                    DateTime birthDate = client.BirthDate ?? DateTime.Today;
+                    DateTime today = DateTime.Today;
+                    int age = DateTime.Today.Year - birthDate.Year;
+
+                    if (birthDate > today.AddYears(-age))
+                    {
+                        age--;
+                    }
+                    string plan;
+                    if (age >= 18 && age <= 50)
+                    {
+                        plan = "1";
+                    }
+                    else if (age >= 51 && age <= 64)
+                    {
+                        plan = "2";
+                    }
+                    else
+                    {
+
+                        plan = "Plan sin definir";
+                    }
+
+                    worksheet.Cells[row, 9].Value = plan;
+
+
+                    string planName;
+                    if (age >= 18 && age <= 50)
+                    {
+                        planName = "Vida I";
+                    }
+                    else if (age >= 51 && age <= 64)
+                    {
+                        planName = "Vida II";
+                    }
+                    else
+                    {
+                        planName = "Plan sin definir";
+                    }
+                    worksheet.Cells[row, 10].Value = planName;
+                    int lastConsecutive = _loanInsurancePolicyRepository.GetLastConsecutive();
+                    int consecutive = lastConsecutive == 0 ? int.Parse((await _settingRepository.GetById((int)ConsecutiveEnum.ConsecutiveNumber)).Code) : lastConsecutive + 1;
+                    worksheet.Cells[row, 11].Value = $"BK128{consecutive}";
+                    worksheet.Cells[row, 12].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
+                    worksheet.Cells[row, 13].Value = client.IdentificationNumber;
+                    worksheet.Cells[row, 14].Value = client.Name;
+                    worksheet.Cells[row, 15].Value = client.LastName;
+                    worksheet.Cells[row, 17].Value = client.Address;
+                    worksheet.Cells[row, 18].Value = client.CityName;
+                    worksheet.Cells[row, 19].Value = client.CityName;
+                    worksheet.Cells[row, 20].Value = client.StateName;
+                    worksheet.Cells[row, 21].Value = client.CountryName;
+                    worksheet.Cells[row, 24].Value = client.PhoneNumber;
+                    worksheet.Cells[row, 25].Value = client.Email;
+                    worksheet.Cells[row, 26].Value = client.BirthDate?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 30].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
+                    worksheet.Cells[row, 31].Value = client.IdentificationNumber;
+                    worksheet.Cells[row, 32].Value = client.Name;
+                    worksheet.Cells[row, 33].Value = client.LastName;
+                    worksheet.Cells[row, 46].Value = "AP";
+                    worksheet.Cells[row, 50].Value = "BUILDING LIFE TECHNOLOGIES S.A.S. - 901647130-5";
+                    worksheet.Cells[row, 51].Value = client.CreationDatePolicy.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 52].Value = DateTime.UtcNow.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 53].Value = DateTime.UtcNow.AddYears(1).ToString("yyyyMMdd");
+                    worksheet.Cells[row, 56].Value = "1A";
+                    worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
+                    worksheet.Cells[row, 58].Value = "Oneroso";
+                    worksheet.Cells[row, 59].Value = "100%";
+
+                    int beneficiaryColumn = 60;
+
+                    foreach (var beneficiary in client.Beneficiary)
+                    {
+                        worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
+                        worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.RelationshipId;
+                        worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.PercentInherit;
+                        beneficiaryColumn += 3;
+                    }
+
+                    worksheet.Cells[row, 84].Value = client.LoanBalance;
+                    worksheet.Cells[row, 85].Value = client.YearlyFee;
+
+                    row++;
+                    await SaveLastConsecutive(consecutive, client.LoanPolicyId);
+                }
+                var result = await package.GetAsByteArrayAsync();
+
+
+                return result;
             }
-            catch (Exception ex)
-            {
-                Logs.WriteErrorLog($"Error en el método Crear Ingesta Bangk Polizas  -> {ex.Message}");
-                throw;
-                
-            }
+
         }
 
-        public async Task CreateSarlaftReportLogs()
+        public async Task<byte[]> CreateSarlaftReportLogs()
         {
             string fileName = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logs de aceptacion BangK.xlsx";
             string remoteDirectory = "/Ingestas/";
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaftLogs(stateloanApplication);
-            await GenerateExcelLogs(remoteDirectory, fileName, eligibleClients);
+            return await GenerateExcelLogs(remoteDirectory, fileName, eligibleClients);
         }
 
 
-        public async Task GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients)
+        public async Task<byte[]> GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients)
         {
+            var result = new byte[0];
             try
             {
-                using (var package = new ExcelPackage())
+                result = await CreateExcelLogs(clients);
+                using (MemoryStream stream = new MemoryStream(result))
                 {
-                    var worksheet = package.Workbook.Worksheets.Add("Ingesta con logs de aceptacion");
+                    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result = await CreateExcelLogs(clients);
+                Logs.WriteErrorLog($"Error en el método Crear Ingesta con logs de aceptacion  -> {ex.Message}");
+                return result;
+            }
+        }
 
-                    Console.WriteLine("Generando Titulos");
+        public async Task<byte[]> CreateExcelLogs(IQueryable<ClientReport2Dto> clients)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Ingesta con logs de aceptacion");
 
-                    string[] titles = { "Fecha de Aceptacion de PTD","Fecha de Aceptacion de TyC", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP (Si aplica)",
+                Console.WriteLine("Generando Titulos");
+
+                string[] titles = { "Fecha de Aceptacion de PTD","Fecha de Aceptacion de TyC", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP (Si aplica)",
                 "Fecha de aceptacion de origen de fondos ( si aplica)", "Nombres","Apellidos","Tipo de documento","Numero de documento","Codigo del pais","Numero de telefono","Correo Electronico",
                 "País de nacimiento","Departamento/Estado de nacimiento","Ciudad de nacimiento","Nacionalidad","Estado civil","Número de hijos","Profesión","Actividad económica","Persona PPE",
                 "Familiares PPE","País de residencia","Departamento de residencia","Ciudad de residencia","Ingresos mensuales","Gastos mensuales","Valor de tus activos","Valor de tus pasivos",
@@ -260,97 +291,82 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 "TIPO DE DOCUMENTO BENEFICIARIO 6", "NUMERO DOCUMENTO BENEFICIARIO 6","PARENTESCO 6","% PARTICIPACION 6","NOMBRE BENEFICIARIO 7","TIPO DE DOCUMENTO BENEFICIARIO 7",
                 "NUMERO DOCUMENTO BENEFICIARIO 7","PARENTESCO 7", "% PARTICIPACION 7","NOMBRE BENEFICIARIO 8","TIPO DE DOCUMENTO BENEFICIARIO 8","NUMERO DOCUMENTO BENEFICIARIO 8","PARENTESCO 8","% PARTICIPACION 8" };
 
-                    for (int i = 0; i < titles.Length; i++)
-                    {
-                        worksheet.Cells[1, i + 1].Value = titles[i];
-                    }
-
-                    int row = 2;
-                    var clientList = clients.ToList();
-
-                    foreach (var client in clientList)
-                    {
-                        worksheet.Cells[row, 1].Value = client.PermissionTreatPersonalDataDate.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 2].Value = client.TermsConditionsAcceptanceQuote?.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 3].Value = client.ValidateClientOtp?.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 4].Value = client.AcceptQuoteOtp?.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 5].Value = client.OtpDateForms?.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 6].Value = client.AcceptanceOriginOfFunds?.ToString("yyyyMMdd");
-                        worksheet.Cells[row, 7].Value = client.Name;
-                        worksheet.Cells[row, 8].Value = client.LastName;
-                        worksheet.Cells[row, 9].Value = client.DocumenIdentificationTypeId;
-                        worksheet.Cells[row, 10].Value = client.IdentificationNumber;
-                        worksheet.Cells[row, 11].Value = client.CountryCodePhoneId;
-                        worksheet.Cells[row, 12].Value = client.PhoneNumber;
-                        worksheet.Cells[row, 13].Value = client.Email;
-                        worksheet.Cells[row, 14].Value = client.CountryName;
-                        worksheet.Cells[row, 15].Value = client.StateName;
-                        worksheet.Cells[row, 16].Value = client.CityName;
-                        worksheet.Cells[row, 17].Value = client.CountryNationality;
-                        worksheet.Cells[row, 18].Value = client.CivilStatus;
-                        worksheet.Cells[row, 19].Value = client.NumberChildren;
-                        worksheet.Cells[row, 20].Value = client.Occupation;
-                        worksheet.Cells[row, 21].Value = client.OccupationActivity;
-                        worksheet.Cells[row, 22].Value = client.IsPublicPerson.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 23].Value = client.HasBondPublicPerson.HasValue ? (client.HasBondPublicPerson.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 24].Value = client.ResidenceCountry;
-                        worksheet.Cells[row, 25].Value = client.ResidenceState;
-                        worksheet.Cells[row, 26].Value = client.ResidenceCity;
-                        worksheet.Cells[row, 27].Value = client.MonthlyIncome;
-                        worksheet.Cells[row, 28].Value = client.MonthlyExpenses;
-                        worksheet.Cells[row, 29].Value = client.AssetValue;
-                        worksheet.Cells[row, 30].Value = client.LiabilitiesValue;
-                        worksheet.Cells[row, 31].Value = client.IncomeOrigin;
-                        worksheet.Cells[row, 32].Value = client.Weight;
-                        worksheet.Cells[row, 33].Value = client.Height;
-                        worksheet.Cells[row, 34].Value = _clientRepository.GetDiseasesNames(client.Diseases);
-                        worksheet.Cells[row, 35].Value = client.DisabilityMoreInfo;
-                        worksheet.Cells[row, 36].Value = client.HIVActive.HasValue ? (client.HIVActive.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 37].Value = client.PlannedMedicalProcidure.HasValue ? (client.PlannedMedicalProcidure.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 38].Value = client.PlannedMedicalProcidureMoreInfo;
-                        worksheet.Cells[row, 39].Value = client.Disability.HasValue ? (client.Disability.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 40].Value = client.DisabilityMoreInfo;
-                        worksheet.Cells[row, 41].Value = client.Convicted.HasValue ? (client.Convicted.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 42].Value = client.LifeEnsure.HasValue ? (client.LifeEnsure.Value ? "Si" : "No") : "";
-                        worksheet.Cells[row, 43].Value = client.NameBank;
-                        worksheet.Cells[row, 44].Value = "NIT";
-                        worksheet.Cells[row, 45].Value = client.NitBank;
-                        worksheet.Cells[row, 46].Value = "Oneroso";
-                        worksheet.Cells[row, 47].Value = "100%";
-
-                        int beneficiaryColumn = 48;
-
-                        foreach (var beneficiary in client.Beneficiary)
-                        {
-                            worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
-                            worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.DocumenIdentificationTypeB;
-                            worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.IdentificationNumberB;
-                            worksheet.Cells[row, beneficiaryColumn + 3].Value = beneficiary.Relationship;
-                            worksheet.Cells[row, beneficiaryColumn + 4].Value = beneficiary.PercentInherit;
-                            beneficiaryColumn += 5;
-                        }
-                        row++;
-                    }
-
-                    var result = await package.GetAsByteArrayAsync();
-                    using (MemoryStream stream = new MemoryStream(result))
-                    {
-                        _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
-                    }
+                for (int i = 0; i < titles.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = titles[i];
                 }
-            }
-            catch (Exception ex)
-            {
-                Logs.WriteErrorLog($"Error en el método Crear Ingesta con logs de aceptacion  -> {ex.Message}");
-                throw;
 
+                int row = 2;
+                var clientList = clients.ToList();
+
+                foreach (var client in clientList)
+                {
+                    worksheet.Cells[row, 1].Value = client.PermissionTreatPersonalDataDate.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 2].Value = client.TermsConditionsAcceptanceQuote?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 3].Value = client.ValidateClientOtp?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 4].Value = client.AcceptQuoteOtp?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 5].Value = client.OtpDateForms?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 6].Value = client.AcceptanceOriginOfFunds?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 7].Value = client.Name;
+                    worksheet.Cells[row, 8].Value = client.LastName;
+                    worksheet.Cells[row, 9].Value = client.DocumenIdentificationTypeId;
+                    worksheet.Cells[row, 10].Value = client.IdentificationNumber;
+                    worksheet.Cells[row, 11].Value = client.CountryCodePhoneId;
+                    worksheet.Cells[row, 12].Value = client.PhoneNumber;
+                    worksheet.Cells[row, 13].Value = client.Email;
+                    worksheet.Cells[row, 14].Value = client.CountryName;
+                    worksheet.Cells[row, 15].Value = client.StateName;
+                    worksheet.Cells[row, 16].Value = client.CityName;
+                    worksheet.Cells[row, 17].Value = client.CountryNationality;
+                    worksheet.Cells[row, 18].Value = client.CivilStatus;
+                    worksheet.Cells[row, 19].Value = client.NumberChildren;
+                    worksheet.Cells[row, 20].Value = client.Occupation;
+                    worksheet.Cells[row, 21].Value = client.OccupationActivity;
+                    worksheet.Cells[row, 22].Value = client.IsPublicPerson.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 23].Value = client.HasBondPublicPerson.HasValue ? (client.HasBondPublicPerson.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 24].Value = client.ResidenceCountry;
+                    worksheet.Cells[row, 25].Value = client.ResidenceState;
+                    worksheet.Cells[row, 26].Value = client.ResidenceCity;
+                    worksheet.Cells[row, 27].Value = client.MonthlyIncome;
+                    worksheet.Cells[row, 28].Value = client.MonthlyExpenses;
+                    worksheet.Cells[row, 29].Value = client.AssetValue;
+                    worksheet.Cells[row, 30].Value = client.LiabilitiesValue;
+                    worksheet.Cells[row, 31].Value = client.IncomeOrigin;
+                    worksheet.Cells[row, 32].Value = client.Weight;
+                    worksheet.Cells[row, 33].Value = client.Height;
+                    worksheet.Cells[row, 34].Value = _clientRepository.GetDiseasesNames(client.Diseases);
+                    worksheet.Cells[row, 35].Value = client.DisabilityMoreInfo;
+                    worksheet.Cells[row, 36].Value = client.HIVActive.HasValue ? (client.HIVActive.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 37].Value = client.PlannedMedicalProcidure.HasValue ? (client.PlannedMedicalProcidure.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 38].Value = client.PlannedMedicalProcidureMoreInfo;
+                    worksheet.Cells[row, 39].Value = client.Disability.HasValue ? (client.Disability.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 40].Value = client.DisabilityMoreInfo;
+                    worksheet.Cells[row, 41].Value = client.Convicted.HasValue ? (client.Convicted.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 42].Value = client.LifeEnsure.HasValue ? (client.LifeEnsure.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 43].Value = client.NameBank;
+                    worksheet.Cells[row, 44].Value = "NIT";
+                    worksheet.Cells[row, 45].Value = client.NitBank;
+                    worksheet.Cells[row, 46].Value = "Oneroso";
+                    worksheet.Cells[row, 47].Value = "100%";
+
+                    int beneficiaryColumn = 48;
+
+                    foreach (var beneficiary in client.Beneficiary)
+                    {
+                        worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
+                        worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.DocumenIdentificationTypeB;
+                        worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.IdentificationNumberB;
+                        worksheet.Cells[row, beneficiaryColumn + 3].Value = beneficiary.Relationship;
+                        worksheet.Cells[row, beneficiaryColumn + 4].Value = beneficiary.PercentInherit;
+                        beneficiaryColumn += 5;
+                    }
+                    row++;
+                }
+
+                var result = await package.GetAsByteArrayAsync();
+                return result;
             }
         }
-
-
-
-
-
     }
 
 }

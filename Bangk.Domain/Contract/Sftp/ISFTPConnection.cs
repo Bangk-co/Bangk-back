@@ -11,5 +11,7 @@ namespace Bangk.Domain.Contract.Sftp
     {
         Task ConnectAsync();
         void Disconnect();
+
+        Task SendReportIngesta();
     }
 }
