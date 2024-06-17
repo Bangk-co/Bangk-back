@@ -61,11 +61,12 @@ namespace Bangk.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("ValidateLoanStateQuote")]
+        [HttpGet("ValidateLoanStateQuote")]
         [AllowAnonymous]
         public async Task<IActionResult> ValidateLoanStateQuote([FromQuery] int loanApplicationId)
         {
             var result = await _validateLoanApplicationQouteService.Execute(loanApplicationId);
+
             return Redirect(result);
         }
 
