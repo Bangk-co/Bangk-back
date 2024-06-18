@@ -47,7 +47,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
             var loanApplicationIds = _clientRepository.GetLoanApplicationIdsWithState(stateloanApplication);
             var clientListId = loanApplicationIds.ToList();
-            foreach (var loanApplicationId in loanApplicationIds)
+            foreach (var loanApplicationId in clientListId)
             {
                 var newLoanApplicationStateHistory = new Repositories.Entities.LoanApplicationStateHistory
                 {
@@ -134,9 +134,9 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 int row = 2;
                 var clientList = clients.ToList();
 
-
-
-                foreach (var client in clients)
+                
+                
+                foreach (var client in clientList)
                 {
                     worksheet.Cells[row, 1].Value = "3";
                     worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
@@ -215,11 +215,11 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 59].Value = "100%";
 
                     int beneficiaryColumn = 60;
-
-                    foreach (var beneficiary in client.Beneficiary)
+                    var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyId(client.LoanPolicyId);
+                    foreach (var beneficiary in clientBeneficiaries)
                     {
                         worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
-                        worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.RelationshipId;
+                        worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.Relationship;
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.PercentInherit;
                         beneficiaryColumn += 3;
                     }
@@ -334,8 +334,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 31].Value = client.IncomeOrigin;
                     worksheet.Cells[row, 32].Value = client.Weight;
                     worksheet.Cells[row, 33].Value = client.Height;
-                    worksheet.Cells[row, 34].Value = _clientRepository.GetDiseasesNames(client.Diseases);
-                    worksheet.Cells[row, 35].Value = client.DisabilityMoreInfo;
+                    worksheet.Cells[row, 34].Value = _clientRepository.GetDiseasesNames(client.Diseases); 
+                    worksheet.Cells[row, 35].Value = client.DiseasesMoreInfo;
                     worksheet.Cells[row, 36].Value = client.HIVActive.HasValue ? (client.HIVActive.Value ? "Si" : "No") : "";
                     worksheet.Cells[row, 37].Value = client.PlannedMedicalProcidure.HasValue ? (client.PlannedMedicalProcidure.Value ? "Si" : "No") : "";
                     worksheet.Cells[row, 38].Value = client.PlannedMedicalProcidureMoreInfo;
@@ -351,9 +351,11 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
                     int beneficiaryColumn = 48;
 
-                    foreach (var beneficiary in client.Beneficiary)
+                    var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyIdLogs(client.LoanPolicyId);
+
+                    foreach (var beneficiary in clientBeneficiaries)
                     {
-                        worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
+                        worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + beneficiary.LastName;
                         worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.DocumenIdentificationTypeB;
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.IdentificationNumberB;
                         worksheet.Cells[row, beneficiaryColumn + 3].Value = beneficiary.Relationship;

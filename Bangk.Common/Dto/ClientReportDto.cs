@@ -31,6 +31,7 @@ namespace Bangk.Common.Dto
 
     public class ClientReport2Dto
     {
+        public int LoanPolicyId { get; set; }
         public DateTime PermissionTreatPersonalDataDate { get; set; }
         public DateTime? TermsConditionsAcceptanceQuote {  get; set; }
         public DateTime? ValidateClientOtp { get; set; }
@@ -83,7 +84,7 @@ namespace Bangk.Common.Dto
     {
         public string Name { get; set; }
         public string LastName { get; set; }
-        public int RelationshipId { get; set; }
+        public string Relationship { get; set; }
         public decimal PercentInherit { get; set; }
     }
     public class Beneficiaries2JobDto

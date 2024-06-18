@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
@@ -105,7 +106,10 @@ namespace Bangk.Repositories.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public  IQueryable<ClientReportDto> GetReportClientsSarlaft (ApplicationStateHistoryEnum stateloanApplication)
+
+
+
+        public IQueryable<ClientReportDto> GetReportClientsSarlaft(ApplicationStateHistoryEnum stateloanApplication)
         {
             var query = from c in Context.Clients
                         join l in Context.LoanApplication on c.Id equals l.ClientId
@@ -121,8 +125,6 @@ namespace Bangk.Repositories.Repositories
                         from ct in ctGroup.DefaultIfEmpty()
                         join lq in Context.LoanQuote on l.Id equals lq.LoanApplicationId into lqGroup
                         from lq in lqGroup.DefaultIfEmpty()
-                        join bn in Context.Beneficiaries on sublp.Id equals bn.LoanInsurancePolicyId into bnGroup
-                        from bn in bnGroup.DefaultIfEmpty()
                         where lh.StateId == (int)stateloanApplication &&
                         !Context.LoanApplicationStateHistory.Any(lh2 =>
                         lh2.LoanApplicationId == lh.LoanApplicationId &&
@@ -145,22 +147,26 @@ namespace Bangk.Repositories.Repositories
                             NameBank = st.Name != null ? st.Name : string.Empty,
                             NitBank = st.Code != null ? st.Code : string.Empty,
                             LoanBalance = l.LoanBalance != 0 ? l.LoanBalance : 0,
-                            YearlyFee = lq.YearlyFee != 0 ? lq.YearlyFee : 0,
-                            Beneficiary = (
-                            from b in Context.Beneficiaries 
-                            where b.LoanInsurancePolicyId == sublp.Id
-                            select new BeneficiariesJobDto
-                            {
-                                Name = b.Name,
-                                LastName = b.LastName,
-                                RelationshipId = b.RelationshipId,
-                                PercentInherit = b.PercentInherit
-
-                            }).ToList(),
-
+                            YearlyFee = lq.YearlyFee != 0 ? lq.YearlyFee : 0
                         };
 
             return query;
+        }
+
+
+        public List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId)
+        {
+            return (
+                from b in Context.Beneficiaries
+                join stb in Context.Settings on b.RelationshipId equals stb.Id
+                where b.LoanInsurancePolicyId == policyId
+                select new BeneficiariesJobDto
+                {
+                    Name = b.Name,
+                    LastName = b.LastName,
+                    Relationship = stb.Name,
+                    PercentInherit = b.PercentInherit
+                }).ToList();
         }
 
         public IQueryable<int> GetLoanApplicationIdsWithState (ApplicationStateHistoryEnum stateloanApplication)
@@ -202,20 +208,16 @@ namespace Bangk.Repositories.Repositories
                         join stc in Context.Settings on lp.CivilStatusId equals stc.Id
                         join sta in Context.Settings on lp.OccupationActivityId equals sta.Id
                         join stp in Context.Settings on c.CountryCodePhoneId equals stp.Id
-                        join bn in Context.Beneficiaries on lp.Id equals bn.LoanInsurancePolicyId into bnGroup
-                        from bn in bnGroup.DefaultIfEmpty()
-                        join stb in Context.Settings on bn.RelationshipId equals stb.Id
-                        join sttb in Context.Settings on bn.IdentificationTypeId equals sttb.Id
                         where lh.StateId == (int)stateloanApplication &&
                         !Context.LoanApplicationStateHistory.Any(lh2 =>
                             lh2.LoanApplicationId == lh.LoanApplicationId &&
                             lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
                         select new ClientReport2Dto
                         {
-
+                            LoanPolicyId = lp.Id,
                             PermissionTreatPersonalDataDate = c.PermissionTreatPersonalDataDate,
                             TermsConditionsAcceptanceQuote = lq.TermsConditionsAcceptanceQuote,
-                            ValidateClientOtp= c.ValidateClientOtp,
+                            ValidateClientOtp = c.ValidateClientOtp,
                             OtpDateForms = lp.OtpDateForms,
                             AcceptQuoteOtp = lq.AcceptQuoteOtp,
                             AcceptanceOriginOfFunds = lp.AcceptanceOriginOfFunds,
@@ -256,24 +258,30 @@ namespace Bangk.Repositories.Repositories
                             Convicted = lp.Convicted,
                             LifeEnsure = lp.LifeEnsure,
                             NameBank = st.Name,
-                            NitBank = st.Code,
-                            Beneficiary = (
-                            from b in Context.Beneficiaries
-                            where b.LoanInsurancePolicyId == lp.Id
-                            select new Beneficiaries2JobDto
-                            {
-                                Name = b.Name,
-                                LastName = b.LastName,
-                                DocumenIdentificationTypeB = sttb.Name,
-                                IdentificationNumberB = b.IdentificationNumber,
-                                Relationship = stb.Name,
-                                PercentInherit = b.PercentInherit
-
-                            }).ToList(),
+                            NitBank = st.Code
+                           
                         };
+            
 
             return query;
+        }
 
+        public List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId)
+        {
+            return (
+                from b in Context.Beneficiaries
+                join sttb in Context.Settings on b.IdentificationTypeId equals sttb.Id
+                join stb in Context.Settings on b.RelationshipId equals stb.Id
+                where b.LoanInsurancePolicyId == policyId
+                select new Beneficiaries2JobDto
+                {
+                    Name = b.Name,
+                    LastName = b.LastName,
+                    DocumenIdentificationTypeB = sttb.Name,
+                    IdentificationNumberB = b.IdentificationNumber,
+                    Relationship = stb.Name,
+                    PercentInherit = b.PercentInherit
+                }).ToList();
         }
 
         public string GetDiseasesNames(string diseaseIds)
