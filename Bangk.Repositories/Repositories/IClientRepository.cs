@@ -22,6 +22,11 @@ namespace Bangk.Repositories.Repositories
         IQueryable<ClientReport2Dto> GetReportClientsSarlaftLogs(ApplicationStateHistoryEnum stateloanApplication);
         string GetDiseasesNames(string diseaseIds);
         IQueryable<ClientPolicyDto> GetPolicyClient(int clientId);
+        //IQueryable<Beneficiaries2JobDto> GetBeneficiariesLogs(int loanInsurancePolicyId);
+        List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId);
+        //IQueryable<BeneficiariesJobDto> GetBeneficiaries(int loanInsurancePolicyId);
+        List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId);
+
 
 
     }
