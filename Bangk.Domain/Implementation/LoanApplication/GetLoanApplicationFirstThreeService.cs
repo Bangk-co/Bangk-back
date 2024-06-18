@@ -2,23 +2,23 @@
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Repositories.Repositories;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace Bangk.Domain.Implementation.LoanApplication
 {
     public class GetLoanApplicationFirstThreeService : IGetLoanApplicationFirstThreeService
     {
+        private readonly IClientRepository _clientRepository;
 
-        private readonly ILoanApplicationRepository _ILoanApplicationRepository;
-
-        public GetLoanApplicationFirstThreeService(ILoanApplicationRepository LoanApplicationRepository)
+        public GetLoanApplicationFirstThreeService(IClientRepository clientRepository)
         {
-            _ILoanApplicationRepository = LoanApplicationRepository;
+            _clientRepository = clientRepository;
         }
 
-        public async Task<List<LoanApplicationDto>> Execute(int ClientId)
+        public List<ClientPolicyDto> Execute(int clientId)
         {
-            return await _ILoanApplicationRepository.GetLoanApplicationInfo(ClientId, true);
+            var query = _clientRepository.GetPolicyClient(clientId);
+            return query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToList();
         }
     }
 }

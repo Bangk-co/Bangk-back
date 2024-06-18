@@ -86,9 +86,9 @@ namespace Bangk.Api.Controllers
 
         [HttpGet("GetLoanApplicationFirstThree")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<List<LoanApplicationDto>>> GetLoanApplicationFirstThree(int ClientId)
+        public ActionResult<List<ClientPolicyDto>> GetLoanApplicationFirstThree(int clientId)
         {
-            var result = await _getLoanApplicationFirstThreeService.Execute(ClientId);
+            var result = _getLoanApplicationFirstThreeService.Execute(clientId);
             return Ok(new
             {
                 loanApplications = result

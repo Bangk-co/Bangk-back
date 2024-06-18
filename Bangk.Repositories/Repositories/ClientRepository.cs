@@ -355,9 +355,5 @@ namespace Bangk.Repositories.Repositories
 
             return result.AsQueryable();
         }
-
-
-
-
     }
 }
