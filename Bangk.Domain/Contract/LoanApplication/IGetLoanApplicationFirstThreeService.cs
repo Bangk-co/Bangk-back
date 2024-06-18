@@ -1,10 +1,11 @@
 ﻿using Bangk.Common.Dto;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Bangk.Domain.Contract.LoanApplication
 {
     public interface IGetLoanApplicationFirstThreeService
     {
-        List<ClientPolicyDto> Execute(int clientId);
+        Task<List<ClientPolicyDto>> Execute(int clientId);
     }
 }

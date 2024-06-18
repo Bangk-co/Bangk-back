@@ -16,16 +16,18 @@ namespace Bangk.Api.Controllers
         private readonly IGetLoadApplicationByIdService _getLoadApplicationByIdService;
         private readonly IUpdateLoanApplicationService _updateLoanApplicationService;
         private readonly IGetLoanApplicationInfoByLoanApplicationIdService _getLoanApplicationInfoByLoanApplicationIdService;
-        private readonly IGetLoanApplicationFirstThreeService _getLoanApplicationFirstThreeService; 
+        private readonly IGetLoanApplicationFirstThreeService _getLoanApplicationFirstThreeService;
+        private readonly ICreateLoanApplicationService _createLoanApplicationService;
         public LoanApplicationController(ILoanApplicationServices getLoanApplicationServices, IGetLoadApplicationByIdService getLoadApplicationByIdService, 
             IUpdateLoanApplicationService updateLoanApplicationService, IGetLoanApplicationInfoByLoanApplicationIdService getLoanApplicationInfoByLoanApplicationIdService,
-            IGetLoanApplicationFirstThreeService getLoanApplicationFirstThreeService)
+            IGetLoanApplicationFirstThreeService getLoanApplicationFirstThreeService, ICreateLoanApplicationService createLoanApplicationService)
         {
             _getLoanApplicationServices = getLoanApplicationServices;
             _getLoadApplicationByIdService = getLoadApplicationByIdService;
             _updateLoanApplicationService = updateLoanApplicationService;
             _getLoanApplicationInfoByLoanApplicationIdService = getLoanApplicationInfoByLoanApplicationIdService;
             _getLoanApplicationFirstThreeService = getLoanApplicationFirstThreeService;
+            _createLoanApplicationService = createLoanApplicationService;
         }
 
         [HttpGet("GetLoanApplicationService")]
@@ -86,13 +88,22 @@ namespace Bangk.Api.Controllers
 
         [HttpGet("GetLoanApplicationFirstThree")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<List<ClientPolicyDto>> GetLoanApplicationFirstThree(int clientId)
+        public async Task<ActionResult<List<ClientPolicyDto>>> GetLoanApplicationFirstThree(int clientId)
         {
-            var result = _getLoanApplicationFirstThreeService.Execute(clientId);
+            var result = await _getLoanApplicationFirstThreeService.Execute(clientId);
             return Ok(new
             {
                 loanApplications = result
             });
+        }
+
+
+        [HttpPost("CreateLoanApplication")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<bool>> CreateLoanApplication([FromForm] NewLoadAplicacionDto newLoadAplicacionDto)
+        {
+            var result = await _createLoanApplicationService.Execute(newLoadAplicacionDto);
+            return Ok(result);
         }
     }
 }

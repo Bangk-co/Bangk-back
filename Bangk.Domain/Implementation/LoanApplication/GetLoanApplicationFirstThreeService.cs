@@ -3,6 +3,7 @@ using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Repositories.Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.LoanApplication
 {
@@ -15,10 +16,9 @@ namespace Bangk.Domain.Implementation.LoanApplication
             _clientRepository = clientRepository;
         }
 
-        public List<ClientPolicyDto> Execute(int clientId)
+        public async  Task<List<ClientPolicyDto>> Execute(int clientId)
         {
-            var query = _clientRepository.GetPolicyClient(clientId);
-            return query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToList();
+            return await _clientRepository.GetLoanApplicationLastThreeByClient(clientId);
         }
     }
 }

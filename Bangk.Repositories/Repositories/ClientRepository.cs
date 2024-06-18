@@ -169,7 +169,7 @@ namespace Bangk.Repositories.Repositories
                 }).ToList();
         }
 
-        public IQueryable<int> GetLoanApplicationIdsWithState (ApplicationStateHistoryEnum stateloanApplication)
+        public IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication)
         {
             var query = from l in Context.LoanApplication
                         join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
@@ -259,9 +259,9 @@ namespace Bangk.Repositories.Repositories
                             LifeEnsure = lp.LifeEnsure,
                             NameBank = st.Name,
                             NitBank = st.Code
-                           
+
                         };
-            
+
 
             return query;
         }
@@ -354,6 +354,32 @@ namespace Bangk.Repositories.Repositories
             }
 
             return result.AsQueryable();
+        }
+
+        public async Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId)
+        {
+            var query = from l in Context.LoanApplication
+                        join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId into t
+                        from sublp in t.DefaultIfEmpty()
+                        join c in Context.Clients on l.ClientId equals c.Id
+                        join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
+                        from sj in settingsGroup.DefaultIfEmpty()
+                        where c.Id == clientId
+                        select new ClientPolicyDto
+                        {
+                            LoanApplicationId = l.Id,
+                            PolicyId = sublp.Id,
+                            LoanType = sj.Name,
+                            CreationDateLoanApplication = l.CreationDate,
+                            CreationDatePolicy = sublp.CreationDate,
+                            StateName = Context.LoanApplicationStateHistory
+                                         .Where(m => m.LoanApplicationId == l.Id)
+                                         .OrderByDescending(lh => lh.CreationDate)
+                                         .Select(lh => lh.State.Name)
+                                         .FirstOrDefault()
+                        };
+
+            return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
         }
     }
 }
