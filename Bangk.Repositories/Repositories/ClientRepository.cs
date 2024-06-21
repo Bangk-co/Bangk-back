@@ -298,62 +298,27 @@ namespace Bangk.Repositories.Repositories
             return string.Join(", ", diseaseNames);
         }
 
-        public IQueryable<ClientPolicyDto> GetPolicyClient(int clientId)
+        public async Task<List<ClientPolicyDto>> GetPolicyClient(int clientId)
         {
-            var query = from lp in Context.LoanInsurancePolicy
-                        join l in Context.LoanApplication on lp.LoanApplicationId equals l.Id
+            var query = from l in Context.LoanApplication
                         join c in Context.Clients on l.ClientId equals c.Id
                         join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
                         from sj in settingsGroup.DefaultIfEmpty()
                         where c.Id == clientId
-                        select new
+                        select new ClientPolicyDto
                         {
                             LoanApplicationId = l.Id,
-                            PolicyId = lp.Id,
-                            LoanType = sj != null ? sj.Name : null,
+                            PolicyId = null,
+                            LoanType = sj.Name,
                             CreationDateLoanApplication = l.CreationDate,
-                            CreationDatePolicy = lp.CreationDate,
+                            CreationDatePolicy = null,
                             StateName = Context.LoanApplicationStateHistory
                                          .Where(m => m.LoanApplicationId == l.Id)
                                          .OrderByDescending(lh => lh.CreationDate)
                                          .Select(lh => lh.State.Name)
                                          .FirstOrDefault()
                         };
-
-            var result = query.ToList().Select(item => new ClientPolicyDto
-            {
-                LoanApplicationId = item.LoanApplicationId,
-                PolicyId = item.PolicyId,
-                LoanType = item.LoanType,
-                CreationDateLoanApplication = item.CreationDateLoanApplication,
-                CreationDatePolicy = item.CreationDatePolicy,
-                StateName = item.StateName
-            }).ToList();
-
-            if (!result.Any() && Context.LoanApplication.Any(l => l.ClientId == clientId))
-            {
-                var fallbackQuery = from l in Context.LoanApplication
-                                    join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
-                                    from sj in settingsGroup.DefaultIfEmpty()
-                                    where l.ClientId == clientId
-                                    select new ClientPolicyDto
-                                    {
-                                        LoanApplicationId = l.Id,
-                                        PolicyId = null,
-                                        LoanType = sj != null ? sj.Name : null,
-                                        CreationDateLoanApplication = l.CreationDate,
-                                        CreationDatePolicy = null,
-                                        StateName = Context.LoanApplicationStateHistory
-                                         .Where(m => m.LoanApplicationId == l.Id)
-                                         .OrderByDescending(lh => lh.CreationDate)
-                                         .Select(lh => lh.State.Name)
-                                         .FirstOrDefault()
-                                    };
-
-                result.AddRange(fallbackQuery);
-            }
-
-            return result.AsQueryable();
+            return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
         }
 
         public async Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId)
