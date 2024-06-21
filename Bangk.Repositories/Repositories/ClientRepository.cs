@@ -333,10 +333,10 @@ namespace Bangk.Repositories.Repositories
                         select new ClientPolicyDto
                         {
                             LoanApplicationId = l.Id,
-                            PolicyId = sublp.Id,
+                            PolicyId = null,
                             LoanType = sj.Name,
                             CreationDateLoanApplication = l.CreationDate,
-                            CreationDatePolicy = sublp.CreationDate,
+                            CreationDatePolicy = null,
                             StateName = Context.LoanApplicationStateHistory
                                          .Where(m => m.LoanApplicationId == l.Id)
                                          .OrderByDescending(lh => lh.CreationDate)
