@@ -8,8 +8,8 @@ using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
-//using ValidacionOFAC;
-using ValidationOFACTest;
+using ValidacionOFAC;
+//using ValidationOFACTest;
 
 namespace Bangk.Domain.Implementation.Integrations
 {
