@@ -1,12 +1,15 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Common.Utils;
 using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
@@ -57,24 +60,32 @@ namespace Bangk.Repositories.Repositories
             var query = from c in Context.Clients
                         let loans = Context.LoanApplication.Where(l => l.ClientId == c.Id).OrderBy(l => l.CreationDate).FirstOrDefault()
                         join s in Context.Settings on c.DocumenIdentificationTypeId equals s.Id
-                        join sg in Context.Settings on c.GenderId equals sg.Id
-                        join sc in Context.Settings on c.CountryCodePhoneId equals sc.Id
+
+                        join sg in Context.Settings on c.GenderId equals sg.Id into t
+                        from subsg in t.DefaultIfEmpty()
+
+                        join sc in Context.Settings on c.CountryCodePhoneId equals sc.Id into r
+                        from subsc in r.DefaultIfEmpty()
+
                         where c.Id == clientId
                         select new ClientInfoDto
                         {
-
                             Name = c.Name,
                             LastName = c.LastName,
                             DocumentType = s.Name,
+                            DocumentTypeId = s.Id,
                             IdentificationNumber = c.IdentificationNumber,
                             IdClient = c.Id,
                             Email = c.Email,
-                            CountryCode = sc.Id,
+                            CountryCode = subsc.Id,
                             PhoneNumber = c.PhoneNumber,
                             BirthDate = c.BirthDate,
                             DocumentIssueDate = c.DocumentIssueDate,
-                            GenderName = sg.Name,
-                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty
+                            GenderName = subsg.Name,
+                            GenderId = subsg.Id,
+                            StateName = loans != null ? Context.Settings.FirstOrDefault(setting => setting.Id == c.State).Name : string.Empty,
+                            ClientAge = c.BirthDate != null && ((DateTime.Now.Year - c.BirthDate.Value.Year) >= 65 && (DateTime.Now.Year - c.BirthDate.Value.Year) <= 74),
+                            ClientMayorToFifty = c.BirthDate != null && ((DateTime.Now.Year - c.BirthDate.Value.Year) >= 50 && (DateTime.Now.Year - c.BirthDate.Value.Year) <= 64),
                         };
 
             return query;
@@ -94,5 +105,259 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
+
+
+
+
+        public IQueryable<ClientReportDto> GetReportClientsSarlaft(ApplicationStateHistoryEnum stateloanApplication)
+        {
+            var query = from c in Context.Clients
+                        join l in Context.LoanApplication on c.Id equals l.ClientId
+                        join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
+                        join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId into t
+                        from sublp in t.DefaultIfEmpty()
+                        join st in Context.Settings on l.BankId equals st.Id
+                        join ci in Context.Cities on sublp.BirthCityId equals ci.Id into ciGroup
+                        from ci in ciGroup.DefaultIfEmpty()
+                        join stn in Context.State on ci.StateId equals stn.Id into stnGroup
+                        from stn in stnGroup.DefaultIfEmpty()
+                        join ct in Context.Countries on stn.CountryId equals ct.Id into ctGroup
+                        from ct in ctGroup.DefaultIfEmpty()
+                        join lq in Context.LoanQuote on l.Id equals lq.LoanApplicationId into lqGroup
+                        from lq in lqGroup.DefaultIfEmpty()
+                        where lh.StateId == (int)stateloanApplication &&
+                        !Context.LoanApplicationStateHistory.Any(lh2 =>
+                        lh2.LoanApplicationId == lh.LoanApplicationId &&
+                        lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
+                        select new ClientReportDto
+                        {
+                            LoanPolicyId = sublp.Id,
+                            DocumenIdentificationTypeId = c.DocumenIdentificationTypeId != 0 ? c.DocumenIdentificationTypeId : 0,
+                            IdentificationNumber = c.IdentificationNumber != null ? c.IdentificationNumber : string.Empty,
+                            Name = c.Name != null ? c.Name : string.Empty,
+                            LastName = c.LastName != null ? c.LastName : string.Empty,
+                            Address = sublp.Address != null ? sublp.Address : string.Empty,
+                            CityName = ci.Name ?? string.Empty,
+                            StateName = stn.Name ?? string.Empty,
+                            CountryName = ct.Name ?? string.Empty,
+                            PhoneNumber = c.PhoneNumber != null ? c.PhoneNumber : string.Empty,
+                            Email = c.Email != null ? c.Email : string.Empty,
+                            BirthDate = c.BirthDate != DateTime.Now ? c.BirthDate : DateTime.Now,
+                            CreationDatePolicy = sublp.CreationDate != DateTime.Now ? sublp.CreationDate : DateTime.Now,
+                            NameBank = st.Name != null ? st.Name : string.Empty,
+                            NitBank = st.Code != null ? st.Code : string.Empty,
+                            LoanBalance = l.LoanBalance != 0 ? l.LoanBalance : 0,
+                            YearlyFee = lq.YearlyFee != 0 ? lq.YearlyFee : 0
+                        };
+
+            return query;
+        }
+
+
+        public List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId)
+        {
+            return (
+                from b in Context.Beneficiaries
+                join stb in Context.Settings on b.RelationshipId equals stb.Id
+                where b.LoanInsurancePolicyId == policyId
+                select new BeneficiariesJobDto
+                {
+                    Name = b.Name,
+                    LastName = b.LastName,
+                    Relationship = stb.Name,
+                    PercentInherit = b.PercentInherit
+                }).ToList();
+        }
+
+        public IQueryable<int> GetLoanApplicationIdsWithState (ApplicationStateHistoryEnum stateloanApplication)
+        {
+            var query = from l in Context.LoanApplication
+                        join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
+                        where lh.StateId == (int)stateloanApplication &&
+                        !Context.LoanApplicationStateHistory.Any(lh2 =>
+                        lh2.LoanApplicationId == lh.LoanApplicationId &&
+                        lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
+                        select l.Id;
+            return query;
+        }
+
+        public IQueryable<ClientReport2Dto> GetReportClientsSarlaftLogs(ApplicationStateHistoryEnum stateloanApplication)
+        {
+            var query = from c in Context.Clients
+                        join l in Context.LoanApplication on c.Id equals l.ClientId
+                        join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
+                        join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId
+                        join ci in Context.Cities on lp.BirthCityId equals ci.Id into ciGroup
+                        from ci in ciGroup.DefaultIfEmpty()
+                        join stn in Context.State on ci.StateId equals stn.Id into stnGroup
+                        from stn in stnGroup.DefaultIfEmpty()
+                        join co in Context.Countries on stn.CountryId equals co.Id into coGroup
+                        from co in coGroup.DefaultIfEmpty()
+                        join ct in Context.Countries on lp.CountryNationalityId equals ct.Id into ctGroup
+                        from ct in ctGroup.DefaultIfEmpty()
+                        join lq in Context.LoanQuote on l.Id equals lq.LoanApplicationId into lqGroup
+                        from lq in lqGroup.DefaultIfEmpty()
+                        join cir in Context.Cities on lp.ResidenceCityId equals cir.Id into cirGroup
+                        from cir in cirGroup.DefaultIfEmpty()
+                        join str in Context.State on cir.StateId equals str.Id into strGroup
+                        from str in strGroup.DefaultIfEmpty()
+                        join cor in Context.Countries on str.CountryId equals cor.Id into corGroup
+                        from cor in corGroup.DefaultIfEmpty()
+                        join sttc in Context.Settings on c.DocumenIdentificationTypeId equals sttc.Id
+                        join st in Context.Settings on l.BankId equals st.Id
+                        join stc in Context.Settings on lp.CivilStatusId equals stc.Id
+                        join sta in Context.Settings on lp.OccupationActivityId equals sta.Id
+                        join stp in Context.Settings on c.CountryCodePhoneId equals stp.Id
+                        where lh.StateId == (int)stateloanApplication &&
+                        !Context.LoanApplicationStateHistory.Any(lh2 =>
+                            lh2.LoanApplicationId == lh.LoanApplicationId &&
+                            lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
+                        select new ClientReport2Dto
+                        {
+                            LoanPolicyId = lp.Id,
+                            PermissionTreatPersonalDataDate = c.PermissionTreatPersonalDataDate,
+                            TermsConditionsAcceptanceQuote = lq.TermsConditionsAcceptanceQuote,
+                            ValidateClientOtp = c.ValidateClientOtp,
+                            OtpDateForms = lp.OtpDateForms,
+                            AcceptQuoteOtp = lq.AcceptQuoteOtp,
+                            AcceptanceOriginOfFunds = lp.AcceptanceOriginOfFunds,
+                            Name = c.Name,
+                            LastName = c.LastName,
+                            DocumenIdentificationTypeId = sttc.Name,
+                            IdentificationNumber = c.IdentificationNumber,
+                            CountryCodePhoneId = stp.Code,
+                            PhoneNumber = c.PhoneNumber,
+                            Email = c.Email,
+                            CountryName = co.Name,
+                            StateName = stn.Name,
+                            CityName = ci.Name,
+                            CountryNationality = ct.Nationality,
+                            CivilStatus = stc.Name,
+                            NumberChildren = lp.NumberChildren,
+                            Occupation = lp.Occupation,
+                            OccupationActivity = sta.Name,
+                            IsPublicPerson = lp.IsPublicPerson,
+                            HasBondPublicPerson = lp.HasBondPublicPerson,
+                            ResidenceCountry = cor.Name,
+                            ResidenceCity = cir.Name,
+                            ResidenceState = str.Name,
+                            MonthlyIncome = lp.MonthlyIncome,
+                            MonthlyExpenses = lp.MonthlyExpenses,
+                            AssetValue = lp.AssetValue,
+                            LiabilitiesValue = lp.LiabilitiesValue,
+                            IncomeOrigin = lp.IncomeOrigin,
+                            Weight = lp.Weight,
+                            Height = lp.Height,
+                            Diseases = lp.Diseases,
+                            DiseasesMoreInfo = lp.DiseasesMoreInfo,
+                            HIVActive = lp.HIVActive,
+                            PlannedMedicalProcidure = lp.PlannedMedicalProcidure,
+                            PlannedMedicalProcidureMoreInfo = lp.PlannedMedicalProcidureMoreInfo,
+                            Disability = lp.Disability,
+                            DisabilityMoreInfo = lp.DisabilityMoreInfo,
+                            Convicted = lp.Convicted,
+                            LifeEnsure = lp.LifeEnsure,
+                            NameBank = st.Name,
+                            NitBank = st.Code
+                           
+                        };
+            
+
+            return query;
+        }
+
+        public List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId)
+        {
+            return (
+                from b in Context.Beneficiaries
+                join sttb in Context.Settings on b.IdentificationTypeId equals sttb.Id
+                join stb in Context.Settings on b.RelationshipId equals stb.Id
+                where b.LoanInsurancePolicyId == policyId
+                select new Beneficiaries2JobDto
+                {
+                    Name = b.Name,
+                    LastName = b.LastName,
+                    DocumenIdentificationTypeB = sttb.Name,
+                    IdentificationNumberB = b.IdentificationNumber,
+                    Relationship = stb.Name,
+                    PercentInherit = b.PercentInherit
+                }).ToList();
+        }
+
+        public string GetDiseasesNames(string diseaseIds)
+        {
+            if (string.IsNullOrEmpty(diseaseIds))
+                return string.Empty;
+
+            string[] ids = diseaseIds.Split(',');
+            var diseaseIdList = ids.Select(id => int.Parse(id.Trim()));
+
+            var diseaseNames = from setting in Context.Settings
+                               where diseaseIdList.Contains(setting.Id)
+                               select setting.Name;
+            return string.Join(", ", diseaseNames);
+        }
+
+        public IQueryable<ClientPolicyDto> GetPolicyClient(int clientId)
+        {
+            var query = from lp in Context.LoanInsurancePolicy
+                        join l in Context.LoanApplication on lp.LoanApplicationId equals l.Id
+                        join c in Context.Clients on l.ClientId equals c.Id
+                        join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
+                        from sj in settingsGroup.DefaultIfEmpty()
+                        where c.Id == clientId
+                        select new
+                        {
+                            LoanApplicationId = l.Id,
+                            PolicyId = lp.Id,
+                            LoanType = sj != null ? sj.Name : null,
+                            CreationDateLoanApplication = l.CreationDate,
+                            CreationDatePolicy = lp.CreationDate,
+                            StateName = Context.LoanApplicationStateHistory
+                                         .Where(m => m.LoanApplicationId == l.Id)
+                                         .OrderByDescending(lh => lh.CreationDate)
+                                         .Select(lh => lh.State.Name)
+                                         .FirstOrDefault()
+                        };
+
+            var result = query.ToList().Select(item => new ClientPolicyDto
+            {
+                LoanApplicationId = item.LoanApplicationId,
+                PolicyId = item.PolicyId,
+                LoanType = item.LoanType,
+                CreationDateLoanApplication = item.CreationDateLoanApplication,
+                CreationDatePolicy = item.CreationDatePolicy,
+                StateName = item.StateName
+            }).ToList();
+
+            if (!result.Any() && Context.LoanApplication.Any(l => l.ClientId == clientId))
+            {
+                var fallbackQuery = from l in Context.LoanApplication
+                                    join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
+                                    from sj in settingsGroup.DefaultIfEmpty()
+                                    where l.ClientId == clientId
+                                    select new ClientPolicyDto
+                                    {
+                                        LoanApplicationId = l.Id,
+                                        PolicyId = null,
+                                        LoanType = sj != null ? sj.Name : null,
+                                        CreationDateLoanApplication = l.CreationDate,
+                                        CreationDatePolicy = null,
+                                        StateName = Context.LoanApplicationStateHistory
+                                         .Where(m => m.LoanApplicationId == l.Id)
+                                         .OrderByDescending(lh => lh.CreationDate)
+                                         .Select(lh => lh.State.Name)
+                                         .FirstOrDefault()
+                                    };
+
+                result.AddRange(fallbackQuery);
+            }
+
+            return result.AsQueryable();
+        }
+
+
+
+
     }
 }

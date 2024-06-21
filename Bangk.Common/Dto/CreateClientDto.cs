@@ -17,6 +17,8 @@ namespace Bangk.Common.Dto
         public int GenderId { get; set; }
         public DateTime PermissionTreatPersonalDataDate { get; set; }
         public CreateLoadAplicacionDto LoadAplicacionDto { get; set; }
+        public DateTime ValidateClientOtp { get; set; }
+        
     }
 
     public class CreateLoadAplicacionDto
@@ -26,6 +28,20 @@ namespace Bangk.Common.Dto
         public int LoanTypeId { get; set; }
         public long LoanBalance { get; set; }
         public string LoanNumber { get; set; }
+
+    }
+
+    public class CreateClientNotLoanApplicationDto
+    {
+        public int ClientId { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string IdentificationNumber { get; set; }
+        public int DocumenIdentificationTypeId { get; set; }
+        public DateTime AcceptTermsDate { get; set; }
+        public DateTime PermissionTreatPersonalDataDate { get; set; }
+        public DateTime ValidateClientOtp { get; set; }
 
     }
 }

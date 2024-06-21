@@ -1,5 +1,10 @@
 using Bangk.Api.Extensions;
+using Bangk.Common.Dto;
+using Bangk.Domain.Contract;
+using Bangk.Domain.Contract.Sftp;
+using Bangk.Domain.Implementation.BackgroundTask;
 using Bangk.Repositories.Context;
+using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Renci.SshNet;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using System;
@@ -48,10 +55,22 @@ namespace Bangk.Api
 
             // Add converter to DI
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
+            services.Configure<SftpConnectionOptionsDto>(Configuration.GetSection("SftpConnection"));
+
+            services.AddSingleton(provider =>
+            {
+                var sftpOptions = provider.GetRequiredService<IOptions<SftpConnectionOptionsDto>>().Value;
+                var sftpClient = new SftpClient(sftpOptions.Host, sftpOptions.Port, sftpOptions.Username, sftpOptions.Password);
+                return sftpClient;
+            });
+
+            services.AddScheduler();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
@@ -96,6 +115,20 @@ namespace Bangk.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            serviceProvider.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<ReportSarlaftJob>().DailyAt(22, 0)
+                .Monday()
+                .Tuesday()
+                .Wednesday()
+                .Thursday()
+                .Friday().PreventOverlapping(nameof(ReportSarlaftJob)); 
+                scheduler.Schedule<ReportSarlaftJob>().DailyAt(17, 0)
+                .Saturday().PreventOverlapping(nameof(ReportSarlaftJob));
+                scheduler.Schedule<RetryIntegrationsJob>().EveryMinute().PreventOverlapping(nameof(RetryIntegrationsJob));
+                scheduler.Schedule<CompleteApplicationJob>().EveryFiveMinutes().PreventOverlapping(nameof(CompleteApplicationJob));
             });
         }
     }

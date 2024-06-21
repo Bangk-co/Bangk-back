@@ -38,7 +38,6 @@ namespace Bangk.Api.Controllers
 
 
         [HttpGet("GetLoanForm")]
-        [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

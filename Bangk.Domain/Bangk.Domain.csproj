@@ -6,18 +6,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Connected Services\ValidacionOFAC\ConnectedService.json" />
     <None Remove="Implementation\Login\ResetPasswordService.cs~RF44887912.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Connected Services\ValidacionOFAC\ConnectedService.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
-    <PackageReference Include="EPPlus" Version="6.0.6" />
+    <PackageReference Include="Coravel" Version="5.0.3" />
+    <PackageReference Include="EPPlus" Version="7.1.1" />
+    <PackageReference Include="IdentityModel" Version="6.2.0" />
     <PackageReference Include="IT.Pdf.DinkToPdf" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     <PackageReference Include="NCrontab.Signed" Version="3.3.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Renci.SshNet.Async" Version="1.4.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.*" />
     <PackageReference Include="System.ServiceModel.Federation" Version="4.8.*" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.8.*" />
@@ -31,7 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Connected Services\" />
     <Folder Include="Contract\Beneficiary\" />
   </ItemGroup>
 

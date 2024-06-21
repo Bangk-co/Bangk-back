@@ -16,11 +16,14 @@ namespace Bangk.Common.Dto
         public string Email {  get; set; }
         public int CountryCode { get; set; }
         public string  PhoneNumber {  get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string StateName { get; set; }
         public string GenderName {  get; set; }
         public DateTime? DocumentIssueDate { get; set; }
-
+        public int? GenderId { get; set; }
+        public int DocumentTypeId { get; set; }
+        public bool ClientAge { get; set; }
+        public bool ClientMayorToFifty { get; set; }
     }
 
     public class ClientUpdateInfoDto
@@ -30,6 +33,20 @@ namespace Bangk.Common.Dto
         public int DocumentTypeId { get; set; }
         public string IdentificationNumber { get; set; }
         public string Email { get; set; }
+        public int CountryCode { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime BirthDate { get; set; }
+        public int GenderId { get; set; }
+        public DateTime DocumentIssueDate { get; set; }
+    }
+
+    public class UpdateProfileDto
+    {
+        public int ClientId { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public int DocumentTypeId { get; set; }
+        public string IdentificationNumber { get; set; }
         public int CountryCode { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }

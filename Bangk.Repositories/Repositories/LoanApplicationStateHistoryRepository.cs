@@ -24,14 +24,14 @@ namespace Bangk.Repositories.Repositories
 
             var query = from history in Context.LoanApplicationStateHistory
                         where history.LoanApplicationId == loanApplicationId
-                        orderby history.StateId descending
+                        orderby history.CreationDate descending
                         select new LoanApplicationStateHistoryDto
                         {
+                            Id = history.Id,
                             StateName = Enum.GetName(enumType, history.StateId),
                             CreationDate = history.CreationDate,
                             Observations = history.Observations,
                             ValidationClientResult = history.ValidationClientResult
-                            
                         };
 
             return query.AsQueryable();

@@ -9,6 +9,7 @@ namespace Bangk.Repositories.Repositories
 {
     public interface ISettingRepository : IGenericRepository<Setting, SettingListDto>
     {
-        Task<List<SettingListDto>> GetSettingList(int groupSettingId);
+        Task<List<SettingListDto>> GetSettingList(int groupSettingId, string searchText);
+        List<string> GetEmailNames();
     }
 }

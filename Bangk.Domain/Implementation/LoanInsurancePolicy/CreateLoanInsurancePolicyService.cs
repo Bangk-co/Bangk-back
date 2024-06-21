@@ -1,15 +1,10 @@
-﻿using Bangk.Business.Extension.SenderGrid;
-using Bangk.Common.Dto;
-using Bangk.Common.Enums;
+﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 using System.Transactions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Bangk.Domain.Implementation.Client
 {
@@ -25,8 +20,6 @@ namespace Bangk.Domain.Implementation.Client
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _beneficiaryRepository = beneficiaryRepository;
             _notificationRepository = notificationRepository;
-            
-
         }
 
         public async Task<ResponseDto<LoanInsurancePolicyDto>> Execute(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto)
@@ -64,6 +57,8 @@ namespace Bangk.Domain.Implementation.Client
             {
                 Address = loanInsurancePolicySaveDto.Address,
                 IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
+                AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
+                OtpDateForms = loanInsurancePolicySaveDto.OtpDateForms,
                 LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue,
                 HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson,
                 HousingValue = loanInsurancePolicySaveDto.HousingValue,
@@ -100,6 +95,7 @@ namespace Bangk.Domain.Implementation.Client
                 PlannedMedicalProcidureMoreInfo = loanInsurancePolicySaveDto.PlannedMedicalProcidureMoreInfo,
                 CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId,
                 VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate
+                
             };
 
             await _loanInsurancePolicyRepository.Create(newLoanInsurencePolicy);
@@ -167,7 +163,8 @@ namespace Bangk.Domain.Implementation.Client
             loanInsurencePolicy.CreationDate = DateTime.UtcNow;
             loanInsurencePolicy.CityVehiculeId = loanInsurancePolicySaveDto.CityVehiculeId;
             loanInsurencePolicy.VehicleLicensePlate = loanInsurancePolicySaveDto.VehicleLicensePlate;
-
+            loanInsurencePolicy.OtpDateForms = loanInsurancePolicySaveDto.OtpDateForms;
+            loanInsurencePolicy.AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds;
             await _loanInsurancePolicyRepository.Update(loanInsurencePolicy);
             
 
@@ -188,6 +185,7 @@ namespace Bangk.Domain.Implementation.Client
                             beneficiaryInBD.RelationshipId = b.RelationshipId;
                             beneficiaryInBD.PercentInherit = b.PercentInherit;
                             beneficiaryInBD.CreationDate = DateTime.UtcNow;
+                            beneficiaryInBD.LastName = b.LastName;
                             await _beneficiaryRepository.Update(beneficiaryInBD);
                         }
                     }
@@ -216,6 +214,9 @@ namespace Bangk.Domain.Implementation.Client
 
         private async Task CreateNotification(int loanApplicationId)
         {
+            var notification = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddHours(1) };
+            await _notificationRepository.Create(notification);
+
             var notification1 = new Notification { ApplicationId = loanApplicationId, NotificationType = 1, DateToSendNotification = DateTime.UtcNow.AddHours(23).AddMinutes(53) };
             await _notificationRepository.Create(notification1);
 

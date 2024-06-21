@@ -1,6 +1,8 @@
 ﻿using Bangk.Common;
 using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Login;
+using Bangk.Domain.Contract.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -14,15 +16,17 @@ namespace Bangk.Api.Controllers
         private readonly IResetPasswordService _resetPasswordService;
         private readonly ISendEmailResetPassword _sendEmailResetPassword;
         private readonly ISendCodeValidationEmailService _sendCodeValidationEmailService;
-        private readonly IReSendCodeValidationEmailService _reSendCodeValidationEmailService; 
+        private readonly IReSendCodeValidationEmailService _reSendCodeValidationEmailService;
+        private readonly IUpdatePasswordService _updatePasswordService;
         public AuthenticationController(IUserLoginService userLoginService, IResetPasswordService resetPasswordService, ISendEmailResetPassword sendEmailResetPassword,
-            ISendCodeValidationEmailService sendCodeValidationEmailService, IReSendCodeValidationEmailService reSendCodeValidationEmailService)
+            ISendCodeValidationEmailService sendCodeValidationEmailService, IReSendCodeValidationEmailService reSendCodeValidationEmailService, IUpdatePasswordService updatePasswordService)
         {
             _userLoginService = userLoginService;
             _resetPasswordService = resetPasswordService;
             _sendEmailResetPassword = sendEmailResetPassword;
             _sendCodeValidationEmailService = sendCodeValidationEmailService;
             _reSendCodeValidationEmailService = reSendCodeValidationEmailService;
+            _updatePasswordService = updatePasswordService;
         }
 
         /// <summary>
@@ -121,6 +125,19 @@ namespace Bangk.Api.Controllers
             {
                 code = result.Result
             });
+        }
+
+        [HttpPut("UpdatePassword")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordDto updatePasswordDto)
+        {
+            var result = await _updatePasswordService.Execute(updatePasswordDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(result);
         }
     }
 }

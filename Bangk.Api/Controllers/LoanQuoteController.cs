@@ -24,7 +24,7 @@ namespace Bangk.Api.Controllers
         [HttpPost("CreateLoanQuote")]
         [Authorize(Roles = "asesor, superAdmin")]
 
-        public async Task<IActionResult> CreateLoanQuote(int insuranceId, int loanApplicationId, long yearlyFee, string insuranceName)
+        public async Task<IActionResult> CreateLoanQuote(int insuranceId, int loanApplicationId, decimal yearlyFee, string insuranceName)
         {
             int loanQuoteId = await _loanQuoteService.Execute(insuranceId, loanApplicationId, yearlyFee, insuranceName);
             if (loanQuoteId == 0) 
@@ -45,9 +45,9 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("AcceptLoanQuote")]
         [AllowAnonymous]
-        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId, DateTime termsConditionsAcceptanceQuote)
+        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp)
         {
-            var result = await _acceptLoanQuoteService.Execute(loanApplicationId, termsConditionsAcceptanceQuote);
+            var result = await _acceptLoanQuoteService.Execute(loanApplicationId, termsConditionsAcceptanceQuote, acceptQuoteOtp);
             return Ok(result);
         }
 

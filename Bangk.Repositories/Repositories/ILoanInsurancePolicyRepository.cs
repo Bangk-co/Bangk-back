@@ -9,5 +9,8 @@ namespace Bangk.Repositories.Repositories
     {
         Task<LoanInsurancePolicyDto> GetAllLoanInsurancePolicyByLoanApplicationId(int loanApplicationId);
         Task<LoanInsurancePolicy> GetLoanInsurancePolicyByLoadApplicationId(int loanApplicationId);
+        Task<ClientSBSInfoDto> GetClientSBSInfoDtoyByLoanApplicationId(int loanApplicationId);
+        Task<ClientSarlaftInfoDto> GetClientSarlaftInfoDtoyByLoanApplicationId(int loanApplicationId);
+        int GetLastConsecutive();
     }
 }

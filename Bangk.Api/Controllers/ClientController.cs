@@ -1,12 +1,15 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Costumer;
+using Bangk.Domain.Contract.Users;
 using Bangk.Repositories.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -19,12 +22,25 @@ namespace Bangk.Api.Controllers
         private readonly IClientInfoService _getClientInfoService;
         private readonly ICreateClientService _createClientService;
         private readonly IUpdateClientService _updateClientService;
-        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService, IUpdateClientService updateClientService)
+        private readonly ICreateUserService _createUserService;
+        private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
+        private readonly IUpdateProfileService _updateProfileService;
+        private readonly IGetClientPolicyService _getClientPolicyService;
+        
+
+        public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
+            IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
+            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
             _createClientService = createClientService;
             _updateClientService = updateClientService;
+            _createUserService = createUserService;
+            _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
+            _updateProfileService = updateProfileService;
+            _getClientPolicyService = getClientPolicy;
+            
         }
 
         [HttpGet("GetClientService")]
@@ -42,7 +58,6 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpGet("GetClientInfoService")]
-        [Authorize(Roles = "asesor, superAdmin")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -70,7 +85,7 @@ namespace Bangk.Api.Controllers
                 ClientId = result.Result
             });
         }
-        
+
         [HttpPut("UpdateClientService")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateClient(int clientId, ClientUpdateInfoDto updatedClient)
@@ -84,6 +99,64 @@ namespace Bangk.Api.Controllers
             return Ok(new
             {
                 ClientUpdate = result.Result
+            });
+        }
+
+        [HttpPost("CreateUserPassword")]
+        [AllowAnonymous]
+        public async Task<ActionResult<bool>> CreateUserPassword(CreateUserDto createUser)
+        {
+            var result = await _createUserService.Execute(createUser);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result.Result);
+        }
+
+
+
+        [HttpPost("CreateClient")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<CreateClientNotLoanApplicationDto>>> CreateClient(CreateClientNotLoanApplicationDto createClientDto)
+        {
+            var result = await _createClientNotLoanApplicationService.Execute(createClientDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                result.Result
+            });
+        }
+
+        [HttpPut("UpdateProfile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto updatedClient)
+        {
+            var result = await _updateProfileService.Execute(updatedClient);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(new
+            {
+                result.Result
+            });
+        }
+
+        [HttpGet("GetClientPolicy")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ClientInfoDto>>> GetClientPolicy(int clientId)
+        {
+            var result = await _getClientPolicyService.Execute(clientId);
+            return Ok(new
+            {
+                ClientPolicyInfo = result
             });
         }
 

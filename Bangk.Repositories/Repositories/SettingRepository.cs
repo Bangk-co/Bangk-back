@@ -17,16 +17,33 @@ namespace Bangk.Repositories.Repositories
 
         }
 
-        public async Task<List<SettingListDto>> GetSettingList(int groupSettingId)
+        public async Task<List<SettingListDto>> GetSettingList(int groupSettingId, string searchText)
         {
-            return await Context.Settings.Where(s => s.SettingGroupId == groupSettingId).Select(s => new SettingListDto
+            IQueryable<Setting> query = Context.Settings.Where(s => s.SettingGroupId == groupSettingId);
+
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                query = query.Where(s => s.Code.Contains(searchText) || s.Name.Contains(searchText));
+            }
+
+            return await query.Select(s => new SettingListDto
             {
                 Id = s.Id,
                 Name = s.Name,
                 Code = s.Code,
                 GroupSettingId = s.SettingGroupId
-                
+
             }).OrderBy(x => x.Name).ToListAsync();
+
+        }
+
+        public List<string> GetEmailNames()
+        {
+            int settingGroupId = 19;
+            var emailNames = from setting in Context.Settings
+                             where setting.SettingGroupId == settingGroupId
+                             select setting.Name;
+            return emailNames.ToList();
         }
     }
 }

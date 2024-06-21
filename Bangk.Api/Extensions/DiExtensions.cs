@@ -7,6 +7,7 @@ using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
+using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
@@ -14,7 +15,9 @@ using Bangk.Domain.Contract.LoanForm;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
+using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Domain.Contract.Settings;
+using Bangk.Domain.Contract.Sftp;
 using Bangk.Domain.Contract.State;
 using Bangk.Domain.Contract.Users;
 using Bangk.Domain.Implementation;
@@ -24,12 +27,14 @@ using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
+using Bangk.Domain.Implementation.Integrations;
 using Bangk.Domain.Implementation.LoanApplication;
 using Bangk.Domain.Implementation.LoanApplicationDocument;
 using Bangk.Domain.Implementation.LoanApplicationStateHistory;
 using Bangk.Domain.Implementation.LoanForm;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
+using Bangk.Domain.Implementation.ScheduleIntegration;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.State;
 using Bangk.Domain.Implementation.Users;
@@ -51,6 +56,10 @@ namespace Bangk.Api.Extensions
             services.AddSingleton<IValidator<CreateClientDto>, CreateClientValidator>();
             services.AddSingleton<IValidator<ClientUpdateInfoDto>, UpdateClientValidator>();
             services.AddSingleton<IValidator<UpdateLoanApplicationDto>, UpdateLoanApplicationValidator>();
+            services.AddSingleton<IValidator<CreateUserDto>, CreateUserValidator>();
+            services.AddSingleton<IValidator<CreateClientNotLoanApplicationDto>, CreateClientNotLoanApplicationValidator>();
+            services.AddSingleton<IValidator<UpdateProfileDto>, UpdateProfileValidator>();
+            services.AddSingleton<IValidator<UpdatePasswordDto>, UpdatePasswordValidation>();
             // Repositories
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -68,7 +77,9 @@ namespace Bangk.Api.Extensions
             services.AddScoped<ILoanFormRepository, LoanFormRepository>();
             services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
-            
+            services.AddScoped<IValidationSBSLogRepository, ValidationSBSLogRepository>();
+            services.AddScoped<IScheduleIntegrationRepository, ScheduleIntegrationRepository>();
+            services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>(); 
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -107,12 +118,30 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ILoanSaveFormService, LoanSaveFormService>();
             services.AddTransient<IGetLoanFormService, GetLoanFormService>();
             services.AddTransient<IChangeStateFormsValidatedService, ChangeStateFormsValidatedService>();
-            
+            services.AddTransient<IValidationSBSService, ValidationSBSService>();
+            services.AddTransient<IValidationSarlaftService, ValidationSarlaftService>();
+            services.AddTransient<IScheduleIntegrationService, ScheduleIntegrationService>();
+            services.AddTransient<ICreateUserService, CreateUserService>();
+            services.AddTransient<ICreateClientNotLoanApplicationService, CreateClientNotLoanApplicationService>();
+            services.AddTransient<IUpdateProfileService, UpdateProfileService>();
+            services.AddTransient<IUpdatePasswordService, UpdatePasswordService>();
+            services.AddTransient<IGetUserInfoByClientIdService, GetUserInfoByClientIdService>();
+            services.AddTransient<IAddCommentService, AddCommentService>();
+            services.AddTransient<IGetClientPolicyService, GetClientPolicyService>();
+            services.AddTransient<IGetLoanApplicationInfoByLoanApplicationIdService, GetLoanApplicationInfoByLoanApplicationIdService>();
+            services.AddTransient<IReportExcel, ReportClientsSarlaft>();
+            services.AddTransient<ISFTPConnection, SFTPConnection>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage
 
-            services.AddHostedService<CompleteApplicationJob>();
+            //services.AddHostedService<SFTPConnection>();
+
+            //Add Service Jobs
+
+            services.AddTransient<ReportSarlaftJob>();
+            services.AddTransient<RetryIntegrationsJob>();
+            services.AddTransient<CompleteApplicationJob>();
         }
     }
 }
