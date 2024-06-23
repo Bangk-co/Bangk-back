@@ -41,11 +41,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             try
             {
                 _client.Connect();
-                if (_client.IsConnected)
-                {
-                    Logs.WriteInfoLog("Conexión establecida correctamente.");
-                }
-                else
+                if (!_client.IsConnected)
                 {
                     throw new SftpConnectionException("No se pudo establecer la conexión al servidor SFTP.");
                 }
@@ -72,7 +68,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             if (_client.IsConnected)
             {
                 _client.Disconnect();
-                Logs.WriteInfoLog("Conexión cerrada correctamente.");
             }
         }
 
