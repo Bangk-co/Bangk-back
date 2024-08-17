@@ -1,5 +1,4 @@
-﻿using Bangk.Common.Enums;
-using Bangk.Domain.Contract.ScheduleIntegration;
+﻿using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Repositories.Repositories;
 using System;
 using System.Threading.Tasks;
@@ -39,27 +38,7 @@ namespace Bangk.Domain.Implementation.ScheduleIntegration
                     scheduler.CountFails += 1;
                     await _scheduleIntegrationRepository.Update(scheduler);
                 }
-                else
-                {
-                    await SaveLoanHistory(loanApplicationId, string.Empty, scheduler.IntegrationType == 1 ? (int)ApplicationStateHistoryEnum.EstudioListaRestrictivaSBS :
-                        (int)ApplicationStateHistoryEnum.EstudioSarlaft, 4);
-                }
             }
         }
-
-        private async Task SaveLoanHistory(int loanApplicationId, string observation, int state, int validationResultCode)
-        {
-            var loanApplicationHistory = new Repositories.Entities.LoanApplicationStateHistory
-            {
-                CreationDate = DateTime.UtcNow,
-                LoanApplicationId = loanApplicationId,
-                Observations = observation ?? string.Empty,
-                StateId = state,
-                ValidationClientResult = validationResultCode
-            };
-
-            await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
-        }
-
     }
 }
