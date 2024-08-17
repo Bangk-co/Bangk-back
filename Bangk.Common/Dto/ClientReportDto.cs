@@ -34,6 +34,7 @@ namespace Bangk.Common.Dto
         public int LoanPolicyId { get; set; }
         public DateTime PermissionTreatPersonalDataDate { get; set; }
         public DateTime? TermsConditionsAcceptanceQuote {  get; set; }
+        public DateTime? SbsPrivacyPolicies { get; set; }
         public DateTime? ValidateClientOtp { get; set; }
         public DateTime? AcceptQuoteOtp { get; set; }
         public DateTime? OtpDateForms { get; set; }

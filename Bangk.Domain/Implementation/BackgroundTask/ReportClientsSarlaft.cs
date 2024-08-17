@@ -276,7 +276,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
                 Console.WriteLine("Generando Titulos");
 
-                string[] titles = { "Fecha de Aceptacion de PTD","Fecha de Aceptacion de TyC", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP (Si aplica)",
+                string[] titles = { "Fecha de Aceptacion de PTD","Fecha de Aceptacion de TyC","Fecha de Aceptacion de PDTSBS", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP", "Fecha de Ingreso con OTP (Si aplica)",
                 "Fecha de aceptacion de origen de fondos ( si aplica)", "Nombres","Apellidos","Tipo de documento","Numero de documento","Codigo del pais","Numero de telefono","Correo Electronico",
                 "País de nacimiento","Departamento/Estado de nacimiento","Ciudad de nacimiento","Nacionalidad","Estado civil","Número de hijos","Profesión","Actividad económica","Persona PPE",
                 "Familiares PPE","País de residencia","Departamento de residencia","Ciudad de residencia","Ingresos mensuales","Gastos mensuales","Valor de tus activos","Valor de tus pasivos",
@@ -303,53 +303,54 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 {
                     worksheet.Cells[row, 1].Value = client.PermissionTreatPersonalDataDate.ToString("yyyyMMdd");
                     worksheet.Cells[row, 2].Value = client.TermsConditionsAcceptanceQuote?.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 3].Value = client.ValidateClientOtp?.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 4].Value = client.AcceptQuoteOtp?.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 5].Value = client.OtpDateForms?.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 6].Value = client.AcceptanceOriginOfFunds?.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 7].Value = client.Name;
-                    worksheet.Cells[row, 8].Value = client.LastName;
-                    worksheet.Cells[row, 9].Value = client.DocumenIdentificationTypeId;
-                    worksheet.Cells[row, 10].Value = client.IdentificationNumber;
-                    worksheet.Cells[row, 11].Value = client.CountryCodePhoneId;
-                    worksheet.Cells[row, 12].Value = client.PhoneNumber;
-                    worksheet.Cells[row, 13].Value = client.Email;
-                    worksheet.Cells[row, 14].Value = client.CountryName;
-                    worksheet.Cells[row, 15].Value = client.StateName;
-                    worksheet.Cells[row, 16].Value = client.CityName;
-                    worksheet.Cells[row, 17].Value = client.CountryNationality;
-                    worksheet.Cells[row, 18].Value = client.CivilStatus;
-                    worksheet.Cells[row, 19].Value = client.NumberChildren;
-                    worksheet.Cells[row, 20].Value = client.Occupation;
-                    worksheet.Cells[row, 21].Value = client.OccupationActivity;
-                    worksheet.Cells[row, 22].Value = client.IsPublicPerson.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 23].Value = client.HasBondPublicPerson.HasValue ? (client.HasBondPublicPerson.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 24].Value = client.ResidenceCountry;
-                    worksheet.Cells[row, 25].Value = client.ResidenceState;
-                    worksheet.Cells[row, 26].Value = client.ResidenceCity;
-                    worksheet.Cells[row, 27].Value = client.MonthlyIncome;
-                    worksheet.Cells[row, 28].Value = client.MonthlyExpenses;
-                    worksheet.Cells[row, 29].Value = client.AssetValue;
-                    worksheet.Cells[row, 30].Value = client.LiabilitiesValue;
-                    worksheet.Cells[row, 31].Value = client.IncomeOrigin;
-                    worksheet.Cells[row, 32].Value = client.Weight;
-                    worksheet.Cells[row, 33].Value = client.Height;
-                    worksheet.Cells[row, 34].Value = _clientRepository.GetDiseasesNames(client.Diseases); 
-                    worksheet.Cells[row, 35].Value = client.DiseasesMoreInfo;
-                    worksheet.Cells[row, 36].Value = client.HIVActive.HasValue ? (client.HIVActive.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 37].Value = client.PlannedMedicalProcidure.HasValue ? (client.PlannedMedicalProcidure.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 38].Value = client.PlannedMedicalProcidureMoreInfo;
-                    worksheet.Cells[row, 39].Value = client.Disability.HasValue ? (client.Disability.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 40].Value = client.DisabilityMoreInfo;
-                    worksheet.Cells[row, 41].Value = client.Convicted.HasValue ? (client.Convicted.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 42].Value = client.LifeEnsure.HasValue ? (client.LifeEnsure.Value ? "Si" : "No") : "";
-                    worksheet.Cells[row, 43].Value = client.NameBank;
-                    worksheet.Cells[row, 44].Value = "NIT";
-                    worksheet.Cells[row, 45].Value = client.NitBank;
-                    worksheet.Cells[row, 46].Value = "Oneroso";
-                    worksheet.Cells[row, 47].Value = "100%";
+                    worksheet.Cells[row, 3].Value = client.SbsPrivacyPolicies?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 4].Value = client.ValidateClientOtp?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 5].Value = client.AcceptQuoteOtp?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 6].Value = client.OtpDateForms?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 7].Value = client.AcceptanceOriginOfFunds?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 8].Value = client.Name;
+                    worksheet.Cells[row, 9].Value = client.LastName;
+                    worksheet.Cells[row, 10].Value = client.DocumenIdentificationTypeId;
+                    worksheet.Cells[row, 11].Value = client.IdentificationNumber;
+                    worksheet.Cells[row, 12].Value = client.CountryCodePhoneId;
+                    worksheet.Cells[row, 13].Value = client.PhoneNumber;
+                    worksheet.Cells[row, 14].Value = client.Email;
+                    worksheet.Cells[row, 15].Value = client.CountryName;
+                    worksheet.Cells[row, 16].Value = client.StateName;
+                    worksheet.Cells[row, 17].Value = client.CityName;
+                    worksheet.Cells[row, 18].Value = client.CountryNationality;
+                    worksheet.Cells[row, 19].Value = client.CivilStatus;
+                    worksheet.Cells[row, 20].Value = client.NumberChildren;
+                    worksheet.Cells[row, 21].Value = client.Occupation;
+                    worksheet.Cells[row, 22].Value = client.OccupationActivity;
+                    worksheet.Cells[row, 23].Value = client.IsPublicPerson.HasValue ? (client.IsPublicPerson.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 24].Value = client.HasBondPublicPerson.HasValue ? (client.HasBondPublicPerson.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 25].Value = client.ResidenceCountry;
+                    worksheet.Cells[row, 26].Value = client.ResidenceState;
+                    worksheet.Cells[row, 27].Value = client.ResidenceCity;
+                    worksheet.Cells[row, 28].Value = client.MonthlyIncome;
+                    worksheet.Cells[row, 29].Value = client.MonthlyExpenses;
+                    worksheet.Cells[row, 30].Value = client.AssetValue;
+                    worksheet.Cells[row, 31].Value = client.LiabilitiesValue;
+                    worksheet.Cells[row, 32].Value = client.IncomeOrigin;
+                    worksheet.Cells[row, 33].Value = client.Weight;
+                    worksheet.Cells[row, 34].Value = client.Height;
+                    worksheet.Cells[row, 35].Value = _clientRepository.GetDiseasesNames(client.Diseases); 
+                    worksheet.Cells[row, 36].Value = client.DiseasesMoreInfo;
+                    worksheet.Cells[row, 37].Value = client.HIVActive.HasValue ? (client.HIVActive.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 38].Value = client.PlannedMedicalProcidure.HasValue ? (client.PlannedMedicalProcidure.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 39].Value = client.PlannedMedicalProcidureMoreInfo;
+                    worksheet.Cells[row, 40].Value = client.Disability.HasValue ? (client.Disability.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 41].Value = client.DisabilityMoreInfo;
+                    worksheet.Cells[row, 42].Value = client.Convicted.HasValue ? (client.Convicted.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 43].Value = client.LifeEnsure.HasValue ? (client.LifeEnsure.Value ? "Si" : "No") : "";
+                    worksheet.Cells[row, 44].Value = client.NameBank;
+                    worksheet.Cells[row, 45].Value = "NIT";
+                    worksheet.Cells[row, 46].Value = client.NitBank;
+                    worksheet.Cells[row, 47].Value = "Oneroso";
+                    worksheet.Cells[row, 48].Value = "100%";
 
-                    int beneficiaryColumn = 48;
+                    int beneficiaryColumn = 49;
 
                     var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyIdLogs(client.LoanPolicyId);
 
