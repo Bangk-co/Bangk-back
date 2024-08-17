@@ -217,6 +217,7 @@ namespace Bangk.Repositories.Repositories
                             LoanPolicyId = lp.Id,
                             PermissionTreatPersonalDataDate = c.PermissionTreatPersonalDataDate,
                             TermsConditionsAcceptanceQuote = lq.TermsConditionsAcceptanceQuote,
+                            SbsPrivacyPolicies = lq.SbsPrivacyPolicies,
                             ValidateClientOtp = c.ValidateClientOtp,
                             OtpDateForms = lp.OtpDateForms,
                             AcceptQuoteOtp = lq.AcceptQuoteOtp,
