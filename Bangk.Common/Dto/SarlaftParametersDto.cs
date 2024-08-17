@@ -11,9 +11,10 @@
         public string EsPPE { get; set; }
         public string VinculosPPE { get; set; }
         public long ValorAsegurado { get; set; }
-        public decimal ValorPrimaKMs { get; set; }
+        public long ValorPrimaKMs { get; set; }
         public long Intermediario { get; set; }
         public string TipoParticipante { get; set; }
         public string VinculoLaboral { get; set; }
+        public string Sponsor { get; set; }
     }
 }
