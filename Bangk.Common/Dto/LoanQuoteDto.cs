@@ -13,7 +13,8 @@ namespace Bangk.Common.Dto
         public decimal YearlyFee { get; set;}
         public DateTime? TermsConditionsAcceptanceQuote { get; set; }
         public DateTime? AcceptQuoteOtp { get; set; }
-        
+        public DateTime? SbsPrivacyPolicies { get; set; }
+
 
     }
 }
