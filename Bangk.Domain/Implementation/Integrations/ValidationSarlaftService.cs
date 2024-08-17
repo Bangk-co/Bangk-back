@@ -13,6 +13,7 @@ using System.Dynamic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Integrations
@@ -48,7 +49,7 @@ namespace Bangk.Domain.Implementation.Integrations
             var listParameter = new List<SarlaftParametersDto>();
             var parameter = new SarlaftParametersDto
             {
-                TipoConsulta = "1",
+                TipoConsulta = _configuration.GetSection("Sarlaft:TipoConsulta").Value,
                 TipoDocumento = client.DocumenIdentificationTypeId == 76 ? "1" : "2",
                 NumeroDocumento = client.IdentificationNumber,
                 DigitoVerificacion = string.Empty,
@@ -57,10 +58,11 @@ namespace Bangk.Domain.Implementation.Integrations
                 EsPPE = clientSarlaftInf.IsPublicPerson ? "1" : "0",
                 VinculosPPE = clientSarlaftInf.HasBondPublicPerson ? "1" : "0",
                 ValorAsegurado = clientSarlaftInf.LoanBalance,
-                ValorPrimaKMs = clientSarlaftInf.YearlyFee,
+                ValorPrimaKMs = (long)clientSarlaftInf.YearlyFee,
                 Intermediario = long.Parse(_configuration.GetSection("Sarlaft:Intermediario").Value),
                 TipoParticipante = string.Empty,
-                VinculoLaboral = string.Empty    
+                VinculoLaboral = string.Empty,
+                Sponsor = _configuration.GetSection("Sarlaft:Sponsor").Value
             };
 
             listParameter.Add(parameter);
@@ -80,19 +82,20 @@ namespace Bangk.Domain.Implementation.Integrations
                         dynamic jsonObject = JsonConvert.DeserializeObject<ExpandoObject[]>(responseBody)[0];
                         if (string.Equals(jsonObject.estadoSarlaft.estado, "V"))//apto
                         {
-                            await SaveLoanHistory(loanApplicationId, "Cliente apto para emisión de póliza", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 0);
+                            await SaveLoanHistory(loanApplicationId, $"Cliente apto para emisión de póliza. Descripción: {jsonObject.estadoSarlaft.descripcion}", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 0);
                             await SaveLoanHistory(loanApplicationId, null, (int)ApplicationStateHistoryEnum.SolicitudEmisionPoliza, null);
                             await DeleteRetryJob(loanApplicationId);
                         }
                         else if (string.Equals(jsonObject.estadoSarlaft.estado, "F") || string.Equals(jsonObject.estadoSarlaft.estado, "N") ||
                             string.Equals(jsonObject.estadoSarlaft.estado, "P"))//novedad
                         {
-                            await SaveLoanHistory(loanApplicationId, "Presenta novedad en Sarlaft", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 1);
+                            
+                            await SaveLoanHistory(loanApplicationId, $"Presenta novedad en Sarlaft. Descripción: {jsonObject.estadoSarlaft.descripcion}", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 1);
                             await DeleteRetryJob(loanApplicationId);
                         }
                         else if (string.Equals(jsonObject.estadoSarlaft.estado, "R")) //error
                         {
-                            await SaveLoanHistory(loanApplicationId, "Cliente no apto para emisión de póliza", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 2);
+                            await SaveLoanHistory(loanApplicationId, $"Cliente no apto para emisión de póliza. Descripción: {jsonObject.estadoSarlaft.descripcion}", (int)ApplicationStateHistoryEnum.EstudioSarlaft, 2);
                             await SendPolicyNotIssueNotification(client);
                             await SaveLoanHistory(loanApplicationId, null, (int)ApplicationStateHistoryEnum.ClienteNoAsegurable, null);
                             client.State = (int)ClientStateEnum.NoAsegurable;
@@ -101,13 +104,13 @@ namespace Bangk.Domain.Implementation.Integrations
                         }
                         else
                         {
-                            await SaveLoanHistory(loanApplicationId, jsonObject.descripcion, (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
+                            await SaveLoanHistory(loanApplicationId, $"Descripción: {jsonObject.estadoSarlaft.descripcion}", (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
                             await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
                         }
                     }
                     else
                     {
-                        await SaveLoanHistory(loanApplicationId, response.ReasonPhrase, (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
+                        await SaveLoanHistory(loanApplicationId, $"Descripción: {response.ReasonPhrase}", (int)ApplicationStateHistoryEnum.EstudioSarlaft, isCallFromApi ? 4 : 3);
                         await _scheduleIntegrationService.CreateNextTrySBSOrSarlaft(loanApplicationId, 2);
                     }
                 }
