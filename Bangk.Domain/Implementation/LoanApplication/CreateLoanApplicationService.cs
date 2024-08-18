@@ -1,8 +1,10 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Common.Validators;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.LoanApplication;
+using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
@@ -18,10 +20,10 @@ namespace Bangk.Domain.Implementation.LoanApplication
         private readonly IConfiguration _configuration;
         private readonly ILoanApplicationDocumentRepository _loanApplicationDocumentRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
-
+        private readonly IClientRepository _clientRepository;
         public CreateLoanApplicationService(ILoanApplicationRepository LoanApplicationRepository, IUserRepository userRepository,
             IUploadFileService uploadFileService, IConfiguration configuration, ILoanApplicationDocumentRepository loanApplicationDocumentRepository,
-            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository)
+            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IClientRepository clientRepository)
         {
             _loanApplicationRepository = LoanApplicationRepository;
             _userRepository = userRepository;
@@ -29,6 +31,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
             _configuration = configuration;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _loanApplicationDocumentRepository = loanApplicationDocumentRepository;
+            _clientRepository = clientRepository;
         }
 
         public async Task<ResponseDto<int>> Execute(NewLoadAplicacionDto createLoadAplicacionDto)
@@ -48,14 +51,14 @@ namespace Bangk.Domain.Implementation.LoanApplication
             //    return result;
             //}
 
-            var user = await _userRepository.GetUserWithLessApplication();
+            var userReview = await _userRepository.GetUserWithLessApplication();
             var loanApplication = new Repositories.Entities.LoanApplication
             {
                 ClientId = createLoadAplicacionDto.ClientId,
                 LoanNumber = createLoadAplicacionDto.LoanNumber,
                 LoanTypeId = createLoadAplicacionDto.LoanTypeId,
                 BankId = createLoadAplicacionDto.BankId,
-                ReviewerId = user.Id
+                ReviewerId = userReview.Id
             };
 
             await _loanApplicationRepository.Create(loanApplication);
@@ -79,8 +82,29 @@ namespace Bangk.Domain.Implementation.LoanApplication
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
             result.Result = loanApplication.Id;
+            var client =  await _clientRepository.GetById(createLoadAplicacionDto.ClientId);
+            await SendNotification(userReview.Email, loanApplication.Id, client.Name);
             scope.Complete();
             return result;
+        }
+        private async Task SendNotification(string email, int applicationId, string clientName)
+        {
+            var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var sendEmail = new SendGridEmailDto
+            {
+                email = email,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:LoanApplicationAssigned").Value,
+                Data = new
+                {
+                    Cliename = clientName,
+                    UrlCallback = url + $"&loanApplicationId={applicationId}"
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
     }
 }

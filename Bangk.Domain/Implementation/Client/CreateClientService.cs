@@ -1,11 +1,15 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Client;
 using Bangk.Domain.Contract.Files;
+using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -80,7 +84,7 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _clientRepository.Create(client);
-            var user = await _userRepository.GetUserWithLessApplication();
+            var userReview = await _userRepository.GetUserWithLessApplication();
             var loanApplication = new Repositories.Entities.LoanApplication
             {
                 ClientId = client.Id,
@@ -88,8 +92,10 @@ namespace Bangk.Domain.Implementation.Client
                 LoanNumber = createClientDto.LoadAplicacionDto.LoanNumber,
                 LoanTypeId = createClientDto.LoadAplicacionDto.LoanTypeId,
                 BankId = createClientDto.LoadAplicacionDto.BankId,
-                ReviewerId = user.Id
+                ReviewerId = userReview.Id
             };
+
+            
 
             await _loanApplicationRepository.Create(loanApplication);
             var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
@@ -129,8 +135,30 @@ namespace Bangk.Domain.Implementation.Client
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
             result.Result = client.Id;
+
+            await SendNotification(userReview.Email, loanApplication.Id, client.Name);
             scope.Complete();
             return result;
+        }
+
+        private async Task SendNotification(string email, int applicationId, string clientName)
+        {
+            var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var sendEmail = new SendGridEmailDto
+            {
+                email = email,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:LoanApplicationAssigned").Value,
+                Data = new
+                {
+                    Cliename = clientName,
+                    UrlCallback = url + $"&loanApplicationId={applicationId}"
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
     }
 }
