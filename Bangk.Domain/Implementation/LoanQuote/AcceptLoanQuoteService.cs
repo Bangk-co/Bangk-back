@@ -1,11 +1,15 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Transactions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bangk.Domain.Implementation.LoanApplication
 {
@@ -16,19 +20,24 @@ namespace Bangk.Domain.Implementation.LoanApplication
         private readonly IClientRepository _clientRepository;
         private readonly ILoanQuoteRepository _loanQuoteRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
         public AcceptLoanQuoteService(ILoanApplicationRepository loanApplicationRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
-            IClientRepository clientRepository, ILoanQuoteRepository loanQuoteRepository, INotificationRepository notificationRepository)
+            IClientRepository clientRepository, ILoanQuoteRepository loanQuoteRepository, INotificationRepository notificationRepository,
+            IConfiguration configuration, IUserRepository userRepository)
         {
             _loanApplicationRepository = loanApplicationRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _clientRepository = clientRepository;
             _loanQuoteRepository = loanQuoteRepository;
             _notificationRepository = notificationRepository;
+            _configuration = configuration;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp)
         {
-            var loanApplication = _loanApplicationRepository.GetById(loanApplicationId);
+            var loanApplication = await _loanApplicationRepository.GetById(loanApplicationId);
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
             var result = new ResponseDto<bool>
@@ -68,7 +77,9 @@ namespace Bangk.Domain.Implementation.LoanApplication
                 await _notificationRepository.DeleteBulk(notifications);
             }
 
+            var userReview = await _userRepository.GetById(loanApplication.ReviewerId);
             await CreateNotification(loanApplicationId);
+            await SendNotification(userReview.Email, loanApplicationId, client.Name);
             scope.Complete();
             return result;
         }
@@ -92,6 +103,27 @@ namespace Bangk.Domain.Implementation.LoanApplication
 
             var notification5 = new Notification { ApplicationId = loanApplicationId, NotificationType = 2, DateToSendNotification = DateTime.UtcNow.AddDays(30) };
             await _notificationRepository.Create(notification5);
+        }
+
+        private async Task SendNotification(string email, int applicationId, string clientName)
+        {
+            var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var sendEmail = new SendGridEmailDto
+            {
+                email = email,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:LoanApplicationAccepted").Value,
+
+                Data = new
+                {
+                    Cliename = clientName,
+                    UrlCallback = url + $"&loanApplicationId={applicationId}"
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
     }
 }
