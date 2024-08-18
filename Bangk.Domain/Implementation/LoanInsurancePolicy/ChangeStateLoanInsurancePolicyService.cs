@@ -5,8 +5,10 @@ using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Transactions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bangk.Domain.Implementation.Client
 {
@@ -19,10 +21,11 @@ namespace Bangk.Domain.Implementation.Client
         private readonly ILoanApplicationRepository _loanApplicationRepository;
         private readonly IClientRepository _clientRepository;
         private readonly ISettingRepository _settingRepository;
+        private readonly IUserRepository _userRepository;
 
         public ChangeStateLoanInsurancePolicyService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, INotificationRepository notificationRepository,
-            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IConfiguration configuration, ILoanApplicationRepository loanApplicationRepository, 
-            IClientRepository clientRepository, ISettingRepository settingRepository)
+            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IConfiguration configuration, ILoanApplicationRepository loanApplicationRepository,
+            IClientRepository clientRepository, ISettingRepository settingRepository, IUserRepository userRepository)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
@@ -31,6 +34,7 @@ namespace Bangk.Domain.Implementation.Client
             _loanApplicationRepository = loanApplicationRepository;
             _clientRepository = clientRepository;
             _settingRepository = settingRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId)
@@ -106,7 +110,7 @@ namespace Bangk.Domain.Implementation.Client
 
                     string observations = string.Empty;
 
-                    if (imc <= imcLower || imc >= imcHigher)   
+                    if (imc <= imcLower || imc >= imcHigher)
                     {
                         observations += "IMC por fuera de lo normal (" + imc.ToString("F1") + "). ";
                     }
@@ -141,6 +145,8 @@ namespace Bangk.Domain.Implementation.Client
                     client.State = (int)ClientStateEnum.NoAsegurable;
                     await _clientRepository.Update(client);
 
+                    var userReview = await _userRepository.GetById(loanApplicationInfo.ReviewerId);
+                    await SendNotification(userReview.Email, loanInsurencePolicy.LoanApplicationId.Value, client.Name);
                     scope.Complete();
 
                 }
@@ -153,8 +159,29 @@ namespace Bangk.Domain.Implementation.Client
                 await _notificationRepository.DeleteBulk(notifications);
             }
 
-            
+
             return result;
+        }
+
+        private async Task SendNotification(string email, int applicationId, string clientName)
+        {
+            var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var sendEmail = new SendGridEmailDto
+            {
+                email = email,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:LoanApplicationFilled").Value,
+
+                Data = new
+                {
+                    Cliename = clientName,
+                    UrlCallback = url + $"&loanApplicationId={applicationId}"
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
     }
 }
