@@ -17,6 +17,7 @@ namespace Bangk.Repositories.Entities
         public decimal YearlyFee { get; set; }
         public DateTime? TermsConditionsAcceptanceQuote { get; set; }
         public DateTime? AcceptQuoteOtp { get; set; }
+        public DateTime? SbsPrivacyPolicies { get; set; }
         public Setting Insurance { get; set; }
         public LoanApplication LoanApplication { get; set; }
 
