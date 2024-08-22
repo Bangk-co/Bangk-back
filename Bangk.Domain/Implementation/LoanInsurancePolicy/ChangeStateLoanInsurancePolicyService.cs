@@ -53,10 +53,29 @@ namespace Bangk.Domain.Implementation.Client
                 return result;
             }
 
+            //Riesgo De Salud
+            string observation = string.Empty;
+            if (!string.IsNullOrEmpty(loanInsurencePolicy.Diseases) &&
+            int.TryParse(loanInsurencePolicy.Diseases, out int diseasesValue) &&
+            diseasesValue != (int)DiseasesForm.NingunaDeLasAnteriores)
+            {
+                observation = $"Riesgo de salud presente: {loanInsurencePolicy.DiseasesMoreInfo}";
+            }
+
+            if (loanInsurencePolicy.Disability.HasValue && loanInsurencePolicy.Disability.Value)
+            {
+                observation += !string.IsNullOrEmpty(observation) ? $",Riesgo de salud presente: {loanInsurencePolicy.DisabilityMoreInfo}" : $"Riesgo de salud presente: {loanInsurencePolicy.DisabilityMoreInfo}";
+            }
+
+            if (loanInsurencePolicy.PlannedMedicalProcidure.HasValue && loanInsurencePolicy.PlannedMedicalProcidure.Value)
+            {
+                observation += !string.IsNullOrEmpty(observation) ? $",Riesgo de salud presente: {loanInsurencePolicy.PlannedMedicalProcidureMoreInfo}" : $"Riesgo de salud presente: {loanInsurencePolicy.PlannedMedicalProcidureMoreInfo}";
+            }
+
             var loadApplicationStateHistory = new Repositories.Entities.LoanApplicationStateHistory
             {
                 LoanApplicationId = loanApplicationId,
-                Observations = string.Empty,
+                Observations = observation,
                 StateId = (int)ApplicationStateHistoryEnum.FormulariosDiligenciados,
             };
 
@@ -152,6 +171,9 @@ namespace Bangk.Domain.Implementation.Client
                 }
 
             }
+
+
+
 
             var notifications = await _notificationRepository.GetNotificationByApplicationId(loanApplicationId);
             if (notifications != null && notifications.Count > 0)
