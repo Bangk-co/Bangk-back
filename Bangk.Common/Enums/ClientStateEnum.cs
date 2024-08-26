@@ -77,4 +77,9 @@ namespace Bangk.Common.Enums
     {
         ConsecutiveNumber = 700
     }
+
+    public enum DiseasesForm
+    {
+        NingunaDeLasAnteriores = 707
+    }
 }
