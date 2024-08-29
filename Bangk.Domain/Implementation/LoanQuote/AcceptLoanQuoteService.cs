@@ -120,7 +120,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
                 Data = new
                 {
                     Cliename = clientName,
-                    UrlCallback = url + $"&loanApplicationId={applicationId}"
+                    UrlCallback = url + $"?loanApplicationId={applicationId}"
                 }
             };
 
