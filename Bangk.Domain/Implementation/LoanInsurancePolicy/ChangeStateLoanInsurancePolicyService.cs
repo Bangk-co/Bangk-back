@@ -2,6 +2,7 @@
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
+using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -80,6 +81,11 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
+
+            var loanApplicationInfoReviewer = await _loanApplicationRepository.GetById(loanApplicationId);
+            var clientFd = await _clientRepository.GetClientByLoanApplicationId(loanApplicationId);
+            var userReview = await _userRepository.GetById(loanApplicationInfoReviewer.ReviewerId);
+            await SendNotification(userReview.Email, loanInsurencePolicy.LoanApplicationId.Value, clientFd.Name);
 
 
             var hasHealthInfo = !string.IsNullOrEmpty(loanInsurencePolicy.DisabilityMoreInfo) ||
@@ -164,8 +170,7 @@ namespace Bangk.Domain.Implementation.Client
                     client.State = (int)ClientStateEnum.NoAsegurable;
                     await _clientRepository.Update(client);
 
-                    var userReview = await _userRepository.GetById(loanApplicationInfo.ReviewerId);
-                    await SendNotification(userReview.Email, loanInsurencePolicy.LoanApplicationId.Value, client.Name);
+                    
                     scope.Complete();
 
                 }
