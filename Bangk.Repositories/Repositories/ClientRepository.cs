@@ -136,7 +136,7 @@ namespace Bangk.Repositories.Repositories
                             IdentificationNumber = c.IdentificationNumber != null ? c.IdentificationNumber : string.Empty,
                             Name = c.Name != null ? c.Name : string.Empty,
                             LastName = c.LastName != null ? c.LastName : string.Empty,
-                            Address = sublp.Address != null ? sublp.Address : string.Empty,
+                            Address = sublp.ResidenceAddress != null ? sublp.ResidenceAddress : string.Empty,
                             CityName = ci.Name ?? string.Empty,
                             StateName = stn.Name ?? string.Empty,
                             CountryName = ct.Name ?? string.Empty,
