@@ -24,6 +24,7 @@ namespace Bangk.Common.Dto
         public string NameBank { get; set; }
         public string NitBank { get; set; }
         public long LoanBalance { get; set; }
+        public string LoanNumber { get; set; }
         public decimal YearlyFee { get; set; }
         public List<BeneficiariesJobDto> Beneficiary { get; set; }
 
