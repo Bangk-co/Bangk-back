@@ -73,8 +73,8 @@ namespace Bangk.Repositories.Repositories
                             LoanApplicationId = l.Id,
                             BankStatementUrl = document == null ? string.Empty : document.Url,
                             BankStatementName = document == null ? string.Empty : document.Name,
-                            IdentificationUrl = document == null ? string.Empty : document.Url,
-                            IdentificationNameUrl = document == null ? string.Empty : document.Name,
+                            IdentificationUrl = documentIdentification == null ? string.Empty : documentIdentification.Url,
+                            IdentificationNameUrl = documentIdentification == null ? string.Empty : documentIdentification.Name,
                             IconsBanksUrl = s == null ? string.Empty : s.IconsBanksUrl,
                             DocumentIssueDate = c.DocumentIssueDate
                         };
