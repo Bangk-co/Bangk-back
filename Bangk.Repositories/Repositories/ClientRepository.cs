@@ -147,6 +147,7 @@ namespace Bangk.Repositories.Repositories
                             NameBank = st.Name != null ? st.Name : string.Empty,
                             NitBank = st.Code != null ? st.Code : string.Empty,
                             LoanBalance = l.LoanBalance != 0 ? l.LoanBalance : 0,
+                            LoanNumber = l.LoanNumber != null ? l.LoanNumber : string.Empty,
                             YearlyFee = lq.YearlyFee != 0 ? lq.YearlyFee : 0
                         };
 
