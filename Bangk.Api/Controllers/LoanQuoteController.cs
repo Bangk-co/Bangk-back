@@ -47,7 +47,7 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("AcceptLoanQuote")]
         [AllowAnonymous]
-        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime sbsPrivacyPolicies)
+        public async Task<IActionResult> AcceptLoanQuote(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime? sbsPrivacyPolicies)
         {
             var result = await _acceptLoanQuoteService.Execute(loanApplicationId, termsConditionsAcceptanceQuote, acceptQuoteOtp, sbsPrivacyPolicies);
             return Ok(result);
