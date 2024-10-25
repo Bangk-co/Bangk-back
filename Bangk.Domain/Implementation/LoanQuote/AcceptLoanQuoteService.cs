@@ -34,7 +34,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
             _userRepository = userRepository;
         }
 
-        public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime sbsPrivacyPolicies)
+        public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime? sbsPrivacyPolicies)
         {
             var loanApplication = await _loanApplicationRepository.GetById(loanApplicationId);
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
@@ -63,6 +63,10 @@ namespace Bangk.Domain.Implementation.LoanApplication
             var acceptterms = await _loanQuoteRepository.GetLoanQuoteByLoadApplicationId(loanApplicationId);
             acceptterms.TermsConditionsAcceptanceQuote = termsConditionsAcceptanceQuote;
             acceptterms.AcceptQuoteOtp = acceptQuoteOtp;
+            if (sbsPrivacyPolicies == DateTime.MinValue)
+            {
+                sbsPrivacyPolicies = null;
+            }
             acceptterms.SbsPrivacyPolicies = sbsPrivacyPolicies;
             await _loanQuoteRepository.Update(acceptterms);
 
