@@ -3,6 +3,7 @@ using Bangk.Common.Validators;
 using Bangk.Domain.Contract;
 using Bangk.Domain.Contract.City;
 using Bangk.Domain.Contract.Client;
+using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
@@ -24,6 +25,7 @@ using Bangk.Domain.Implementation;
 using Bangk.Domain.Implementation.BackgroundTask;
 using Bangk.Domain.Implementation.City;
 using Bangk.Domain.Implementation.Client;
+using Bangk.Domain.Implementation.Clientify;
 using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
@@ -133,6 +135,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ISFTPConnection, SFTPConnection>();
             services.AddTransient<IGetLoanApplicationFirstThreeService, GetLoanApplicationFirstThreeService>();
             services.AddTransient<IValidateLoanApplicationQouteService, ValidateLoanApplicationQouteService>();
+            services.AddTransient<ICreateClientClientifyService, CreateClientClientifyService>();
+            services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>(); 
 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

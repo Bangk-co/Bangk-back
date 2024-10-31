@@ -2,14 +2,11 @@
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Client;
+using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.Files;
-using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
-using System.Configuration;
-using System.Drawing;
-using System.Drawing.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -26,10 +23,12 @@ namespace Bangk.Domain.Implementation.Client
         private readonly ILoanApplicationDocumentRepository _loanApplicationDocumentRepository;
         private readonly ILoanApplicationStateHistoryRepository _loanApplicationStateHistoryRepository;
         private readonly ISettingRepository _settingRepository;
+        private readonly ICreateClientClientifyService _createClientClientifyService;
 
         public CreateClientService(IClientRepository repository, IValidator<CreateClientDto> createClientValidator, IUploadFileService uploadFileService, 
             IConfiguration configuration, ILoanApplicationRepository loanApplicationRepository, ILoanApplicationDocumentRepository loanApplicationDocumentRepository, 
-            IUserRepository userRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, ISettingRepository settingRepository)
+            IUserRepository userRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, ISettingRepository settingRepository,
+            ICreateClientClientifyService createClientClientifyService)
         {
             _clientRepository = repository;
             _createClientValidator = createClientValidator;
@@ -40,6 +39,7 @@ namespace Bangk.Domain.Implementation.Client
             _userRepository = userRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
             _settingRepository = settingRepository;
+            _createClientClientifyService = createClientClientifyService;
         }
 
         public async Task<ResponseDto<int>> Execute(CreateClientDto createClientDto)
@@ -84,7 +84,10 @@ namespace Bangk.Domain.Implementation.Client
             };
 
             await _clientRepository.Create(client);
+         
             var userReview = await _userRepository.GetUserWithLessApplication();
+            //Crear el cliente en clientify
+            var clientClentifyId = await _createClientClientifyService.Execute(createClientDto);
             var loanApplication = new Repositories.Entities.LoanApplication
             {
                 ClientId = client.Id,
@@ -92,10 +95,9 @@ namespace Bangk.Domain.Implementation.Client
                 LoanNumber = createClientDto.LoadAplicacionDto.LoanNumber,
                 LoanTypeId = createClientDto.LoadAplicacionDto.LoanTypeId,
                 BankId = createClientDto.LoadAplicacionDto.BankId,
-                ReviewerId = userReview.Id
+                ReviewerId = userReview.Id,
+                ClientifyId = clientClentifyId,
             };
-
-            
 
             await _loanApplicationRepository.Create(loanApplication);
             var file = await _uploadFileService.Execute(createClientDto.IdentificationFile, _configuration.GetSection("AzureStorage:ContainerName").Value);
