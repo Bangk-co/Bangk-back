@@ -136,8 +136,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetLoanApplicationFirstThreeService, GetLoanApplicationFirstThreeService>();
             services.AddTransient<IValidateLoanApplicationQouteService, ValidateLoanApplicationQouteService>();
             services.AddTransient<ICreateClientClientifyService, CreateClientClientifyService>();
-            services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>(); 
-
+            services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>();
+            services.AddTransient<IChangeStateDealService, ChangeStateDealService>();
+            
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

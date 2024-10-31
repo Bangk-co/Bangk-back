@@ -29,12 +29,14 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IValidationSarlaftRepository _validationSarlaftRepository;
         private readonly IScheduleIntegrationRepository _scheduleIntegrationRepository;
         private readonly IChangeStatusDealService _changeStatusDealService;
+        private readonly IChangeStateDealService _changeStateDealService;
 
         public ValidationSarlaftService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IConfiguration configuration, IClientRepository clientRepository,
             ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IScheduleIntegrationService scheduleIntegrationService,
             IValidationSarlaftRepository validationSarlaftRepository,
             IScheduleIntegrationRepository scheduleIntegrationRepository,
-            IChangeStatusDealService changeStatusDealService)
+            IChangeStatusDealService changeStatusDealService,
+            IChangeStateDealService changeStateDealService)
         {
             _loanInsurancePolicyRepository = loanInsurancePolicyRepository;
             _configuration = configuration;
@@ -44,6 +46,7 @@ namespace Bangk.Domain.Implementation.Integrations
             _validationSarlaftRepository = validationSarlaftRepository;
             _scheduleIntegrationRepository = scheduleIntegrationRepository;
             _changeStatusDealService = changeStatusDealService;
+            _changeStateDealService = changeStateDealService;
         }
 
         public async Task Execute(int loanApplicationId, bool isCallFromApi = false)
@@ -107,6 +110,7 @@ namespace Bangk.Domain.Implementation.Integrations
                             client.State = (int)ClientStateEnum.NoAsegurable;
                             await _clientRepository.Update(client);
                             await DeleteRetryJob(loanApplicationId);
+                            await _changeStateDealService.Execute((int)StateClientifyDeal.Lost, loanApplicationId);
                         }
                         else
                         {

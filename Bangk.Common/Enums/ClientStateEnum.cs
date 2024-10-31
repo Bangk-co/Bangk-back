@@ -87,4 +87,9 @@ namespace Bangk.Common.Enums
     {
         CaratulaNumber = 708
     }
+
+    public enum StateClientifyDeal
+    {
+        Lost = 4
+    }
 }
