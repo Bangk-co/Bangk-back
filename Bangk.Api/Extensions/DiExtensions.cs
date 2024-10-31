@@ -134,7 +134,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IReportExcel, ReportClientsSarlaft>();
             services.AddTransient<ISFTPConnection, SFTPConnection>();
             services.AddTransient<ICreateClientClientifyService, CreateClientClientifyService>();
-            services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>(); 
+            services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>();
+            services.AddTransient<IChangeStateDealService, ChangeStateDealService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //Azure Blob Storage

@@ -47,6 +47,11 @@ namespace Bangk.Common.Dto
         public string pipeline_stage { get; set; }
         public string pipeline_stage_desc { get; set; }
     }
+
+    public class UpdateStateClientifyDto
+    {
+        public int status { get; set; }
+    }
 }
 
 

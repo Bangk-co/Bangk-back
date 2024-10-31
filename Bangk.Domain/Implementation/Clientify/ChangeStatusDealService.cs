@@ -34,9 +34,7 @@ namespace Bangk.Domain.Implementation.Clientify
                 pipeline_stage = stageUrl
             };
 
-            var response = await apiClient.PatchAsync($"/v1/deals/{loanApplication.ClientifyId}/", update);
-            dynamic jsonObject = JsonConvert.DeserializeObject<ExpandoObject>(response);
-            var clientId = jsonObject.id;
+            await apiClient.PatchAsync($"/v1/deals/{loanApplication.ClientifyId}/", update);
         }
     }
 }
