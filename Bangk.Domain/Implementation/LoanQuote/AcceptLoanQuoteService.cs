@@ -1,7 +1,9 @@
 ﻿using Bangk.Business.Extension.SenderGrid;
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
+using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.LoanQuote;
+using Bangk.Domain.Implementation.Clientify;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -21,9 +23,11 @@ namespace Bangk.Domain.Implementation.LoanApplication
         private readonly INotificationRepository _notificationRepository;
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IChangeStatusDealService _changeStatusDealService;
         public AcceptLoanQuoteService(ILoanApplicationRepository loanApplicationRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
             IClientRepository clientRepository, ILoanQuoteRepository loanQuoteRepository, INotificationRepository notificationRepository,
-                        IConfiguration configuration, IUserRepository userRepository)
+            IConfiguration configuration, IUserRepository userRepository, 
+            IChangeStatusDealService changeStatusDealService)
         {
             _loanApplicationRepository = loanApplicationRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
@@ -32,6 +36,8 @@ namespace Bangk.Domain.Implementation.LoanApplication
             _notificationRepository = notificationRepository;
             _configuration = configuration;
             _userRepository = userRepository;
+            _changeStatusDealService = changeStatusDealService;
+
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime? sbsPrivacyPolicies)
@@ -84,6 +90,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
             var userReview = await _userRepository.GetById(loanApplication.ReviewerId);
             await CreateNotification(loanApplicationId);
             await SendNotification(userReview.Email, loanApplicationId, client.Name);
+            await _changeStatusDealService.Execute("Solicitud", loanApplicationId);
             scope.Complete();
             return result;
         }
