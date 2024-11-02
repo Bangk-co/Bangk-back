@@ -9,8 +9,8 @@ namespace Bangk.Common.Dto
     public class ClientClientifyDto
     {
         public string contact_source;
-        public string owner_name;
 
+        public string owner;
         public string first_name { get; set; }
         public string last_name { get; set; }
         public string email { get; set; }

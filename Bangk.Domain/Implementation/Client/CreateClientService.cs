@@ -87,7 +87,7 @@ namespace Bangk.Domain.Implementation.Client
          
             var userReview = await _userRepository.GetUserWithLessApplication();
             //Crear el cliente en clientify
-            var clientClentifyId = await _createClientClientifyService.Execute(createClientDto);
+            var clientClentifyId = await _createClientClientifyService.Execute(createClientDto, userReview.Email);
             var loanApplication = new Repositories.Entities.LoanApplication
             {
                 ClientId = client.Id,
