@@ -13,13 +13,14 @@ namespace Bangk.Domain.Implementation.Clientify
     {
         private readonly ISettingRepository _settingRepository;
         private readonly IConfiguration _configuration;
-        public CreateClientClientifyService(ISettingRepository settingRepository, IConfiguration configuration)
+        public CreateClientClientifyService(ISettingRepository settingRepository,
+            IConfiguration configuration)
         {
             _settingRepository = settingRepository;
             _configuration = configuration;
         }
 
-        public async Task<long> Execute(CreateClientDto createClientDto)
+        public async Task<long> Execute(CreateClientDto createClientDto, string reviewEmail)
         {
             var apiClient = new ClientifyService();
             // Autenticación y obtención del token
@@ -52,8 +53,8 @@ namespace Bangk.Domain.Implementation.Clientify
                     phone = codePhoneNumber.Code + createClientDto.PhoneNumber,
                     taxpayer_identification_number = identification,
                     contact_source = "Bangk.co",
-                    owner_name = "Carolina Correa",
-                    status = "client",
+                    status = "in-deal",
+                    owner = reviewEmail,
                     custom_fields = new()
                     {
                         new CustomFieldsDto
@@ -70,6 +71,8 @@ namespace Bangk.Domain.Implementation.Clientify
             }
             var bank = await _settingRepository.GetById(createClientDto.LoadAplicacionDto.BankId);
             var loanType = await _settingRepository.GetById(createClientDto.LoadAplicacionDto.LoanTypeId);
+
+            //
             //crear o asociar deal
             DealClientifyDto dealClientifyDto = new()
             {
@@ -80,7 +83,6 @@ namespace Bangk.Domain.Implementation.Clientify
                 expected_closed_date = DateTime.Now.AddDays(14).ToString("yyyy-MM-dd"),
                 name = $"Vida Deudor SBS_{createClientDto.Name} {createClientDto.LastName}",
                 pipeline_stage_desc = "Validación",
-                //pipeline_stage_desc = "Solicitud",
                 pipeline_desc = "Flujo comercial Endosos Seguros Vida",
                 custom_fields = new()
                 {

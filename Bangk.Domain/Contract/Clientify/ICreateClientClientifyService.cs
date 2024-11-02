@@ -5,7 +5,7 @@ namespace Bangk.Domain.Contract.Clientify
 {
     public interface ICreateClientClientifyService
     {
-        Task<long> Execute(CreateClientDto createClientDto);
+        Task<long> Execute(CreateClientDto createClientDto, string reviewEmail);
 
     }
 }
