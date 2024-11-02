@@ -136,7 +136,7 @@ namespace Bangk.Repositories.Repositories
                             IdentificationNumber = c.IdentificationNumber != null ? c.IdentificationNumber : string.Empty,
                             Name = c.Name != null ? c.Name : string.Empty,
                             LastName = c.LastName != null ? c.LastName : string.Empty,
-                            Address = sublp.Address != null ? sublp.Address : string.Empty,
+                            Address = sublp.ResidenceAddress != null ? sublp.ResidenceAddress : string.Empty,
                             CityName = ci.Name ?? string.Empty,
                             StateName = stn.Name ?? string.Empty,
                             CountryName = ct.Name ?? string.Empty,
@@ -147,6 +147,7 @@ namespace Bangk.Repositories.Repositories
                             NameBank = st.Name != null ? st.Name : string.Empty,
                             NitBank = st.Code != null ? st.Code : string.Empty,
                             LoanBalance = l.LoanBalance != 0 ? l.LoanBalance : 0,
+                            LoanNumber = l.LoanNumber != null ? l.LoanNumber : string.Empty,
                             YearlyFee = lq.YearlyFee != 0 ? lq.YearlyFee : 0
                         };
 

@@ -82,4 +82,14 @@ namespace Bangk.Common.Enums
     {
         NingunaDeLasAnteriores = 707
     }
+
+    public enum CaratulaEnum
+    {
+        CaratulaNumber = 708
+    }
+
+    public enum StateClientifyDeal
+    {
+        Lost = 4
+    }
 }
