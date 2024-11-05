@@ -31,7 +31,8 @@ namespace Bangk.Common.Dto
 
     public class DealClientifyDto
     {
-        public string pipeline_desc;
+        public string contact_source { get; set; }
+        public string pipeline_desc { get; set; } 
         public string name { get; set; }
         public double amount { get; set; }
         public string currency { get; set; }
