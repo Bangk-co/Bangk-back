@@ -234,6 +234,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     {
                         worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
                         worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.Relationship;
+                        worksheet.Cells[row, beneficiaryColumn + 2].Style.Numberformat.Format = "0.000";
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.PercentInherit;
                         beneficiaryColumn += 3;
                     }
@@ -376,6 +377,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.DocumenIdentificationTypeB;
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.IdentificationNumberB;
                         worksheet.Cells[row, beneficiaryColumn + 3].Value = beneficiary.Relationship;
+                        worksheet.Cells[row, beneficiaryColumn + 4].Style.Numberformat.Format = "0.000";
                         worksheet.Cells[row, beneficiaryColumn + 4].Value = beneficiary.PercentInherit;
                         beneficiaryColumn += 5;
                     }
