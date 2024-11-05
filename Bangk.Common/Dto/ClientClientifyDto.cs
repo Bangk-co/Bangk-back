@@ -39,6 +39,7 @@ namespace Bangk.Common.Dto
         public string pipeline { get; set; }
         public string expected_closed_date { get; set; }
         public string pipeline_stage_desc { get; set; }
+        public string owner { get; set; }
         public List<CustomFieldsDto> custom_fields { get; set; }
     }
 
