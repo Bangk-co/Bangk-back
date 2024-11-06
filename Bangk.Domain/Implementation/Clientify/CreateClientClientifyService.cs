@@ -85,7 +85,7 @@ namespace Bangk.Domain.Implementation.Clientify
                 pipeline_stage_desc = "Validación",
                 pipeline_desc = "Flujo comercial Endosos Seguros Vida",
                 owner = reviewerEmail,
-                contact_source = "Bangk.co",
+                deal_source = "Bangk.co",
                 custom_fields = new()
                 {
                     new CustomFieldsDto
