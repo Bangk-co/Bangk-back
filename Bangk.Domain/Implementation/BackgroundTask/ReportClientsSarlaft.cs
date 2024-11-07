@@ -226,7 +226,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 56].Value = "1A";
                     worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
                     worksheet.Cells[row, 58].Value = "Oneroso";
-                    worksheet.Cells[row, 59].Value = "100%";
+                    worksheet.Cells[row, 59].Value = "100.000";
 
                     int beneficiaryColumn = 60;
                     var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyId(client.LoanPolicyId);
@@ -365,7 +365,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 45].Value = "NIT";
                     worksheet.Cells[row, 46].Value = client.NitBank;
                     worksheet.Cells[row, 47].Value = "Oneroso";
-                    worksheet.Cells[row, 48].Value = "100%";
+                    worksheet.Cells[row, 48].Value = "100.000";
 
                     int beneficiaryColumn = 49;
 
