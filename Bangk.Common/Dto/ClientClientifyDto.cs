@@ -31,7 +31,8 @@ namespace Bangk.Common.Dto
 
     public class DealClientifyDto
     {
-        public string pipeline_desc;
+        public string deal_source { get; set; }
+        public string pipeline_desc { get; set; } 
         public string name { get; set; }
         public double amount { get; set; }
         public string currency { get; set; }
@@ -39,6 +40,7 @@ namespace Bangk.Common.Dto
         public string pipeline { get; set; }
         public string expected_closed_date { get; set; }
         public string pipeline_stage_desc { get; set; }
+        public string owner { get; set; }
         public List<CustomFieldsDto> custom_fields { get; set; }
     }
 

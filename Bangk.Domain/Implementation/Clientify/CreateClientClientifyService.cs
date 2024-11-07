@@ -20,7 +20,7 @@ namespace Bangk.Domain.Implementation.Clientify
             _configuration = configuration;
         }
 
-        public async Task<long> Execute(CreateClientDto createClientDto, string reviewEmail)
+        public async Task<long> Execute(CreateClientDto createClientDto, string reviewerEmail)
         {
             var apiClient = new ClientifyService();
             // Autenticación y obtención del token
@@ -54,7 +54,7 @@ namespace Bangk.Domain.Implementation.Clientify
                     taxpayer_identification_number = identification,
                     contact_source = "Bangk.co",
                     status = "in-deal",
-                    owner = reviewEmail,
+                    owner = reviewerEmail,
                     custom_fields = new()
                     {
                         new CustomFieldsDto
@@ -84,6 +84,8 @@ namespace Bangk.Domain.Implementation.Clientify
                 name = $"Vida Deudor SBS_{createClientDto.Name} {createClientDto.LastName}",
                 pipeline_stage_desc = "Validación",
                 pipeline_desc = "Flujo comercial Endosos Seguros Vida",
+                owner = reviewerEmail,
+                deal_source = "Bangk.co",
                 custom_fields = new()
                 {
                     new CustomFieldsDto
