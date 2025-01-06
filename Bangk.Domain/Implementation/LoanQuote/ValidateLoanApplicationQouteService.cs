@@ -31,7 +31,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
 
             if(loanApplicationHistory.StateId == (int)ApplicationStateHistoryEnum.CotizaciónAceptada)
             {
-                return _configuration.GetSection("LoanQuoteAccept:UrlFront").Value;
+                return _configuration.GetSection("LoanQuoteAccept:UrlFront").Value + $"?loanApplicationId={loanApplicationId}";
             }
 
             return _configuration.GetSection("LoanQuoteReject:UrlFront").Value;
