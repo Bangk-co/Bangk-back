@@ -230,15 +230,22 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
                     int beneficiaryColumn = 60;
                     var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyId(client.LoanPolicyId);
+                    if (clientBeneficiaries.Count == 0)
+                    {
+                        clientBeneficiaries.Add(new BeneficiariesJobDto
+                        {
+                            Name = "Herederos legales",
+                            PercentInherit = 100
+                        });
+                    }
                     foreach (var beneficiary in clientBeneficiaries)
                     {
-                        worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
+                        worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + (beneficiary.Name == "Herederos legales" ? "" : " " + client.LastName);
                         worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.Relationship;
                         worksheet.Cells[row, beneficiaryColumn + 2].Style.Numberformat.Format = "0.000";
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.PercentInherit;
                         beneficiaryColumn += 3;
                     }
-
                     worksheet.Cells[row, 84].Value = client.LoanBalance;
                     worksheet.Cells[row, 85].Value = client.YearlyFee;
                     worksheet.Cells[row, 94].Value = client.LoanNumber;
