@@ -16,6 +16,7 @@ using Bangk.Domain.Contract.LoanForm;
 using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
+using Bangk.Domain.Contract.MedPersonalInsureds;
 using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Sftp;
@@ -36,6 +37,7 @@ using Bangk.Domain.Implementation.LoanApplicationStateHistory;
 using Bangk.Domain.Implementation.LoanForm;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
+using Bangk.Domain.Implementation.MedPersonalInsureds;
 using Bangk.Domain.Implementation.ScheduleIntegration;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.State;
@@ -81,7 +83,9 @@ namespace Bangk.Api.Extensions
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IValidationSBSLogRepository, ValidationSBSLogRepository>();
             services.AddScoped<IScheduleIntegrationRepository, ScheduleIntegrationRepository>();
-            services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>(); 
+            services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>();
+            services.AddScoped<IMedEnsuranceApplicationRepository, MEdEnsuranceApplicationRepository>();
+            services.AddScoped<IMedPersonInsuredRepository, MedPersonInsuredRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -138,7 +142,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ICreateClientClientifyService, CreateClientClientifyService>();
             services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>();
             services.AddTransient<IChangeStateDealService, ChangeStateDealService>();
-            
+            services.AddTransient<ICreateMedPersonalInsuredService, CreateMedPersonalInsuredService>();
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
