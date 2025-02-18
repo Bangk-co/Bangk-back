@@ -1,6 +1,7 @@
 ﻿using Bangk.Business.Extension.SenderGrid;
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
+using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Repositories.Entities;
@@ -23,11 +24,13 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IValidationSarlaftService _validationSarlaftService;
         private readonly IScheduleIntegrationService _scheduleIntegrationService;
         private readonly IScheduleIntegrationRepository _scheduleIntegrationRepository;
+        private readonly IChangeStateDealService _changeStateDealService;
 
         public ValidationSBSService(IConfiguration configuration, ILoanInsurancePolicyRepository loanInsurancePolicyRepository,
            IClientRepository clientRepository, IValidationSBSLogRepository validationSBSLogRepository,
            ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IValidationSarlaftService validationSarlaftService,
-           IScheduleIntegrationService scheduleIntegrationService, IScheduleIntegrationRepository scheduleIntegrationRepository)
+           IScheduleIntegrationService scheduleIntegrationService, IScheduleIntegrationRepository scheduleIntegrationRepository,
+            IChangeStateDealService changeStateDealService)
         {
             _configuration = configuration;
             _clientRepository = clientRepository;
@@ -37,6 +40,7 @@ namespace Bangk.Domain.Implementation.Integrations
             _validationSarlaftService = validationSarlaftService;
             _scheduleIntegrationService = scheduleIntegrationService;
             _scheduleIntegrationRepository = scheduleIntegrationRepository;
+            _changeStateDealService = changeStateDealService;
         }
 
         public async Task Execute(int loanApplicationId, bool isCallFromApi = false)
@@ -62,6 +66,8 @@ namespace Bangk.Domain.Implementation.Integrations
                         await SaveLoanHistory(loanApplicationId, null, (int)ApplicationStateHistoryEnum.ClienteNoAsegurable, null);
                         client.State = (int)ClientStateEnum.NoAsegurable;
                         await _clientRepository.Update(client);
+                        await _changeStateDealService.Execute((int)StateClientifyDeal.Lost, loanApplicationId);
+
                     }
                     else if (responseValidation.TipoRestriccionOfac == 1)//presenta novedad
                     {

@@ -1,15 +1,14 @@
 ﻿using Bangk.Business.Extension.SenderGrid;
 using Bangk.Common.Dto;
 using Bangk.Common.Enums;
+using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Transactions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Bangk.Domain.Implementation.LoanApplication
 {
@@ -22,9 +21,12 @@ namespace Bangk.Domain.Implementation.LoanApplication
         private readonly INotificationRepository _notificationRepository;
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IChangeStatusDealService _changeStatusDealService;
+
         public AcceptLoanQuoteService(ILoanApplicationRepository loanApplicationRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
             IClientRepository clientRepository, ILoanQuoteRepository loanQuoteRepository, INotificationRepository notificationRepository,
-            IConfiguration configuration, IUserRepository userRepository)
+            IConfiguration configuration, IUserRepository userRepository, 
+            IChangeStatusDealService changeStatusDealService)
         {
             _loanApplicationRepository = loanApplicationRepository;
             _loanApplicationStateHistoryRepository = loanApplicationStateHistoryRepository;
@@ -35,7 +37,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
             _userRepository = userRepository;
         }
 
-        public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime sbsPrivacyPolicies)
+        public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime? sbsPrivacyPolicies)
         {
             var loanApplication = await _loanApplicationRepository.GetById(loanApplicationId);
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
@@ -64,6 +66,11 @@ namespace Bangk.Domain.Implementation.LoanApplication
             var acceptterms = await _loanQuoteRepository.GetLoanQuoteByLoadApplicationId(loanApplicationId);
             acceptterms.TermsConditionsAcceptanceQuote = termsConditionsAcceptanceQuote;
             acceptterms.AcceptQuoteOtp = acceptQuoteOtp;
+            if (sbsPrivacyPolicies == DateTime.MinValue)
+            {
+                sbsPrivacyPolicies = null;
+            }
+
             acceptterms.SbsPrivacyPolicies = sbsPrivacyPolicies;
             await _loanQuoteRepository.Update(acceptterms);
 
@@ -81,6 +88,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
             var userReview = await _userRepository.GetById(loanApplication.ReviewerId);
             await CreateNotification(loanApplicationId);
             await SendNotification(userReview.Email, loanApplicationId, client.Name);
+            await _changeStatusDealService.Execute("Solicitud", loanApplicationId);
             scope.Complete();
             return result;
         }

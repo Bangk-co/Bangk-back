@@ -76,17 +76,29 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             await _loanInsurancePolicyRepository.Update(loanPolicy);
         }
 
+        public async Task SaveCaratula(string caratula, int loanPolicyId)
+        {
+            var loanPolicy = await _loanInsurancePolicyRepository.GetById(loanPolicyId);
+
+            {
+                loanPolicy.Caratula = caratula;
+
+            };
+
+            await _loanInsurancePolicyRepository.Update(loanPolicy);
+        }
+
         public async Task<byte[]> GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients)
         {
             var result = new byte[0];
             try
             {
                 result = await CreateExcel(clients);
-                using (MemoryStream stream = new MemoryStream(result))
-                {
-                    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+                //using (MemoryStream stream = new MemoryStream(result))
+                //{
+                //    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
 
-                }
+                //}
                 return result;
             }
             catch (Exception ex)
@@ -142,7 +154,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
                     worksheet.Cells[row, 3].Value = "128";
                     worksheet.Cells[row, 4].Value = "VIDA GRUPO";
-                    worksheet.Cells[row, 7].Value = "BK00001";
+                    string caratula = (await _settingRepository.GetById((int)CaratulaEnum.CaratulaNumber)).Code;
+                    worksheet.Cells[row, 7].Value = caratula;
                     worksheet.Cells[row, 8].Value = "VIDA GRUPO BANGK";
 
                     DateTime birthDate = client.BirthDate ?? DateTime.Today;
@@ -169,7 +182,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     }
 
                     worksheet.Cells[row, 9].Value = plan;
-
+                    
 
                     string planName;
                     if (age >= 18 && age <= 50)
@@ -205,6 +218,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 32].Value = client.Name;
                     worksheet.Cells[row, 33].Value = client.LastName;
                     worksheet.Cells[row, 46].Value = "AP";
+                    worksheet.Cells[row, 47].Value = "Activo";
                     worksheet.Cells[row, 50].Value = "BUILDING LIFE TECHNOLOGIES S.A.S. - 901647130-5";
                     worksheet.Cells[row, 51].Value = client.CreationDatePolicy.ToString("yyyyMMdd");
                     worksheet.Cells[row, 52].Value = DateTime.UtcNow.ToString("yyyyMMdd");
@@ -212,7 +226,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 56].Value = "1A";
                     worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
                     worksheet.Cells[row, 58].Value = "Oneroso";
-                    worksheet.Cells[row, 59].Value = "100%";
+                    worksheet.Cells[row, 59].Value = "100.000";
 
                     int beneficiaryColumn = 60;
                     var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyId(client.LoanPolicyId);
@@ -220,14 +234,17 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     {
                         worksheet.Cells[row, beneficiaryColumn].Value = beneficiary.Name + " " + client.LastName;
                         worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.Relationship;
+                        worksheet.Cells[row, beneficiaryColumn + 2].Style.Numberformat.Format = "0.000";
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.PercentInherit;
                         beneficiaryColumn += 3;
                     }
 
                     worksheet.Cells[row, 84].Value = client.LoanBalance;
                     worksheet.Cells[row, 85].Value = client.YearlyFee;
+                    worksheet.Cells[row, 94].Value = client.LoanNumber;
 
                     row++;
+                    await SaveCaratula(caratula, client.LoanPolicyId);
                     await SaveLastConsecutive(consecutive, client.LoanPolicyId);
                 }
                 var result = await package.GetAsByteArrayAsync();
@@ -254,10 +271,10 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             try
             {
                 result = await CreateExcelLogs(clients);
-                using (MemoryStream stream = new MemoryStream(result))
-                {
-                    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
-                }
+                //using (MemoryStream stream = new MemoryStream(result))
+                //{
+                //    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+                //}
                 return result;
             }
             catch (Exception ex)
@@ -348,7 +365,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 45].Value = "NIT";
                     worksheet.Cells[row, 46].Value = client.NitBank;
                     worksheet.Cells[row, 47].Value = "Oneroso";
-                    worksheet.Cells[row, 48].Value = "100%";
+                    worksheet.Cells[row, 48].Value = "100.000";
 
                     int beneficiaryColumn = 49;
 
@@ -360,6 +377,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         worksheet.Cells[row, beneficiaryColumn + 1].Value = beneficiary.DocumenIdentificationTypeB;
                         worksheet.Cells[row, beneficiaryColumn + 2].Value = beneficiary.IdentificationNumberB;
                         worksheet.Cells[row, beneficiaryColumn + 3].Value = beneficiary.Relationship;
+                        worksheet.Cells[row, beneficiaryColumn + 4].Style.Numberformat.Format = "0.000";
                         worksheet.Cells[row, beneficiaryColumn + 4].Value = beneficiary.PercentInherit;
                         beneficiaryColumn += 5;
                     }

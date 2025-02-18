@@ -17,9 +17,8 @@ namespace Bangk.Repositories.Entities
         public string LoanNumber { get; set; }
         [ForeignKey("User")]
         public int ReviewerId { get; set; }
-        
         public long? MonthlyCostInsurance { get; set; }
-
+        public long? ClientifyId { get; set; }
         public Client Client { get; set; }
         public Setting Bank { get; set; }
         public Setting LoanType { get; set; }

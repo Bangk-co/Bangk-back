@@ -9,7 +9,7 @@ namespace Bangk.Repositories.Entities
         public long? HousingValue { get; set; }
         public DateTime? BuiltgDate { get; set; }
         public int? BuiltArea { get; set; }
-        public string Address { get; set; }
+        public string ResidenceAddress { get; set; }
         public int? CityId { get; set; }
         public int? BirthCityId { get; set; }
         public int? CountryNationalityId { get; set; }
@@ -45,6 +45,7 @@ namespace Bangk.Repositories.Entities
         public string VehicleLicensePlate { get; set; }
         public DateTime? OtpDateForms { get; set; }
         public int? Consecutive { get; set; }
+        public string Caratula { get; set; }
 
     }
 }

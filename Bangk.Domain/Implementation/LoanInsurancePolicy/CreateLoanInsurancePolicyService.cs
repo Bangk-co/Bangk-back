@@ -55,7 +55,7 @@ namespace Bangk.Domain.Implementation.Client
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
             var newLoanInsurencePolicy = new Repositories.Entities.LoanInsurancePolicy
             {
-                Address = loanInsurancePolicySaveDto.Address,
+                ResidenceAddress = loanInsurancePolicySaveDto.ResidenceAddress,
                 IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson,
                 AcceptanceOriginOfFunds = loanInsurancePolicySaveDto.AcceptanceOriginOfFunds,
                 OtpDateForms = loanInsurancePolicySaveDto.OtpDateForms,
@@ -125,7 +125,7 @@ namespace Bangk.Domain.Implementation.Client
         private async Task UpdateLoanInsurancePolicy(LoanInsurancePolicySaveDto loanInsurancePolicySaveDto, LoanInsurancePolicy loanInsurencePolicy)
         {
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
-            loanInsurencePolicy.Address = loanInsurancePolicySaveDto.Address;
+            loanInsurencePolicy.ResidenceAddress = loanInsurancePolicySaveDto.ResidenceAddress;
             loanInsurencePolicy.IsPublicPerson = loanInsurancePolicySaveDto.IsPublicPerson;
             loanInsurencePolicy.LiabilitiesValue = loanInsurancePolicySaveDto.LiabilitiesValue;
             loanInsurencePolicy.HasBondPublicPerson = loanInsurancePolicySaveDto.HasBondPublicPerson;
