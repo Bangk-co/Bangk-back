@@ -35,7 +35,7 @@ namespace Bangk.Repositories.Repositories
                         select new LoanInsurancePolicyDto
                         {
                             LoanApplicationId = l.Id,
-                            Address = sublp.Address,
+                            ResidenceAddress = sublp.ResidenceAddress,
                             AssetValue = sublp.AssetValue,
                             BirthCityId = sublp.BirthCityId,
                             BuiltArea = sublp.BuiltArea,
