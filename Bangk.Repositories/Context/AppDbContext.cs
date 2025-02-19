@@ -44,7 +44,6 @@ namespace Bangk.Repositories.Context
         public DbSet<Pet> Pets { get; set; }
         public DbSet<ApplicationTransaction> ApplicationTransaction { get; set; }
         public DbSet<TryPaymentJob> TryPaymentJobs { get; set; }
-        
 
     }
 }

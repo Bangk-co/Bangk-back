@@ -43,6 +43,7 @@ using Bangk.Domain.Implementation.LoanForm;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
 using Bangk.Domain.Implementation.MedPersonalInsureds;
+using Bangk.Domain.Implementation.PetEnsuranceApplication;
 using Bangk.Domain.Implementation.PetInsuranceApplication;
 using Bangk.Domain.Implementation.ScheduleIntegration;
 using Bangk.Domain.Implementation.Settings;
@@ -96,6 +97,9 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IApplicationTransactionRepository, ApplicationTransactionRepository>();
             services.AddScoped<ITryPaymentJobRepository, TryPaymentJobRepository>(); 
+            services.AddScoped<IPetEnsuranceApplicationRepository, PetEnsuranceApplicationRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
+
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -153,6 +157,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>();
             services.AddTransient<IChangeStateDealService, ChangeStateDealService>();
             services.AddTransient<ICreateMedPersonalInsuredService, CreateMedPersonalInsuredService>();
+
             services.AddTransient<ICreatePetInsuranceApplicationService, CreatePetInsuranceApplicationService>();
             services.AddTransient<IGenerateTokenTrxBancolombiaService, GenerateTokenTrxBancolombiaService>();
             services.AddTransient<IGetTrxBancolombiaStatusService, GetTrxBancolombiaStatusService>();
@@ -169,6 +174,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ICreatePetAssistenceService, CreatePetAssistenceService>();
             services.AddTransient<IPaymentAssistanceJobService, PaymentAssistanceJobService>();
             services.AddTransient<IPaymentAssistanceTryService, PaymentAssistanceTryService>(); 
+
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
