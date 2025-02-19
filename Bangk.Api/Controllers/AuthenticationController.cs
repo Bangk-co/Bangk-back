@@ -43,7 +43,7 @@ namespace Bangk.Api.Controllers
                 return BadRequest(result.Errors);
             }
 
-            Logs.WriteInfoLog($"Login successful. User: [{login.Email}].");
+            
             return Ok(new
             {
                 token = result.Result
@@ -65,7 +65,6 @@ namespace Bangk.Api.Controllers
                 return BadRequest(result.Errors);
             }
 
-            Logs.WriteInfoLog($"Send Email Reset password successful. Email: [{email}].");
             return Ok();
         }
         
@@ -83,7 +82,6 @@ namespace Bangk.Api.Controllers
                 return BadRequest(result.Errors);
             }
 
-            Logs.WriteInfoLog($"Reset password successful.");
             return Ok();
         }
 

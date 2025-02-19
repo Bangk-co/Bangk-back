@@ -37,7 +37,6 @@ namespace Bangk.Domain.Implementation.LoanApplication
             _configuration = configuration;
             _userRepository = userRepository;
             _changeStatusDealService = changeStatusDealService;
-
         }
 
         public async Task<ResponseDto<bool>> Execute(int loanApplicationId, DateTime termsConditionsAcceptanceQuote, DateTime acceptQuoteOtp, DateTime? sbsPrivacyPolicies)
@@ -73,6 +72,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
             {
                 sbsPrivacyPolicies = null;
             }
+
             acceptterms.SbsPrivacyPolicies = sbsPrivacyPolicies;
             await _loanQuoteRepository.Update(acceptterms);
 

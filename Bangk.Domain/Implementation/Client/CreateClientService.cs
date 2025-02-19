@@ -137,7 +137,6 @@ namespace Bangk.Domain.Implementation.Client
 
             await _loanApplicationStateHistoryRepository.Create(loadApplicationStateHistory);
             result.Result = client.Id;
-
             await SendNotification(userReview.Email, loanApplication.Id, client.Name);
             scope.Complete();
             return result;

@@ -1,6 +1,5 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanApplication;
-using Bangk.Domain.Implementation.LoanApplication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

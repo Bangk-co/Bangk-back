@@ -264,7 +264,6 @@ namespace Bangk.Repositories.Repositories
 
                         };
 
-
             return query;
         }
 

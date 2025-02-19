@@ -30,9 +30,6 @@ namespace Bangk.Business.Extension.SenderGrid
             }
 
             var response = await client.SendEmailAsync(msg);
-            Logs.WriteInfoLog(response.IsSuccessStatusCode
-                               ? $"Email to {sendGridEmailDto.email} queued successfully!"
-                               : $"Failure Email to {sendGridEmailDto.email}");
         }
     }
 }

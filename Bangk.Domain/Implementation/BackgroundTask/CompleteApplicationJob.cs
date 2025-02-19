@@ -26,7 +26,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task Invoke()
         {
-            Logs.WriteInfoLog($"Running Scheduled Task: CompleteApplicationJob");
             await Execute();
         }
 
