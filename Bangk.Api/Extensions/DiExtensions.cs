@@ -17,6 +17,7 @@ using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.MedPersonalInsureds;
+using Bangk.Domain.Contract.PetEnsuranceApplication;
 using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Sftp;
@@ -38,6 +39,7 @@ using Bangk.Domain.Implementation.LoanForm;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
 using Bangk.Domain.Implementation.MedPersonalInsureds;
+using Bangk.Domain.Implementation.PetEnsuranceApplication;
 using Bangk.Domain.Implementation.ScheduleIntegration;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.State;
@@ -86,6 +88,8 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>();
             services.AddScoped<IMedEnsuranceApplicationRepository, MEdEnsuranceApplicationRepository>();
             services.AddScoped<IMedPersonInsuredRepository, MedPersonInsuredRepository>();
+            services.AddScoped<IPetEnsuranceApplicationRepository, PetEnsuranceApplicationRepository>();
+            services.AddScoped<IPetRepository, PetRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -143,6 +147,7 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>();
             services.AddTransient<IChangeStateDealService, ChangeStateDealService>();
             services.AddTransient<ICreateMedPersonalInsuredService, CreateMedPersonalInsuredService>();
+            services.AddTransient<ICreatePetEnsuranceApplicationService, CreatePetEnsuranceApplicationService>();
 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
