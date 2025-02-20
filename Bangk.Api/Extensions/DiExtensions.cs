@@ -148,6 +148,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IChangeStateDealService, ChangeStateDealService>();
             services.AddTransient<ICreateMedPersonalInsuredService, CreateMedPersonalInsuredService>();
             services.AddTransient<ICreatePetEnsuranceApplicationService, CreatePetEnsuranceApplicationService>();
+            services.AddTransient<ICreateBancolombiaButtonPaymentService, CreateBancolombiaButtonPaymentService>();
+            services.AddTransient<IGetTrxBancolombiaStatusService, GetTrxBancolombiaStatusService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
