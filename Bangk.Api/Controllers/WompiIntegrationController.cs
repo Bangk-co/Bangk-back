@@ -1,4 +1,7 @@
-﻿using Bangk.Domain.Contract.Integrations;
+﻿using Bangk.Common.Dto;
+using Bangk.Domain.Contract.Integrations;
+using Bangk.Domain.Contract.Integrations.Wompi;
+using Bangk.Domain.Implementation.Integrations.Wompi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -11,14 +14,18 @@ namespace Bangk.Api.Controllers
         private readonly IGetTrxBancolombiaStatusService _getTrxBancolombiaStatusService;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IPaymentSourcesBancolombiaTransferService _paymentSourcesBancolombiaTransferService;
+        private readonly ICardPaymentService _cardPaymentService;
+
         public WompiIntegrationController(ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService,
                                          IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
-                                         IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService )
+                                         IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService,
+                                         ICardPaymentService cardPaymentService)
         {
             _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
             _getTrxBancolombiaStatusService = getTrxBancolombiaStatusService;
             _getMerchantsTokenService = getMerchantsTokenService;
             _paymentSourcesBancolombiaTransferService = paymentSourcesBancolombiaTransferService;
+            _cardPaymentService = cardPaymentService;
         }
 
         [HttpPost("CreateBancolombiaButtonTransfer")]
@@ -55,5 +62,12 @@ namespace Bangk.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost("CardPayment")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CardPayment(CardPaymentDto cardPaymentDto)
+        {
+            var result = await _cardPaymentService.Execute(cardPaymentDto);
+            return Ok(result);
+        }
     }
 }
