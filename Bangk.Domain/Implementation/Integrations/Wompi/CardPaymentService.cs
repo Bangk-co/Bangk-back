@@ -30,8 +30,8 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             var publicKey = _configuration.GetSection("WompiKeys:PublicKey").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
             var wompiUrl = $"{baseUrl}tokens/cards";
-            var paymentSourceUrl = $"{baseUrl}payment_sources"; 
-            var acceptanceTokenUrl = $"{baseUrl}merchants/{publicKey}"; 
+            var paymentSourceUrl = $"{baseUrl}payment_sources";
+            var transactionUrl = $"{baseUrl}transactions";
             var card = new CardDto
             {
                 card_holder = cardPaymentDto.CardHolder,
@@ -39,7 +39,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 exp_month = cardPaymentDto.ExpiredMonth,
                 exp_year = cardPaymentDto.ExpiredYear,
                 number = cardPaymentDto.CardNumber
-                
+
             };
 
             using (HttpClient client = new HttpClient())
@@ -51,11 +51,12 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 string result = await jsonResponse.Content.ReadAsStringAsync();
                 var apiResponseCard = JsonConvert.DeserializeObject<CardTokenResponseDto>(result);
 
-                if(!jsonResponse.IsSuccessStatusCode && apiResponseCard.Status != "CREATED")
+                if (!jsonResponse.IsSuccessStatusCode || apiResponseCard.Status != "CREATED")
                 {
                     response = new ResponseDto<bool>
                     {
                         HasErrors = true,
+                        Result = false,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
                     };
                 }
@@ -71,8 +72,8 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     type = "CARD",
                     token = apiResponseCard.Data.Id, // Token obtenido en el paso anterior
                     customer_email = cardPaymentDto.Email,
-                    acceptance_token = acceptance_token,
-                    accept_personal_auth = accept_personal_auth,
+                    acceptance_token,
+                    accept_personal_auth,
                 };
 
                 json = JsonConvert.SerializeObject(paymentSource);
@@ -83,19 +84,58 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 result = await responsePaymentSource.Content.ReadAsStringAsync();
                 var apiResponsePaymentSource = JsonConvert.DeserializeObject<CardPaymentSourceDto>(result);
 
-                if (!responsePaymentSource.IsSuccessStatusCode && apiResponsePaymentSource.Data.Status != "AVAILABLE")
+                if (!responsePaymentSource.IsSuccessStatusCode || apiResponsePaymentSource.Data.Status != "AVAILABLE")
                 {
                     response = new ResponseDto<bool>
                     {
                         HasErrors = true,
+                        Result = false,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
                     };
                 }
 
                 //Transaction
-                var signature = await _generateIntegrityKeyService.Execute(cardPaymentDto.Amount, Guid.NewGuid().ToString("N"));
-            }
+                var reference = Guid.NewGuid().ToString("N");
+                var signature = await _generateIntegrityKeyService.Execute(cardPaymentDto.Amount, reference);
+                var transaction = new
+                {
+                    amount_in_cents = cardPaymentDto.Amount,
+                    currency = "COP",
+                    signature = signature,
+                    customer_email = cardPaymentDto.Email,
+                    payment_method = new
+                    {
+                        installments = cardPaymentDto.PaymentInstallments
+                    },
+                    reference,
+                    payment_source_id = apiResponsePaymentSource.Data.Id
+                };
 
+                json = JsonConvert.SerializeObject(transaction);
+                content = new StringContent(json, Encoding.UTF8, "application/json");
+                HttpResponseMessage responseTransaction = await client.PostAsync(transactionUrl, content);
+                result = await responseTransaction.Content.ReadAsStringAsync();
+                var apiResponseTransaction = JsonConvert.DeserializeObject<dynamic>(result);
+                if (!responseTransaction.IsSuccessStatusCode)
+                {
+                    response = new ResponseDto<bool>
+                    {
+                        HasErrors = true,
+                        Result = false,
+                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
+                    };
+                }
+
+
+                //string id = apiResponseTransaction["data"]["id"];
+                //string status = apiResponseTransaction["data"]["status"];
+
+                //var transactionGetUrl = $"{baseUrl}transactions/{id}";
+                //HttpResponseMessage responseTransactionUpdate = await client.GetAsync(transactionGetUrl);
+                //result = await responseTransactionUpdate.Content.ReadAsStringAsync();
+                //var apiResponseTransactionUpdate = JsonConvert.DeserializeObject<dynamic>(result);
+            }
+            response.Result = true;
             return response;
         }
     }

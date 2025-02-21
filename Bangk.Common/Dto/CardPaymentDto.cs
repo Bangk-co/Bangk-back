@@ -4,8 +4,7 @@
     {
         public string Email { get; set; }
         public string Name { get; set; }
-        public int DocumentIdentificationType { get; set; }
-        public string DocumentIdentificationNumber { get; set; }
+        public int PetApplicationId { get; set; }
         public string CardNumber { get; set; }
         public string ExpiredMonth { get; set; }
         public string ExpiredYear { get; set; }

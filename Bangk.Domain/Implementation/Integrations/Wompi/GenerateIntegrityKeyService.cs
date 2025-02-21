@@ -18,17 +18,17 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
         public async Task<string> Execute(int amount, string paymentReference)
         {
             var integrityKey = _configuration.GetSection("WompiKeys:IntegrityKey").Value;
-            var secretKey = _configuration.GetSection("WompiKeys:IntegrityKey").Value;
-            var resultIntegrity = $"{paymentReference}{amount}COP{integrityKey}";
-            return GenerateHmacSha256Signature(resultIntegrity, secretKey);
+            var secretKey = _configuration.GetSection("WompiKeys:SecretKey").Value;
+            var resultIntegrity = paymentReference + amount + "COP" + integrityKey;
+            return GenerateHmacSha256Signature(resultIntegrity, integrityKey);
         }
 
         static string GenerateHmacSha256Signature(string data, string key)
         {
-            using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key)))
+            using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(data));
+                return BitConverter.ToString(hash).Replace("-", "").ToLower(); // Convertir a hexadecimal
             }
         }
     }
