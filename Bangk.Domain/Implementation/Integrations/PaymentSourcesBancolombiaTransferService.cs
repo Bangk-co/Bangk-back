@@ -30,11 +30,11 @@ namespace Bangk.Domain.Implementation.Integrations
             _createTransactionBancolombiaService = createTransactionBancolombiaService;
         }
 
-        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute(string transactionId, int value)
+        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute(UserPaymentRequest userPaymentRequest)
         {
             var response = new ResponseDto<PaymentWompiResponseDto>();
 
-            var applicationTransaction = _applicationTransactionRepository.GetApplicationTransactionByTransactionNumber(transactionId);
+            var applicationTransaction = _applicationTransactionRepository.GetApplicationTransactionByTransactionNumber(userPaymentRequest.TransactionToken);
 
             if(applicationTransaction == null)
             {
@@ -58,7 +58,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 type = "BANCOLOMBIA_TRANSFER",
                 token = applicationTransaction.TransactionNumber,
                 payment_description = "Pago Bangk",
-                customer_email = "correo@correo.com",
+                customer_email = userPaymentRequest.Email,
                 acceptance_token = merchantsInfo.Result.Data.Presigned_Acceptance.Acceptance_Token,
                 accept_personal_auth = merchantsInfo.Result.Data.Presigned_Personal_Data_Auth.Acceptance_Token
 
@@ -84,7 +84,8 @@ namespace Bangk.Domain.Implementation.Integrations
                         Result = apiResponseBancolombia
                     };
 
-                    var resultTransaction = await _createTransactionBancolombiaService.Execute(value, apiResponseBancolombia.Data.Id);
+                    userPaymentRequest.IdTransaction = apiResponseBancolombia.Data.Id;
+                    var resultTransaction = await _createTransactionBancolombiaService.Execute(userPaymentRequest);
                     if (resultTransaction.HasErrors)
                     {
                         response = new ResponseDto<PaymentWompiResponseDto>

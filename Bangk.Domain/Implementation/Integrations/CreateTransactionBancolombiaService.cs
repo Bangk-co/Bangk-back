@@ -23,22 +23,22 @@ namespace Bangk.Domain.Implementation.Integrations
             _generateIntegrityKeyService = generateIntegrityKeyService;
         }
 
-        public async Task<ResponseDto<string>> Execute(int value, int paymentSourceId)
+        public async Task<ResponseDto<string>> Execute(UserPaymentRequest userPaymentRequest)
         {
             var response = new ResponseDto<string>();
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
-            var integrityKey = await _generateIntegrityKeyService.Execute(value, Guid.NewGuid().ToString("N"));
+            var integrityKey = await _generateIntegrityKeyService.Execute((int)userPaymentRequest.Amount, Guid.NewGuid().ToString("N"));
 
             wompiUrl = $"{wompiUrl}transactions";
             var query = new
             {
-                amount_in_cents = value, // Monto current centavos
+                amount_in_cents = (int)userPaymentRequest.Amount, // Monto current centavos
                 currency = "COP", // Moneda
                 signature = integrityKey, //Firma de integridad
-                customer_email = "example@gmail.com", // Email del usuario
+                customer_email = userPaymentRequest.Email, // Email del usuario
                 reference = Guid.NewGuid().ToString("N"), // Referencia única de pago
-                payment_source_id = paymentSourceId
+                payment_source_id = userPaymentRequest.IdTransaction
             };
 
             var jsonContent = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");

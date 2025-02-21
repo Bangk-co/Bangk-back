@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.Integrations
 {
     public interface ICreateTransactionBancolombiaService
     {
-        Task<ResponseDto<string>> Execute(int value, int paymentSourceId);
+        Task<ResponseDto<string>> Execute(UserPaymentRequest userPaymentRequest);
     }
 }
