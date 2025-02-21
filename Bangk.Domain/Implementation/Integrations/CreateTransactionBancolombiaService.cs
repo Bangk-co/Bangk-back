@@ -38,7 +38,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 currency = "COP", // Moneda
                 signature = integrityKey, //Firma de integridad
                 customer_email = userPaymentRequest.Email, // Email del usuario
-                reference = Guid.NewGuid().ToString("N"), // Referencia única de pago
+                reference = reference, // Referencia única de pago
                 payment_source_id = userPaymentRequest.IdTransaction
             };
 
