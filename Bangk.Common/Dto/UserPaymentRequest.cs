@@ -15,6 +15,6 @@ namespace Bangk.Common.Dto
         public string DocumentIdentificationNumber { get; set; }
         public string TransactionToken { get; set; }
         public int IdTransaction { get; set; }
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
     }
 }
