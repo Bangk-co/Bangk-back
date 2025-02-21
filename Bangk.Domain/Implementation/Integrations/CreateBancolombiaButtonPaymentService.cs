@@ -20,9 +20,9 @@ namespace Bangk.Domain.Implementation.Integrations
         {
             _configuration = configuration;
         }
-        public async Task<ResponseDto<BancolombiaButtonTransferDto>> Execute()
+        public async Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute()
         {
-            var response = new ResponseDto<BancolombiaButtonTransferDto>();
+            var response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>();
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var publicKey = _configuration.GetSection("WompiKeys:PublicKey").Value;
 
@@ -45,9 +45,9 @@ namespace Bangk.Domain.Implementation.Integrations
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
-                    var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<BancolombiaButtonTransferDto>(jsonResponse); 
+                    var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>(jsonResponse); 
                     //Logs.WriteInfoLog($"Response: {jsonResponse}");
-                    response = new ResponseDto<BancolombiaButtonTransferDto>
+                    response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = false,
                         Result = apiResponseBancolombia
@@ -57,7 +57,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     var errorMessage = await apiResponse.Content.ReadAsStringAsync();
                     //Logs.WriteErrorLog($"Error: {errorMessage} - StatusCode: {apiResponse.StatusCode}");
-                    response = new ResponseDto<BancolombiaButtonTransferDto>
+                    response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}" }

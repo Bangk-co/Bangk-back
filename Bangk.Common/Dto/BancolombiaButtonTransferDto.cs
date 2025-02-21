@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bangk.Common.Dto
+namespace Bangk.Common.Dto.BancolombiaButtonTransferResponseDto
 {
-    public class BancolombiaButtonTransferDto
+    public class BancolombiaButtonTransferResponseDto
     {
-        public Data Data { get; set; }
+        public BancolombiaButtonTransferResponseData Data { get; set; }
         public Meta Meta { get; set; }
     }
 
-    public class Data
+    public class BancolombiaButtonTransferResponseData
     {
         public string Id { get; set; }
         public string Status { get; set; }
@@ -27,6 +27,6 @@ namespace Bangk.Common.Dto
 
     public class Meta
     {
-     
+
     }
 }

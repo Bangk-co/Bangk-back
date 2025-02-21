@@ -9,17 +9,40 @@ namespace Bangk.Api.Controllers
     {
         private readonly ICreateBancolombiaButtonPaymentService _createBancolombiaButtonPaymentService;
         private readonly IGetTrxBancolombiaStatusService _getTrxBancolombiaStatusService;
-        public WompiIntegrationController(ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService, IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService)
+        private readonly IGetMerchantsTokenService _getMerchantsTokenService;
+        private readonly IPaymentSourcesBancolombiaTransferService _paymentSourcesBancolombiaTransferService;
+        public WompiIntegrationController(ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService,
+                                         IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
+                                         IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService )
         {
             _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
             _getTrxBancolombiaStatusService = getTrxBancolombiaStatusService;
+            _getMerchantsTokenService = getMerchantsTokenService;
+            _paymentSourcesBancolombiaTransferService = paymentSourcesBancolombiaTransferService;
         }
 
-        [HttpGet("CreateBancolombiaButtonTransfer")]
+        [HttpPost("CreateBancolombiaButtonTransfer")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateBancolombiaButtonTransfer()
         {
             var result = await _createBancolombiaButtonPaymentService.Execute();
+            return Ok(result);
+        }
+
+
+        [HttpGet("GetMerchantsInfo")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetMerchantsInfo()
+        {
+            var result = await _getMerchantsTokenService.Execute();
+            return Ok(result);
+        }
+
+        [HttpPost("PaymentSourcesBancolombiaTransfer")]
+        [AllowAnonymous]
+        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer()
+        {
+            var result = await _paymentSourcesBancolombiaTransferService.Execute();
             return Ok(result);
         }
 

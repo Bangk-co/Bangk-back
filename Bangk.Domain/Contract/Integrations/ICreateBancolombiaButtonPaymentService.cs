@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.Integrations
 {
     public interface ICreateBancolombiaButtonPaymentService
     {
-        Task<ResponseDto<BancolombiaButtonTransferDto>> Execute();
+        Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute();
     }
 }

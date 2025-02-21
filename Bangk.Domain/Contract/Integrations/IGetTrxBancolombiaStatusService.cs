@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.Integrations
 {
     public interface IGetTrxBancolombiaStatusService
     {
-        Task<ResponseDto<BancolombiaButtonTransferDto>> Execute(string id);
+        Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute(string id);
     }
 }
