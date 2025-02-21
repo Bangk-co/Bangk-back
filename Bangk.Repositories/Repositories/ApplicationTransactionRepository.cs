@@ -16,5 +16,13 @@ namespace Bangk.Repositories.Repositories
         {
 
         }
+
+        public ApplicationTransaction GetApplicationTransactionByTransactionNumber(string transactionNumber)
+        {
+            var query = from ap in Context.ApplicationTransaction
+                         where ap.TransactionNumber == transactionNumber
+                         select ap;
+            return query.FirstOrDefault();
+        }
     }
 }

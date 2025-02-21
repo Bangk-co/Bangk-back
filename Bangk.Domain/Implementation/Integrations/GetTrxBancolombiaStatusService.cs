@@ -1,5 +1,7 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Integrations;
+using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

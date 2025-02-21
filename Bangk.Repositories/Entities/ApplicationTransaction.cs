@@ -11,7 +11,7 @@ namespace Bangk.Repositories.Entities
     {
         public int ApplicationType { get; set; }
         public string TransactionNumber { get; set; }
-        public int Status { get; set; }
+        public string Status { get; set; }
         public bool Deleted { get; set; }
 
     }

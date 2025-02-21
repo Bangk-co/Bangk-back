@@ -11,6 +11,6 @@ namespace Bangk.Repositories.Repositories
 {
     public interface IApplicationTransactionRepository : IGenericRepository<ApplicationTransaction, ApplicationTransactionDto>
     {
-
+        ApplicationTransaction GetApplicationTransactionByTransactionNumber(string transactionNumber);      
     }
 }

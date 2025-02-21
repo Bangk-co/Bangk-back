@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Bangk.Repositories.Repositories;
 
 namespace Bangk.Domain.Implementation.Integrations
 {
@@ -15,20 +16,32 @@ namespace Bangk.Domain.Implementation.Integrations
     {
         private readonly IConfiguration _configuration;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
-        private readonly ICreateBancolombiaButtonPaymentService _createBancolombiaButtonPaymentService;
+        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
 
         public PaymentSourcesBancolombiaTransferService(IConfiguration configuration,
                                                         IGetMerchantsTokenService getMerchantsTokenService,
-                                                        ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService)
+                                                        IApplicationTransactionRepository applicationTransactionRepository)
         {
             _configuration = configuration;
             _getMerchantsTokenService = getMerchantsTokenService;
-            _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
+            _applicationTransactionRepository = applicationTransactionRepository;
         }
 
-        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute()
+        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute(string transactionId)
         {
             var response = new ResponseDto<PaymentWompiResponseDto>();
+
+            var applicationTransaction = _applicationTransactionRepository.GetApplicationTransactionByTransactionNumber(transactionId);
+
+            if(applicationTransaction == null)
+            {
+                response = new ResponseDto<PaymentWompiResponseDto>
+                {
+                    HasErrors = true,
+                    Errors = new List<string> { "No se ha encontrado la transacción" }
+                };
+                return response;
+            }
 
             var merchantsInfo = await _getMerchantsTokenService.Execute();
 
@@ -40,7 +53,7 @@ namespace Bangk.Domain.Implementation.Integrations
             var query = new
             {
                 type = "BANCOLOMBIA_TRANSFER",
-                token = "Id",
+                token = applicationTransaction.TransactionNumber,
                 payment_description = "Pago Bangk",
                 customer_email = "correo@correo.com",
                 acceptance_token = merchantsInfo.Result.Data.Presigned_Acceptance.Acceptance_Token,

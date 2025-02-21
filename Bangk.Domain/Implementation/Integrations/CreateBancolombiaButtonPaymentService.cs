@@ -1,7 +1,10 @@
 ﻿using Bangk.Common;
 using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Integrations;
+using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +18,12 @@ namespace Bangk.Domain.Implementation.Integrations
     public class CreateBancolombiaButtonPaymentService : ICreateBancolombiaButtonPaymentService
     {
         private readonly IConfiguration _configuration;
+        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
 
-        public CreateBancolombiaButtonPaymentService(IConfiguration configuration)
+        public CreateBancolombiaButtonPaymentService(IConfiguration configuration, IApplicationTransactionRepository applicationTransactionRepository)
         {
             _configuration = configuration;
+            _applicationTransactionRepository = applicationTransactionRepository;
         }
         public async Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute()
         {
@@ -45,9 +50,20 @@ namespace Bangk.Domain.Implementation.Integrations
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
-                    var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>(jsonResponse); 
+                    var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>(jsonResponse);
                     //Logs.WriteInfoLog($"Response: {jsonResponse}");
-                    response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
+
+                    var applicationToSave = new Repositories.Entities.ApplicationTransaction
+                    {
+                        ApplicationType = (int)ApplicationTypeEnum.BancolombiaButtonTransfer,
+                        CreationDate = apiResponseBancolombia.Data.Created_At,
+                        TransactionNumber = apiResponseBancolombia.Data.Id,
+                        Status = apiResponseBancolombia.Data.Status,
+                        Deleted = false
+                    };
+                    await _applicationTransactionRepository.Create(applicationToSave);
+
+                    response = new ResponseDto<Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = false,
                         Result = apiResponseBancolombia
@@ -57,7 +73,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     var errorMessage = await apiResponse.Content.ReadAsStringAsync();
                     //Logs.WriteErrorLog($"Error: {errorMessage} - StatusCode: {apiResponse.StatusCode}");
-                    response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
+                    response = new ResponseDto<Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}" }
