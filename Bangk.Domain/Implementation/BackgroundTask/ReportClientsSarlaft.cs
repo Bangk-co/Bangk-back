@@ -94,11 +94,11 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             try
             {
                 result = await CreateExcel(clients);
-                //using (MemoryStream stream = new MemoryStream(result))
-                //{
-                //    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+                using (MemoryStream stream = new MemoryStream(result))
+                {
+                    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
 
-                //}
+                }
                 return result;
             }
             catch (Exception ex)
@@ -278,10 +278,10 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             try
             {
                 result = await CreateExcelLogs(clients);
-                //using (MemoryStream stream = new MemoryStream(result))
-                //{
-                //    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
-                //}
+                using (MemoryStream stream = new MemoryStream(result))
+                {
+                    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+                }
                 return result;
             }
             catch (Exception ex)
