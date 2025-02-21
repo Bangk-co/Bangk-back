@@ -90,6 +90,7 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IMedPersonInsuredRepository, MedPersonInsuredRepository>();
             services.AddScoped<IPetEnsuranceApplicationRepository, PetEnsuranceApplicationRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IApplicationTransactionRepository, ApplicationTransactionRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
