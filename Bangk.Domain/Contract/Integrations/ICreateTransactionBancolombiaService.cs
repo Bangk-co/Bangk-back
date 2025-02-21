@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bangk.Common.Dto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace Bangk.Domain.Contract.Integrations
 {
     public interface ICreateTransactionBancolombiaService
     {
+        Task<ResponseDto<string>> Execute(int value, int paymentSourceId);
     }
 }

@@ -156,7 +156,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetMerchantsTokenService, GetMerchantsTokenService>();
             services.AddTransient<IPaymentSourcesBancolombiaTransferService, PaymentSourcesBancolombiaTransferService>();
             services.AddTransient<ICardPaymentService, CardPaymentService>();
-            services.AddTransient<IGenerateIntegrityKeyService, GenerateIntegrityKeyService>(); 
+            services.AddTransient<IGenerateIntegrityKeyService, GenerateIntegrityKeyService>();
+            services.AddTransient<ICreateTransactionBancolombiaService, CreateTransactionBancolombiaService>();
 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

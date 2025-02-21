@@ -4,6 +4,7 @@ using Bangk.Domain.Contract.Integrations.Wompi;
 using Bangk.Domain.Implementation.Integrations.Wompi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -15,17 +16,19 @@ namespace Bangk.Api.Controllers
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IPaymentSourcesBancolombiaTransferService _paymentSourcesBancolombiaTransferService;
         private readonly ICardPaymentService _cardPaymentService;
+        private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
 
         public WompiIntegrationController(ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService,
                                          IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
                                          IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService,
-                                         ICardPaymentService cardPaymentService)
+                                         ICardPaymentService cardPaymentService, IGenerateIntegrityKeyService generateIntegrityKeyService)
         {
             _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
             _getTrxBancolombiaStatusService = getTrxBancolombiaStatusService;
             _getMerchantsTokenService = getMerchantsTokenService;
             _paymentSourcesBancolombiaTransferService = paymentSourcesBancolombiaTransferService;
             _cardPaymentService = cardPaymentService;
+            _generateIntegrityKeyService = generateIntegrityKeyService;
         }
 
         [HttpPost("CreateBancolombiaButtonTransfer")]
@@ -47,9 +50,9 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("PaymentSourcesBancolombiaTransfer")]
         [AllowAnonymous]
-        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer(string transactionNumber)
+        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer(string transactionNumber, int value)
         {
-            var result = await _paymentSourcesBancolombiaTransferService.Execute(transactionNumber);
+            var result = await _paymentSourcesBancolombiaTransferService.Execute(transactionNumber, value);
             return Ok(result);
         }
 
@@ -67,6 +70,15 @@ namespace Bangk.Api.Controllers
         public async Task<IActionResult> CardPayment(CardPaymentDto cardPaymentDto)
         {
             var result = await _cardPaymentService.Execute(cardPaymentDto);
+            return Ok(result);
+        }
+
+
+        [HttpPost("GenerateSignature")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GenerateSignature(int value)
+        {
+            var result = await _generateIntegrityKeyService.Execute(value, Guid.NewGuid().ToString("N"));
             return Ok(result);
         }
     }

@@ -17,17 +17,20 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IConfiguration _configuration;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
+        private readonly ICreateTransactionBancolombiaService _createTransactionBancolombiaService;
 
         public PaymentSourcesBancolombiaTransferService(IConfiguration configuration,
                                                         IGetMerchantsTokenService getMerchantsTokenService,
-                                                        IApplicationTransactionRepository applicationTransactionRepository)
+                                                        IApplicationTransactionRepository applicationTransactionRepository,
+                                                        ICreateTransactionBancolombiaService createTransactionBancolombiaService)
         {
             _configuration = configuration;
             _getMerchantsTokenService = getMerchantsTokenService;
             _applicationTransactionRepository = applicationTransactionRepository;
+            _createTransactionBancolombiaService = createTransactionBancolombiaService;
         }
 
-        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute(string transactionId)
+        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute(string transactionId, int value)
         {
             var response = new ResponseDto<PaymentWompiResponseDto>();
 
@@ -80,6 +83,16 @@ namespace Bangk.Domain.Implementation.Integrations
                         HasErrors = false,
                         Result = apiResponseBancolombia
                     };
+
+                    var resultTransaction = await _createTransactionBancolombiaService.Execute(value, apiResponseBancolombia.Data.Id);
+                    if (resultTransaction.HasErrors)
+                    {
+                        response = new ResponseDto<PaymentWompiResponseDto>
+                        {
+                            HasErrors = true,
+                            Errors = new List<string> { resultTransaction.Errors.First() }
+                        };
+                    }
                 }
                 else
                 {
@@ -92,6 +105,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     };
                 }
             }
+
 
             return response;
         }
