@@ -9,6 +9,7 @@ using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.Integrations;
+using Bangk.Domain.Contract.Integrations.Wompi;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
@@ -32,6 +33,7 @@ using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.Integrations;
+using Bangk.Domain.Implementation.Integrations.Wompi;
 using Bangk.Domain.Implementation.LoanApplication;
 using Bangk.Domain.Implementation.LoanApplicationDocument;
 using Bangk.Domain.Implementation.LoanApplicationStateHistory;
@@ -153,6 +155,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetTrxBancolombiaStatusService, GetTrxBancolombiaStatusService>();
             services.AddTransient<IGetMerchantsTokenService, GetMerchantsTokenService>();
             services.AddTransient<IPaymentSourcesBancolombiaTransferService, PaymentSourcesBancolombiaTransferService>();
+            services.AddTransient<ICardPaymentService, CardPaymentService>();
+            services.AddTransient<IGenerateIntegrityKeyService, GenerateIntegrityKeyService>(); 
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
