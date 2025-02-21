@@ -16,12 +16,14 @@ namespace Bangk.Domain.Implementation.Integrations
     public class GetTrxBancolombiaStatusService : IGetTrxBancolombiaStatusService
     {
         private readonly IConfiguration _configuration;
+        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
 
-        public GetTrxBancolombiaStatusService(IConfiguration configuration)
+        public GetTrxBancolombiaStatusService(IConfiguration configuration, IApplicationTransactionRepository applicationTransactionRepository)
         {
             _configuration = configuration;
+            _applicationTransactionRepository = applicationTransactionRepository;
         }
-            
+
         public async Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute(string id)
         {
             var response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>();
@@ -38,6 +40,17 @@ namespace Bangk.Domain.Implementation.Integrations
                     var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
                     var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>(jsonResponse);
                     //Logs.WriteInfoLog($"Response: {jsonResponse}");
+
+                    var applicationToSave = new Repositories.Entities.ApplicationTransaction
+                    {
+                        ApplicationType = (int)ApplicationTypeEnum.BancolombiaButtonTransfer,
+                        CreationDate = apiResponseBancolombia.Data.Created_At,
+                        TransactionNumber = apiResponseBancolombia.Data.Id,
+                        Status = apiResponseBancolombia.Data.Status,
+                        Deleted = false
+                    };
+                    await _applicationTransactionRepository.Create(applicationToSave);
+
                     response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = false,
