@@ -11,11 +11,14 @@ namespace Bangk.Common.Dto
     {
         public string Email { get; set; }
         public string Name { get; set; }
+        public int ApplicationId { get; set; }  
         public DocumentType DocumentIdentificationType { get; set; }
         public string DocumentIdentificationNumber { get; set; }
         public string TransactionToken { get; set; }
         public int IdTransaction { get; set; }
         public int Amount { get; set; }
         public string TypeApplication {  get; set; }
+        public MethodPaymentTimeEnum TimeApplication { get; set; }
+
     }
 }

@@ -34,18 +34,6 @@ namespace Bangk.Domain.Implementation.Integrations
         {
             var response = new ResponseDto<PaymentWompiResponseDto>();
 
-            var applicationTransaction = _applicationTransactionRepository.GetApplicationTransactionByTransactionNumber(userPaymentRequest.TransactionToken);
-
-            if(applicationTransaction == null)
-            {
-                response = new ResponseDto<PaymentWompiResponseDto>
-                {
-                    HasErrors = true,
-                    Errors = new List<string> { "No se ha encontrado la transacción" }
-                };
-                return response;
-            }
-
             var merchantsInfo = await _getMerchantsTokenService.Execute();
 
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
@@ -56,7 +44,7 @@ namespace Bangk.Domain.Implementation.Integrations
             var query = new
             {
                 type = "BANCOLOMBIA_TRANSFER",
-                token = applicationTransaction.TransactionNumber,
+                token = userPaymentRequest.TransactionToken,
                 payment_description = "Pago Bangk",
                 customer_email = userPaymentRequest.Email,
                 acceptance_token = merchantsInfo.Result.Data.Presigned_Acceptance.Acceptance_Token,

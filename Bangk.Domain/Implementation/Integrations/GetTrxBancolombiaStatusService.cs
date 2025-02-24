@@ -41,13 +41,13 @@ namespace Bangk.Domain.Implementation.Integrations
                     var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>(jsonResponse);
                     //Logs.WriteInfoLog($"Response: {jsonResponse}");
 
-                    var applicationToSave = new Repositories.Entities.ApplicationTransaction
-                    {
-                        CreationDate = apiResponseBancolombia.Data.Created_At,
-                        TransactionNumber = apiResponseBancolombia.Data.Id,
-                        Status = apiResponseBancolombia.Data.Status,
-                    };
-                    await _applicationTransactionRepository.Create(applicationToSave);
+                    //var applicationToSave = new Repositories.Entities.ApplicationTransaction
+                    //{
+                    //    CreationDate = apiResponseBancolombia.Data.Created_At,
+                    //    TransactionNumber = apiResponseBancolombia.Data.Id,
+                    //    Status = apiResponseBancolombia.Data.Status,
+                    //};
+                    //await _applicationTransactionRepository.Create(applicationToSave);
 
                     response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {

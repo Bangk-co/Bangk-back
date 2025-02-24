@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Bangk.Domain.Contract.Integrations
 {
-    public interface ICreateBancolombiaButtonPaymentService
+    public interface IGetTransactionPaymentStatusService
     {
-        Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute();
+        Task<ResponseDto<dynamic>> Execute(string id);
     }
 }

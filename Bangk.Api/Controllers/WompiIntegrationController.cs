@@ -11,14 +11,14 @@ namespace Bangk.Api.Controllers
 {
     public class WompiIntegrationController : BaseController
     {
-        private readonly ICreateBancolombiaButtonPaymentService _createBancolombiaButtonPaymentService;
+        private readonly IGenerateTokenTrxBancolombiaService _createBancolombiaButtonPaymentService;
         private readonly IGetTrxBancolombiaStatusService _getTrxBancolombiaStatusService;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IPaymentSourcesBancolombiaTransferService _paymentSourcesBancolombiaTransferService;
         private readonly ICardPaymentService _cardPaymentService;
         private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
         private readonly ITransactionUpdateStateService _transactionUpdateStateService;
-        public WompiIntegrationController(ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService,
+        public WompiIntegrationController(IGenerateTokenTrxBancolombiaService createBancolombiaButtonPaymentService,
                                          IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
                                          IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService,
                                          ICardPaymentService cardPaymentService, IGenerateIntegrityKeyService generateIntegrityKeyService, ITransactionUpdateStateService transactionUpdateStateService)
@@ -32,20 +32,11 @@ namespace Bangk.Api.Controllers
             _transactionUpdateStateService = transactionUpdateStateService;
         }
 
-        [HttpPost("CreateBancolombiaButtonTransfer")]
+        [HttpPost("GenerateTokenTrxBancolombia")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateBancolombiaButtonTransfer()
+        public async Task<IActionResult> GenerateTokenTrxBancolombia()
         {
             var result = await _createBancolombiaButtonPaymentService.Execute();
-            return Ok(result);
-        }
-
-
-        [HttpGet("GetMerchantsInfo")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetMerchantsInfo()
-        {
-            var result = await _getMerchantsTokenService.Execute();
             return Ok(result);
         }
 
@@ -71,15 +62,6 @@ namespace Bangk.Api.Controllers
         public async Task<ActionResult<ResponseDto<PaymentCardResponseDto>>> CardPayment(CardPaymentDto cardPaymentDto)
         {
             var result = await _cardPaymentService.Execute(cardPaymentDto);
-            return Ok(result);
-        }
-
-
-        [HttpPost("GenerateSignature")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GenerateSignature(int value)
-        {
-            var result = await _generateIntegrityKeyService.Execute(value, Guid.NewGuid().ToString("N"));
             return Ok(result);
         }
 
