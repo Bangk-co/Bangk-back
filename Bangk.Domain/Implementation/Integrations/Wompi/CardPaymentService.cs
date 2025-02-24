@@ -136,6 +136,8 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 var petApplication = await _petEnsuranceApplicationRepository.GetById(cardPaymentDto.PetApplicationId);
                 petApplication.PaymentSourceId = apiResponsePaymentSource.Data.Id;
                 petApplication.TransactionReference = reference;
+                await _petEnsuranceApplicationRepository.Update(petApplication);
+
                 //Create log transaction
                 var transactionAdd = new ApplicationTransaction
                 {
