@@ -9,7 +9,6 @@ namespace Bangk.Repositories.Entities
 {
     public class ApplicationTransaction: EntityBase
     {
-        public int ApplicationType { get; set; }
         public string TransactionNumber { get; set; }
         public string Status { get; set; }
         public string Reference { get; set; }

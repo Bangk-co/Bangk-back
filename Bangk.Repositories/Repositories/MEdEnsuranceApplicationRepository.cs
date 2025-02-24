@@ -2,10 +2,7 @@
 using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
@@ -14,6 +11,11 @@ namespace Bangk.Repositories.Repositories
     {
         public MEdEnsuranceApplicationRepository(AppDbContext context) : base(context)
         {
+        }
+
+        public async Task<MedEnsuranceApplication> GetMedEnsuranceApplicationByReference(string reference)
+        {
+            return await Context.MedEnsuranceApplication.FirstOrDefaultAsync(p => p.TransactionReference == reference);
         }
     }
 }

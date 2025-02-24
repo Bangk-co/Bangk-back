@@ -28,7 +28,7 @@ namespace Bangk.Domain.Implementation.Integrations
             var response = new ResponseDto<string>();
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
-            var reference = Guid.NewGuid().ToString("N");
+            var reference = $"{userPaymentRequest.TypeApplication}-{Guid.NewGuid().ToString("N")}";
             var integrityKey = await _generateIntegrityKeyService.Execute(userPaymentRequest.Amount, reference);
 
             wompiUrl = $"{wompiUrl}transactions";

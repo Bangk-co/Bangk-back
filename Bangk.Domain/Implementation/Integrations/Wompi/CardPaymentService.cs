@@ -102,7 +102,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 }
 
                 //Transaction
-                var reference = Guid.NewGuid().ToString("N");
+                var reference = $"{cardPaymentDto.TypeApplication}-{Guid.NewGuid().ToString("N")}";
                 var signature = await _generateIntegrityKeyService.Execute(cardPaymentDto.Amount, reference);
                 var transaction = new
                 {
@@ -142,7 +142,6 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 var transactionAdd = new ApplicationTransaction
                 {
                     Amount = cardPaymentDto.Amount,
-                    ApplicationType = (int)ApplicationTypeEnum.CardTransfer,
                     Currency = apiResponseTransaction["data"]["currency"],
                     Reference = apiResponseTransaction["data"]["reference"],
                     Status = apiResponseTransaction["data"]["status"],

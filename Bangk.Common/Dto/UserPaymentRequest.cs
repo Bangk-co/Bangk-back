@@ -16,5 +16,6 @@ namespace Bangk.Common.Dto
         public string TransactionToken { get; set; }
         public int IdTransaction { get; set; }
         public int Amount { get; set; }
+        public string TypeApplication {  get; set; }
     }
 }

@@ -17,11 +17,11 @@ namespace Bangk.Api.Controllers
         private readonly IPaymentSourcesBancolombiaTransferService _paymentSourcesBancolombiaTransferService;
         private readonly ICardPaymentService _cardPaymentService;
         private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
-
+        private readonly ITransactionUpdateStateService _transactionUpdateStateService;
         public WompiIntegrationController(ICreateBancolombiaButtonPaymentService createBancolombiaButtonPaymentService,
                                          IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
                                          IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService,
-                                         ICardPaymentService cardPaymentService, IGenerateIntegrityKeyService generateIntegrityKeyService)
+                                         ICardPaymentService cardPaymentService, IGenerateIntegrityKeyService generateIntegrityKeyService, ITransactionUpdateStateService transactionUpdateStateService)
         {
             _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
             _getTrxBancolombiaStatusService = getTrxBancolombiaStatusService;
@@ -29,6 +29,7 @@ namespace Bangk.Api.Controllers
             _paymentSourcesBancolombiaTransferService = paymentSourcesBancolombiaTransferService;
             _cardPaymentService = cardPaymentService;
             _generateIntegrityKeyService = generateIntegrityKeyService;
+            _transactionUpdateStateService = transactionUpdateStateService;
         }
 
         [HttpPost("CreateBancolombiaButtonTransfer")]
@@ -80,6 +81,19 @@ namespace Bangk.Api.Controllers
         {
             var result = await _generateIntegrityKeyService.Execute(value, Guid.NewGuid().ToString("N"));
             return Ok(result);
+        }
+
+        [HttpPost("TransactionUpdateState")]
+        [AllowAnonymous]
+        public async Task<IActionResult> TransactionUpdateState([FromBody] UpdateTransactionWebHookDto transactionUpdateDto)
+        {
+            if (transactionUpdateDto == null)
+            {
+                return BadRequest("Invalid transaction data");
+            }
+
+            await _transactionUpdateStateService.Execute(transactionUpdateDto);
+            return Ok();
         }
     }
 }

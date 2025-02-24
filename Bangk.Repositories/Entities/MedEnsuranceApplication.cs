@@ -13,5 +13,7 @@ namespace Bangk.Repositories.Entities
         public int MethodPaymentId { get; set; }
         public bool Deleted { get; set; }
         public int Status { get; set; }
+        public string TransactionReference { get; set; }
+        public long? PaymentSourceId { get; set; }
     }
 }

@@ -55,7 +55,6 @@ namespace Bangk.Domain.Implementation.Integrations
 
                     var applicationToSave = new Repositories.Entities.ApplicationTransaction
                     {
-                        ApplicationType = (int)ApplicationTypeEnum.BancolombiaButtonTransfer,
                         CreationDate = apiResponseBancolombia.Data.Created_At,
                         TransactionNumber = apiResponseBancolombia.Data.Id,
                         Status = apiResponseBancolombia.Data.Status,

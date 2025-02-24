@@ -12,7 +12,8 @@
         public int PaymentInstallments { get; set; }
         public string CVC { get; set; }
         public int Amount { get; set; }
-    }
+        public string TypeApplication { get; set; }
+}
 
     public class CardDto
     {
