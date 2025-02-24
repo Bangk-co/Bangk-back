@@ -59,7 +59,6 @@ namespace Bangk.Domain.Implementation.Integrations
                         CreationDate = apiResponseBancolombia.Data.Created_At,
                         TransactionNumber = apiResponseBancolombia.Data.Id,
                         Status = apiResponseBancolombia.Data.Status,
-                        Deleted = false
                     };
                     await _applicationTransactionRepository.Create(applicationToSave);
 

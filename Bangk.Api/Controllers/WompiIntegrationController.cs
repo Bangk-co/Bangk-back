@@ -67,7 +67,7 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("CardPayment")]
         [AllowAnonymous]
-        public async Task<IActionResult> CardPayment(CardPaymentDto cardPaymentDto)
+        public async Task<ActionResult<ResponseDto<PaymentCardResponseDto>>> CardPayment(CardPaymentDto cardPaymentDto)
         {
             var result = await _cardPaymentService.Execute(cardPaymentDto);
             return Ok(result);

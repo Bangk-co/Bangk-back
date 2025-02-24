@@ -9,6 +9,6 @@ namespace Bangk.Common.Enums
     public enum ApplicationTypeEnum: int
     {
         BancolombiaButtonTransfer = 1,
-        CreditTransfer = 2,
+        CardTransfer = 2,
     }
 }

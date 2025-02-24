@@ -15,5 +15,7 @@ namespace Bangk.Repositories.Entities
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime TreatPersonalDataDate { get; set; }
+        public long? PaymentSourceId { get; set; }
+        public string TransactionReference { get; set; }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.Integrations.Wompi;
+using Bangk.Repositories.Entities;
+using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -16,16 +19,22 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
         private readonly IConfiguration _configuration;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
-
-        public CardPaymentService(IConfiguration configuration, IGetMerchantsTokenService getMerchantsTokenService, IGenerateIntegrityKeyService generateIntegrityKeyService)
+        private readonly IPetEnsuranceApplicationRepository _petEnsuranceApplicationRepository;
+        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
+        public CardPaymentService(IConfiguration configuration, IGetMerchantsTokenService getMerchantsTokenService, 
+            IGenerateIntegrityKeyService generateIntegrityKeyService,
+            IPetEnsuranceApplicationRepository petEnsuranceApplicationRepository,
+            IApplicationTransactionRepository applicationTransactionRepository)
         {
             _configuration = configuration;
             _getMerchantsTokenService = getMerchantsTokenService;
             _generateIntegrityKeyService = generateIntegrityKeyService;
+            _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
+            _applicationTransactionRepository = applicationTransactionRepository;
         }
-        public async Task<ResponseDto<bool>> Execute(CardPaymentDto cardPaymentDto)
+        public async Task<ResponseDto<PaymentCardResponseDto>> Execute(CardPaymentDto cardPaymentDto)
         {
-            var response = new ResponseDto<bool>();
+            var response = new ResponseDto<PaymentCardResponseDto>();
             var baseUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var publicKey = _configuration.GetSection("WompiKeys:PublicKey").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
@@ -53,10 +62,9 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 if (!jsonResponse.IsSuccessStatusCode || apiResponseCard.Status != "CREATED")
                 {
-                    response = new ResponseDto<bool>
+                    response = new ResponseDto<PaymentCardResponseDto>
                     {
                         HasErrors = true,
-                        Result = false,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
                     };
                 }
@@ -86,10 +94,9 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 if (!responsePaymentSource.IsSuccessStatusCode || apiResponsePaymentSource.Data.Status != "AVAILABLE")
                 {
-                    response = new ResponseDto<bool>
+                    response = new ResponseDto<PaymentCardResponseDto>
                     {
                         HasErrors = true,
-                        Result = false,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
                     };
                 }
@@ -118,24 +125,39 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 var apiResponseTransaction = JsonConvert.DeserializeObject<dynamic>(result);
                 if (!responseTransaction.IsSuccessStatusCode)
                 {
-                    response = new ResponseDto<bool>
+                    response = new ResponseDto<PaymentCardResponseDto>
                     {
                         HasErrors = true,
-                        Result = false,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
                     };
                 }
 
+                //Save tokenization
+                var petApplication = await _petEnsuranceApplicationRepository.GetById(cardPaymentDto.PetApplicationId);
+                petApplication.PaymentSourceId = apiResponsePaymentSource.Data.Id;
+                petApplication.TransactionReference = reference;
+                //Create log transaction
+                var transactionAdd = new ApplicationTransaction
+                {
+                    Amount = cardPaymentDto.Amount,
+                    ApplicationType = (int)ApplicationTypeEnum.CardTransfer,
+                    Currency = apiResponseTransaction["data"]["currency"],
+                    Reference = apiResponseTransaction["data"]["reference"],
+                    Status = apiResponseTransaction["data"]["status"],
+                    TransactionCreationDate = apiResponseTransaction["data"]["created_at"],
+                    TransactionNumber = apiResponseTransaction["data"]["id"],
+                    PaymentMethodType = apiResponseTransaction["data"]["payment_method_type"],
+                };
 
-                //string id = apiResponseTransaction["data"]["id"];
-                //string status = apiResponseTransaction["data"]["status"];
-
-                //var transactionGetUrl = $"{baseUrl}transactions/{id}";
-                //HttpResponseMessage responseTransactionUpdate = await client.GetAsync(transactionGetUrl);
-                //result = await responseTransactionUpdate.Content.ReadAsStringAsync();
-                //var apiResponseTransactionUpdate = JsonConvert.DeserializeObject<dynamic>(result);
+                await _applicationTransactionRepository.Create(transactionAdd);
+                response.Result = new PaymentCardResponseDto
+                {
+                    Amount = cardPaymentDto.Amount,
+                    Status = transactionAdd.Status,
+                    TransactionReference = transactionAdd.Reference
+                };
             }
-            response.Result = true;
+
             return response;
         }
     }

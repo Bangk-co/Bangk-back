@@ -12,7 +12,10 @@ namespace Bangk.Repositories.Entities
         public int ApplicationType { get; set; }
         public string TransactionNumber { get; set; }
         public string Status { get; set; }
-        public bool Deleted { get; set; }
-
+        public string Reference { get; set; }
+        public string Currency { get; set; }
+        public DateTime TransactionCreationDate { get; set; }
+        public long Amount { get; set; }
+        public string PaymentMethodType { get; set; }
     }
 }

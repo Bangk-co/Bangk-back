@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.Integrations.Wompi
 {
     public interface ICardPaymentService
     {
-        Task<ResponseDto<bool>> Execute(CardPaymentDto cardPaymentDto);
+        Task<ResponseDto<PaymentCardResponseDto>> Execute(CardPaymentDto cardPaymentDto);
     }
 }
