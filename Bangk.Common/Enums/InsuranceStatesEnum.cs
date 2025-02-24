@@ -10,5 +10,6 @@ namespace Bangk.Common.Enums
     {
         PendingToCreate = 720,
         Created = 721,
+        Rejected = 722,
     }
 }

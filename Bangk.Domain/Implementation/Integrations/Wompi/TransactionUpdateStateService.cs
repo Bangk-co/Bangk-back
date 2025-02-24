@@ -34,7 +34,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             }
             else
             {
-
+                await RejectedTransactionProcess(transactionUpdateDto);
             }
         }
 
@@ -69,5 +69,39 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             await _applicationTransactionRepository.Create(transactionAdd);
 
         }
+
+
+        private async Task RejectedTransactionProcess(UpdateTransactionWebHookDto transactionUpdateDto)
+        {
+            switch (transactionUpdateDto.Data.Transaction.Reference)
+            {
+                case string reference when reference.Contains("PET"):
+                    var petApplication = await _petEnsuranceApplicationRepository.GetPetApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
+                    petApplication.Status = (int)InsuranceStatesEnum.Rejected;
+                    await _petEnsuranceApplicationRepository.Update(petApplication);
+                    break;
+                case string reference when reference.Contains("MED"):
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
+                    medApplication.Status = (int)InsuranceStatesEnum.Rejected;
+                    await _medEnsuranceApplicationRepository.Update(medApplication);
+                    break;
+            }
+
+            //Create log transaction
+            var transactionAdd = new ApplicationTransaction
+            {
+                Amount = transactionUpdateDto.Data.Transaction.Amount_In_Cents,
+                Currency = transactionUpdateDto.Data.Transaction.Currency,
+                Reference = transactionUpdateDto.Data.Transaction.Reference,
+                Status = transactionUpdateDto.Data.Transaction.Status,
+                TransactionCreationDate = transactionUpdateDto.Sent_At,
+                TransactionNumber = transactionUpdateDto.Data.Transaction.Id,
+                PaymentMethodType = transactionUpdateDto.Data.Transaction.Payment_Method_Type,
+            };
+
+            await _applicationTransactionRepository.Create(transactionAdd);
+
+        }
+
     }
 }
