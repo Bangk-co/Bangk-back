@@ -1,0 +1,131 @@
+﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
+using Bangk.Domain.Contract.Integrations;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Bangk.Domain.Contract.Integrations.Wompi;
+using Bangk.Repositories.Repositories;
+using Bangk.Repositories.Entities;
+using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
+
+namespace Bangk.Domain.Implementation.Integrations
+{
+    public class CreateTransactionBancolombiaService : ICreateTransactionBancolombiaService
+    {
+        private readonly IConfiguration _configuration;
+        private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
+        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
+        private readonly IGetTransactionPaymentStatusService _getTransactionPaymentStatusService;
+        private readonly IPetEnsuranceApplicationRepository _petEnsuranceApplicationRepository;
+        private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        public CreateTransactionBancolombiaService(IConfiguration configuration,
+                                                   IGenerateIntegrityKeyService generateIntegrityKeyService,
+                                                   IApplicationTransactionRepository applicationTransactionRepository,
+                                                   IGetTransactionPaymentStatusService getTransactionPaymentStatusServi,
+                                                   IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository,
+                                                   IPetEnsuranceApplicationRepository petEnsuranceApplicationRepository)
+        {
+            _configuration = configuration;
+            _generateIntegrityKeyService = generateIntegrityKeyService;
+            _applicationTransactionRepository = applicationTransactionRepository;
+            _getTransactionPaymentStatusService = getTransactionPaymentStatusServi;
+            _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
+            _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
+        }
+
+        public async Task<ResponseDto<string>> Execute(UserPaymentRequest userPaymentRequest)
+        {
+            var response = new ResponseDto<string>();
+            var currency = "COP";
+            var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
+            var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
+            var reference = $"{userPaymentRequest.TypeApplication}-{Guid.NewGuid().ToString("N")}";
+            var integrityKey = await _generateIntegrityKeyService.Execute(userPaymentRequest.Amount, reference);
+
+            wompiUrl = $"{wompiUrl}transactions";
+            var query = new
+            {
+                amount_in_cents = userPaymentRequest.Amount, // Monto current centavos
+                currency = currency, // Moneda
+                signature = integrityKey, //Firma de integridad
+                customer_email = userPaymentRequest.Email, // Email del usuario
+                reference = reference, // Referencia única de pago
+                payment_source_id = userPaymentRequest.IdTransaction
+            };
+
+            var jsonContent = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", privateKey);
+                HttpResponseMessage apiResponse = await client.PostAsync(wompiUrl, jsonContent);
+                //Logs.WriteInfoLog($"Status Code API: {apiResponse.StatusCode}");
+                if (apiResponse.IsSuccessStatusCode)
+                {
+
+                    var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
+                    var apiResponseTransaction = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
+
+                    var transactionFinalId = apiResponseTransaction["data"]["id"].ToString();
+                    var transactionStatus = await _getTransactionPaymentStatusService.Execute(transactionFinalId);
+                    //Create log transaction
+
+                    var transactionAdd = new ApplicationTransaction
+                    {
+                        Amount = userPaymentRequest.Amount,
+                        Currency = apiResponseTransaction["data"]["currency"],
+                        Reference = apiResponseTransaction["data"]["reference"],
+                        Status = transactionStatus.Result["data"]["status"].ToString(),
+                        TransactionCreationDate = apiResponseTransaction["data"]["created_at"],
+                        TransactionNumber = apiResponseTransaction["data"]["id"],
+                        PaymentMethodType = apiResponseTransaction["data"]["payment_method_type"],
+                    };
+
+                    if (userPaymentRequest.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var medApplicationInBD = await _medEnsuranceApplicationRepository.GetById(userPaymentRequest.ApplicationId);
+                        medApplicationInBD.PaymentSourceId = userPaymentRequest.IdTransaction;
+                        medApplicationInBD.TransactionReference = reference;
+                        await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
+                    }
+                    else if (userPaymentRequest.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var petApplicationInBD = await _petEnsuranceApplicationRepository.GetById(userPaymentRequest.ApplicationId);
+                        petApplicationInBD.PaymentSourceId = userPaymentRequest.IdTransaction;
+                        petApplicationInBD.TransactionReference = reference;
+                        await _petEnsuranceApplicationRepository.Update(petApplicationInBD);
+                    }
+
+                    await _applicationTransactionRepository.Create(transactionAdd);
+
+                    response = new ResponseDto<string>
+                    {
+                        HasErrors = false,
+                        Result = jsonResponse
+                    };
+
+                }
+                else
+                {
+                    var errorMessage = await apiResponse.Content.ReadAsStringAsync();
+                    //Logs.WriteErrorLog($"Error: {errorMessage} - StatusCode: {apiResponse.StatusCode}");
+                    response = new ResponseDto<string>
+                    {
+                        HasErrors = true,
+                        Errors = new List<string> { errorMessage }
+                    };
+                }
+            }
+
+            return response;
+        }
+    }
+}
