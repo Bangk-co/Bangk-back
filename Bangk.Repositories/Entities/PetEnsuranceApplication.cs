@@ -3,18 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bangk.Repositories.Entities
 {
-    public class PetEnsuranceApplication : EntityBase
+    public class PetInsuranceApplication : EntityBase
     {
         [ForeignKey("Setting")]
         public int MethodPayment {  get; set; }
         public int Status { get; set; }
-        [ForeignKey("Setting")]
-        public int DocumentTypeId { get; set; }
-        public string DocumentNumber { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public DateTime TreatPersonalDataDate { get; set; }
+        [ForeignKey("Client")]
+        public int ClientId { get; set; }
         public long? PaymentSourceId { get; set; }
         public string TransactionReference { get; set; }
     }

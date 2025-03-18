@@ -347,5 +347,10 @@ namespace Bangk.Repositories.Repositories
 
             return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
         }
+
+        public async Task<Client> GetClientByEmailAndIdentificationNumber(string email, string identificationNumber)
+        {
+            return await Context.Clients.FirstAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
+        }
     }
 }

@@ -19,11 +19,11 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
         private readonly IConfiguration _configuration;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
-        private readonly IPetEnsuranceApplicationRepository _petEnsuranceApplicationRepository;
+        private readonly IPetInsuranceApplicationRepository _petEnsuranceApplicationRepository;
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
         public CardPaymentService(IConfiguration configuration, IGetMerchantsTokenService getMerchantsTokenService, 
             IGenerateIntegrityKeyService generateIntegrityKeyService,
-            IPetEnsuranceApplicationRepository petEnsuranceApplicationRepository,
+            IPetInsuranceApplicationRepository petEnsuranceApplicationRepository,
             IApplicationTransactionRepository applicationTransactionRepository)
         {
             _configuration = configuration;

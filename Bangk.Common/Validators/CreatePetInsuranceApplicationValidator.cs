@@ -3,10 +3,10 @@ using FluentValidation;
 
 namespace Bangk.Common.Validators
 {
-    public class CreatePetEnsuranceApplicationValidator : AbstractValidator<PetEnsuranceDto>
+    public class CreatePetInsuranceApplicationValidator : AbstractValidator<PetInsuranceDto>
     {
 
-        public CreatePetEnsuranceApplicationValidator()
+        public CreatePetInsuranceApplicationValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("El correo del cliente es obligatorio");

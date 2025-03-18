@@ -2,7 +2,6 @@
 using Bangk.Common.Enums;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -24,5 +23,6 @@ namespace Bangk.Repositories.Repositories
         List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId);
         List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId);
         Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId);
+        Task<Client> GetClientByEmailAndIdentificationNumber(string email, string identificationNumber);
     }
 }
