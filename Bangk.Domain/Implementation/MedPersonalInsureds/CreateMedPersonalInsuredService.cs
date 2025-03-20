@@ -95,6 +95,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                     Email = item.Email,
                     PhoneNumber = item.PhoneNumber,
                     MedEnsuraceApplicationId = medEnsuranceApplication.Id,
+                    TreatPErsonalDatadate = item.TreatPErsonalDatadate,
                 };
 
                 beneficiaries.Add(beneficiary);
