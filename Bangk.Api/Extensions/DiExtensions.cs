@@ -9,6 +9,7 @@ using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
 using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.Integrations;
+using Bangk.Domain.Contract.Integrations.Wompi;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Domain.Contract.LoanApplicationDocument;
 using Bangk.Domain.Contract.LoanApplicationStateHistory;
@@ -17,7 +18,7 @@ using Bangk.Domain.Contract.LoanInsurancePolicy;
 using Bangk.Domain.Contract.LoanQuote;
 using Bangk.Domain.Contract.Login;
 using Bangk.Domain.Contract.MedPersonalInsureds;
-using Bangk.Domain.Contract.PetEnsuranceApplication;
+using Bangk.Domain.Contract.PetInsuranceApplication;
 using Bangk.Domain.Contract.ScheduleIntegration;
 using Bangk.Domain.Contract.Settings;
 using Bangk.Domain.Contract.Sftp;
@@ -32,6 +33,7 @@ using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
 using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.Integrations;
+using Bangk.Domain.Implementation.Integrations.Wompi;
 using Bangk.Domain.Implementation.LoanApplication;
 using Bangk.Domain.Implementation.LoanApplicationDocument;
 using Bangk.Domain.Implementation.LoanApplicationStateHistory;
@@ -39,7 +41,7 @@ using Bangk.Domain.Implementation.LoanForm;
 using Bangk.Domain.Implementation.LoanQuote;
 using Bangk.Domain.Implementation.Login;
 using Bangk.Domain.Implementation.MedPersonalInsureds;
-using Bangk.Domain.Implementation.PetEnsuranceApplication;
+using Bangk.Domain.Implementation.PetInsuranceApplication;
 using Bangk.Domain.Implementation.ScheduleIntegration;
 using Bangk.Domain.Implementation.Settings;
 using Bangk.Domain.Implementation.State;
@@ -88,8 +90,9 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>();
             services.AddScoped<IMedEnsuranceApplicationRepository, MEdEnsuranceApplicationRepository>();
             services.AddScoped<IMedPersonInsuredRepository, MedPersonInsuredRepository>();
-            services.AddScoped<IPetEnsuranceApplicationRepository, PetEnsuranceApplicationRepository>();
+            services.AddScoped<IPetInsuranceApplicationRepository, PetInsuranceApplicationRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IApplicationTransactionRepository, ApplicationTransactionRepository>();
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -147,7 +150,17 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IChangeStatusDealService, ChangeStatusDealService>();
             services.AddTransient<IChangeStateDealService, ChangeStateDealService>();
             services.AddTransient<ICreateMedPersonalInsuredService, CreateMedPersonalInsuredService>();
-            services.AddTransient<ICreatePetEnsuranceApplicationService, CreatePetEnsuranceApplicationService>();
+            services.AddTransient<ICreatePetInsuranceApplicationService, CreatePetInsuranceApplicationService>();
+            services.AddTransient<IGenerateTokenTrxBancolombiaService, GenerateTokenTrxBancolombiaService>();
+            services.AddTransient<IGetTrxBancolombiaStatusService, GetTrxBancolombiaStatusService>();
+            services.AddTransient<IGetMerchantsTokenService, GetMerchantsTokenService>();
+            services.AddTransient<IPaymentSourcesBancolombiaTransferService, PaymentSourcesBancolombiaTransferService>();
+            services.AddTransient<ICardPaymentService, CardPaymentService>();
+            services.AddTransient<IGenerateIntegrityKeyService, GenerateIntegrityKeyService>();
+            services.AddTransient<ICreateTransactionBancolombiaService, CreateTransactionBancolombiaService>();
+            services.AddTransient<ITransactionUpdateStateService, TransactionUpdateStateService>();
+            services.AddTransient<IGetTransactionPaymentStatusService, GetTransactionPaymentStatusService>();
+
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

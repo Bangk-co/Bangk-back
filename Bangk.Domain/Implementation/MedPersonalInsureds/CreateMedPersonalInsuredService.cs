@@ -1,4 +1,5 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.MedPersonalInsureds;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
@@ -12,7 +13,7 @@ using System.Transactions;
 
 namespace Bangk.Domain.Implementation.MedPersonalInsureds
 {
-    public class CreateMedPersonalInsuredService: ICreateMedPersonalInsuredService
+    public class CreateMedPersonalInsuredService : ICreateMedPersonalInsuredService
     {
         private readonly IMedPersonInsuredRepository _medPersonalInsuredRepository;
         private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
@@ -36,26 +37,39 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             {
                 MethodPaymentId = medPersonInsuredsDto.MedEnsuranceApplicationDto.MethodPaymentId,
                 Deleted = medPersonInsuredsDto.MedEnsuranceApplicationDto.Deleted,
-                Status = medPersonInsuredsDto.MedEnsuranceApplicationDto.Status
+                Status = (int)InsuranceStatesEnum.PendingToCreate
             };
 
             await _medEnsuranceApplicationRepository.Create(MedEnsuranceApplication);
 
-            var MedPersonalInsured = new Repositories.Entities.MedPersonInsureds()
+            var medPersonalInsureds = new List<Repositories.Entities.MedPersonInsureds>();
+            if (medPersonInsuredsDto != null && medPersonInsuredsDto.MedEnsuranceApplicationDto != null)
             {
-                DocumentTypeId = medPersonInsuredsDto.DocumentTypeId,
-                DocumentNumber = medPersonInsuredsDto.DocumentNumber,
-                Name = medPersonInsuredsDto.Name,
-                Deleted = medPersonInsuredsDto.Deleted,
-                Email = medPersonInsuredsDto.Email,
-                PhoneNumber = medPersonInsuredsDto.PhoneNumber,
-                MedEnsuraceApplicationId = MedEnsuranceApplication.Id,
-                TreatPErsonalDatadate = medPersonInsuredsDto.TreatPErsonalDatadate
-            };
+                var insureds = new List<MedPersonInsuredsDto> { medPersonInsuredsDto };
+                foreach (var item in insureds)
+                {
+                    var medPersonalInsured = new Repositories.Entities.MedPersonInsureds
+                    {
+                        DocumentTypeId = item.DocumentTypeId,
+                        DocumentNumber = item.DocumentNumber,
+                        Name = item.Name,
+                        Deleted = item.Deleted,
+                        Email = item.Email,
+                        PhoneNumber = item.PhoneNumber,
+                        MedEnsuraceApplicationId = MedEnsuranceApplication.Id,
+                        TreatPErsonalDatadate = item.TreatPErsonalDatadate
+                    };
 
-            await _medPersonalInsuredRepository.Create(MedPersonalInsured);
+                    medPersonalInsureds.Add(medPersonalInsured);
+                }
+            }
 
-            result.Result = MedPersonalInsured.Id;
+            if (medPersonalInsureds.Count > 0)
+            {
+                await _medPersonalInsuredRepository.CreateBulk(medPersonalInsureds);
+            }
+
+            result.Result = MedEnsuranceApplication.Id;
             scope.Complete();
             return result;
         }

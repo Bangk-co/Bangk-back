@@ -11,5 +11,6 @@ namespace Bangk.Repositories.Repositories
 {
     public interface IMedEnsuranceApplicationRepository: IGenericRepository<MedEnsuranceApplication, MedEnsuranceApplicationDto>
     {
+        Task<MedEnsuranceApplication> GetMedEnsuranceApplicationByReference(string reference);
     }
 }

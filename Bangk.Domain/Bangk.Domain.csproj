@@ -45,7 +45,6 @@
   <ItemGroup>
     <Folder Include="Contract\Beneficiary\" />
     <Folder Include="Contract\MedEnsuranceApplication\" />
-    <Folder Include="Implementation\MedEnsuranceApplication\" />
   </ItemGroup>
 
 </Project>

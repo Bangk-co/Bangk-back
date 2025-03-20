@@ -1,6 +1,6 @@
 ﻿namespace Bangk.Common.Enums
 {
-    public enum MethodPaymentEnum
+    public enum MethodPaymentTimeEnum
     {
         Anual = 717,
         Semestral = 716,
