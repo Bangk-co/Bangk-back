@@ -18,7 +18,7 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("CreatePetInsuranceApplication")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<MedPersonInsuredsDto>>> CreatePetInsuranceApplication(PetInsuranceDto petEnsuranceDto)
+        public async Task<ActionResult<ResponseDto<bool>>> CreatePetInsuranceApplication(PetInsuranceDto petEnsuranceDto)
         {
             var result = await _createPetInsuranceApplicationService.Execute(petEnsuranceDto);
             if (result.HasErrors)

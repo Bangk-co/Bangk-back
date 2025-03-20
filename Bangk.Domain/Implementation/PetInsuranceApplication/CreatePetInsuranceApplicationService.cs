@@ -3,6 +3,7 @@ using Bangk.Common.Enums;
 using Bangk.Domain.Contract.PetInsuranceApplication;
 using Bangk.Repositories.Repositories;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -26,6 +27,15 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
             {
                 Result = 0
             };
+
+            bool invalidaAge = petInsuranceDto.Pets.Any(p => p.Age < 6 || p.Age > 120);
+
+            if (invalidaAge)
+            {
+                result.HasErrors = true;
+                result.Errors.Add($"La edad de las mascotas debe ser mayor a 6 meses y menor a 10 años");
+                return result;
+            }
 
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
