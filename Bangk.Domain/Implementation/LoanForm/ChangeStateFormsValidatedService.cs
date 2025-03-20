@@ -57,27 +57,27 @@ namespace Bangk.Domain.Implementation.LoanForm
             };
 
             await _loanApplicationStateHistoryRepository.Create(loanApplicationHistory);
-            var userWithClientId = _userRepository.GetByClientId(loanApplication.Result.ClientId);
-            var client = _clientRepository.GetById(loanApplication.Result.ClientId);
-            if (userWithClientId == null)
-            {
-                var url = _configuration.GetSection("CreateClientAccount:UrlFront").Value + $"?requestId={client.Result.Id}&email={client.Result.Email}";
-                var sendEmail = new SendGridEmailDto
-                {
-                    email = client.Result.Email,
-                    From = _configuration.GetSection("SendGridEmailSender:From").Value,
-                    Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
-                    Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
-                    TemplateId = _configuration.GetSection("SendGridEmailSender:CreateClientAccountEmail").Value,
-                    Data = new
-                    {
-                        clientname = $"{client.Result.Name}",
-                        UrlCallback = url
-                    }
-                };
+            //var userWithClientId = _userRepository.GetByClientId(loanApplication.Result.ClientId);
+            //var client = _clientRepository.GetById(loanApplication.Result.ClientId);
+            //if (userWithClientId == null)
+            //{
+            //    var url = _configuration.GetSection("CreateClientAccount:UrlFront").Value + $"?requestId={client.Result.Id}&email={client.Result.Email}";
+            //    var sendEmail = new SendGridEmailDto
+            //    {
+            //        email = client.Result.Email,
+            //        From = _configuration.GetSection("SendGridEmailSender:From").Value,
+            //        Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+            //        Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+            //        TemplateId = _configuration.GetSection("SendGridEmailSender:CreateClientAccountEmail").Value,
+            //        Data = new
+            //        {
+            //            clientname = $"{client.Result.Name}",
+            //            UrlCallback = url
+            //        }
+            //    };
 
-                await SendGridEmailSender.SendEmailAsync(sendEmail);
-            }
+            //    await SendGridEmailSender.SendEmailAsync(sendEmail);
+            //}
 
             var loanQupte = await _loanQuoteRepository.GetLoanQuoteByLoadApplicationId(loanApplicationId);
             if (loanQupte.InsuranceId == (int)InsuranceEnum.SBS)

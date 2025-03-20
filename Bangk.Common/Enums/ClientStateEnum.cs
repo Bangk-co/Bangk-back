@@ -82,7 +82,6 @@ namespace Bangk.Common.Enums
     {
         NingunaDeLasAnteriores = 707
     }
-
     public enum CaratulaEnum
     {
         CaratulaNumber = 708

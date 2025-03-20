@@ -22,7 +22,6 @@ namespace Bangk.Api.Controllers
         }
 
         [HttpPost("ValidationSarlaft")]
-        [AllowAnonymous]
 
         public async Task<IActionResult> ValidationSarlaft(int loanApplicationId)
         {

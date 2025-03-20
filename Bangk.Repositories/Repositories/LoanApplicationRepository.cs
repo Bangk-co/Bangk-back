@@ -16,7 +16,7 @@ namespace Bangk.Repositories.Repositories
         {
         }
 
-        public async Task<List<LoanApplicationDto>> GetLoanApplicationInfo(int ClientId, bool takeFirstThree = false)
+        public List<LoanApplicationDto> GetLoanApplicationInfo(int ClientId)
         {
             var query = from c in Context.Clients
                         join l in Context.LoanApplication on c.Id equals l.ClientId
@@ -37,12 +37,8 @@ namespace Bangk.Repositories.Repositories
 
                         };
 
-            if (takeFirstThree)
-            {
-                query = query.OrderByDescending(q => q.CreationDate).Take(3);
-            }
+            return query.ToList();
 
-            return await query.ToListAsync();
         }
 
         public async Task<LoanApplicationInfoDto> GetLoanApplicationById(int loanApplicationId)
@@ -84,7 +80,9 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return await query.FirstOrDefaultAsync();
+
         }
+
 
         public async Task<List<LoanApplicationDto>> GetLoanApplicationInfoByLoanApplicationId(int loanApplicationId)
         {
@@ -109,6 +107,7 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return await query.ToListAsync();
+
         }
     }
 }

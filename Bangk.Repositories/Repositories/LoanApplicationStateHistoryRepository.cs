@@ -65,11 +65,5 @@ namespace Bangk.Repositories.Repositories
 
             return await query.ToListAsync();
         }
-
-        public async Task<LoanApplicationStateHistory> GetLastStateByLoanApplicationId(int loanApplicationId)
-        {
-            return await Context.LoanApplicationStateHistory.Where(h => h.LoanApplicationId == loanApplicationId)
-                .OrderByDescending(h => h.CreationDate).FirstOrDefaultAsync();
-        }
     }
 }

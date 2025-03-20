@@ -31,16 +31,6 @@ namespace Bangk.Common.Dto
 
     }
 
-    public class NewLoadAplicacionDto
-    {
-        public IFormFile BankStatementFile { get; set; }
-        public int BankId { get; set; }
-        public int LoanTypeId { get; set; }
-        public int ClientId { get; set; }
-        public string LoanNumber { get; set; }
-
-    }
-
     public class CreateClientNotLoanApplicationDto
     {
         public int ClientId { get; set; }

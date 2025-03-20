@@ -1,7 +1,10 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanApplication;
 using Bangk.Repositories.Repositories;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.LoanApplication
@@ -18,7 +21,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
 
         public async Task<List<LoanApplicationDto>> Execute(int ClientId)
         {
-            var loanApplications = await _ILoanApplicationRepository.GetLoanApplicationInfo(ClientId);
+            var loanApplications = _ILoanApplicationRepository.GetLoanApplicationInfo(ClientId);
             return  loanApplications;
         }
     }

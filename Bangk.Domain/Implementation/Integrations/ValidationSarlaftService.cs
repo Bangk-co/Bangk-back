@@ -30,7 +30,6 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IScheduleIntegrationRepository _scheduleIntegrationRepository;
         private readonly IChangeStatusDealService _changeStatusDealService;
         private readonly IChangeStateDealService _changeStateDealService;
-
         public ValidationSarlaftService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IConfiguration configuration, IClientRepository clientRepository,
             ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IScheduleIntegrationService scheduleIntegrationService,
             IValidationSarlaftRepository validationSarlaftRepository,

@@ -170,7 +170,7 @@ namespace Bangk.Repositories.Repositories
                 }).ToList();
         }
 
-        public IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication)
+        public IQueryable<int> GetLoanApplicationIdsWithState (ApplicationStateHistoryEnum stateloanApplication)
         {
             var query = from l in Context.LoanApplication
                         join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
@@ -261,8 +261,9 @@ namespace Bangk.Repositories.Repositories
                             LifeEnsure = lp.LifeEnsure,
                             NameBank = st.Name,
                             NitBank = st.Code
-
+                           
                         };
+            
 
             return query;
         }
@@ -299,45 +300,21 @@ namespace Bangk.Repositories.Repositories
             return string.Join(", ", diseaseNames);
         }
 
-        public async Task<List<ClientPolicyDto>> GetPolicyClient(int clientId)
+        public IQueryable<ClientPolicyDto> GetPolicyClient(int clientId)
         {
-            var query = from l in Context.LoanApplication
+            var query = from lp in Context.LoanInsurancePolicy
+                        join l in Context.LoanApplication on lp.LoanApplicationId equals l.Id
                         join c in Context.Clients on l.ClientId equals c.Id
                         join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
                         from sj in settingsGroup.DefaultIfEmpty()
                         where c.Id == clientId
-                        select new ClientPolicyDto
+                        select new
                         {
                             LoanApplicationId = l.Id,
-                            PolicyId = null,
-                            LoanType = sj.Name,
+                            PolicyId = lp.Id,
+                            LoanType = sj != null ? sj.Name : null,
                             CreationDateLoanApplication = l.CreationDate,
-                            CreationDatePolicy = null,
-                            StateName = Context.LoanApplicationStateHistory
-                                         .Where(m => m.LoanApplicationId == l.Id)
-                                         .OrderByDescending(lh => lh.CreationDate)
-                                         .Select(lh => lh.State.Name)
-                                         .FirstOrDefault()
-                        };
-            return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
-        }
-
-        public async Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId)
-        {
-            var query = from l in Context.LoanApplication
-                        join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId into t
-                        from sublp in t.DefaultIfEmpty()
-                        join c in Context.Clients on l.ClientId equals c.Id
-                        join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
-                        from sj in settingsGroup.DefaultIfEmpty()
-                        where c.Id == clientId
-                        select new ClientPolicyDto
-                        {
-                            LoanApplicationId = l.Id,
-                            PolicyId = null,
-                            LoanType = sj.Name,
-                            CreationDateLoanApplication = l.CreationDate,
-                            CreationDatePolicy = null,
+                            CreationDatePolicy = lp.CreationDate,
                             StateName = Context.LoanApplicationStateHistory
                                          .Where(m => m.LoanApplicationId == l.Id)
                                          .OrderByDescending(lh => lh.CreationDate)
@@ -345,7 +322,44 @@ namespace Bangk.Repositories.Repositories
                                          .FirstOrDefault()
                         };
 
-            return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
+            var result = query.ToList().Select(item => new ClientPolicyDto
+            {
+                LoanApplicationId = item.LoanApplicationId,
+                PolicyId = item.PolicyId,
+                LoanType = item.LoanType,
+                CreationDateLoanApplication = item.CreationDateLoanApplication,
+                CreationDatePolicy = item.CreationDatePolicy,
+                StateName = item.StateName
+            }).ToList();
+
+            if (!result.Any() && Context.LoanApplication.Any(l => l.ClientId == clientId))
+            {
+                var fallbackQuery = from l in Context.LoanApplication
+                                    join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
+                                    from sj in settingsGroup.DefaultIfEmpty()
+                                    where l.ClientId == clientId
+                                    select new ClientPolicyDto
+                                    {
+                                        LoanApplicationId = l.Id,
+                                        PolicyId = null,
+                                        LoanType = sj != null ? sj.Name : null,
+                                        CreationDateLoanApplication = l.CreationDate,
+                                        CreationDatePolicy = null,
+                                        StateName = Context.LoanApplicationStateHistory
+                                         .Where(m => m.LoanApplicationId == l.Id)
+                                         .OrderByDescending(lh => lh.CreationDate)
+                                         .Select(lh => lh.State.Name)
+                                         .FirstOrDefault()
+                                    };
+
+                result.AddRange(fallbackQuery);
+            }
+
+            return result.AsQueryable();
         }
+
+
+
+
     }
 }

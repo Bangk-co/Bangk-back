@@ -14,15 +14,20 @@ namespace Bangk.Repositories.Repositories
     {
         Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber);
         IQueryable<ClientDto> GetClientListQuery(string searchValue, string sortField, string sortOrder, ClaimsPrincipal user);
+
         IQueryable<ClientInfoDto> GetClientByIdInfo(int clientId);
         Task<Client> GetClientByLoanApplicationId(int loanApplicationId);
         IQueryable<ClientReportDto> GetReportClientsSarlaft(ApplicationStateHistoryEnum stateloanApplication);
         IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication);
         IQueryable<ClientReport2Dto> GetReportClientsSarlaftLogs(ApplicationStateHistoryEnum stateloanApplication);
         string GetDiseasesNames(string diseaseIds);
-        Task<List<ClientPolicyDto>> GetPolicyClient(int clientId);
+        IQueryable<ClientPolicyDto> GetPolicyClient(int clientId);
+        //IQueryable<Beneficiaries2JobDto> GetBeneficiariesLogs(int loanInsurancePolicyId);
         List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId);
+        //IQueryable<BeneficiariesJobDto> GetBeneficiaries(int loanInsurancePolicyId);
         List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId);
-        Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId);
+
+
+
     }
 }

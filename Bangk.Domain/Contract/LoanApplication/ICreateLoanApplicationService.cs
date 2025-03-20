@@ -1,5 +1,4 @@
-﻿using Bangk.Common.Dto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +8,5 @@ namespace Bangk.Domain.Contract.LoanApplication
 {
     public interface ICreateLoanApplicationService
     {
-        Task<ResponseDto<int>> Execute(NewLoadAplicacionDto createLoadAplicacionDto);
     }
 }

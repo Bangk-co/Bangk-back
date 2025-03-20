@@ -3,12 +3,10 @@ using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.LoanQuote;
-using Bangk.Domain.Implementation.Clientify;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Configuration;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -24,6 +22,7 @@ namespace Bangk.Domain.Implementation.LoanApplication
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly IChangeStatusDealService _changeStatusDealService;
+
         public AcceptLoanQuoteService(ILoanApplicationRepository loanApplicationRepository, ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository,
             IClientRepository clientRepository, ILoanQuoteRepository loanQuoteRepository, INotificationRepository notificationRepository,
             IConfiguration configuration, IUserRepository userRepository, 
