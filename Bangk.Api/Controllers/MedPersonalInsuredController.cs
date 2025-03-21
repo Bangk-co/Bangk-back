@@ -3,6 +3,7 @@ using Bangk.Domain.Contract.MedPersonalInsureds;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -18,9 +19,19 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("CreateMedPersonalInsuredService")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<MedPersonInsuredsDto>>> CreateMedPersonalInsuredService(MedPersonInsuredsDto medPersonInsuredsDto)
+        public async Task<ActionResult<ResponseDto<int>>> CreateMedPersonalInsuredService( [FromBody] MedPersonInsuredsDto medPersonInsuredsDto)
         {
+            if (medPersonInsuredsDto == null || medPersonInsuredsDto.BeneficiaryInsurance == null || !medPersonInsuredsDto.BeneficiaryInsurance.Any())
+            {
+                return BadRequest(new ResponseDto<int>
+                {
+                    HasErrors = true,
+                    Errors = new List<string> { "Debe proporcionar al menos un beneficiario para el seguro." }
+                });
+            }
+
             var result = await _createMedPersonalInsuredService.Execute(medPersonInsuredsDto);
+
             if (result.HasErrors)
             {
                 return BadRequest(result);
@@ -28,8 +39,9 @@ namespace Bangk.Api.Controllers
 
             return Ok(new
             {
-                ClientInsuredId = result.Result
+                MedEnsuranceApplicationId = result.Result
             });
         }
+
     }
 }

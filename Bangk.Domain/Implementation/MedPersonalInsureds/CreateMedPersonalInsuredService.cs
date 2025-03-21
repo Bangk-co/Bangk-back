@@ -17,11 +17,12 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
     {
         private readonly IMedPersonInsuredRepository _medPersonalInsuredRepository;
         private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
-        public CreateMedPersonalInsuredService(IMedPersonInsuredRepository medPersonalInsuredRepository, IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository)
+        private readonly IClientRepository _clientRepository;
+        public CreateMedPersonalInsuredService(IMedPersonInsuredRepository medPersonalInsuredRepository, IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository, IClientRepository clientRepository)
         {
             _medPersonalInsuredRepository = medPersonalInsuredRepository;
             _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
-
+            _clientRepository = clientRepository;
         }
 
         public async Task<ResponseDto<int>> Execute(MedPersonInsuredsDto medPersonInsuredsDto)
@@ -33,45 +34,84 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
 
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
-            var MedEnsuranceApplication = new Repositories.Entities.MedEnsuranceApplication()
+            if (medPersonInsuredsDto.BeneficiaryInsurance == null || !medPersonInsuredsDto.BeneficiaryInsurance.Any())
             {
-                MethodPaymentId = medPersonInsuredsDto.MedEnsuranceApplicationDto.MethodPaymentId,
-                Deleted = medPersonInsuredsDto.MedEnsuranceApplicationDto.Deleted,
-                Status = (int)InsuranceStatesEnum.PendingToCreate
+                result.HasErrors = true;
+                result.Errors.Add("Debe proporcionar al menos un beneficiario para el seguro.");
+                return result;
+            }
+
+            int clientId = 0;
+            var clientExist = await _clientRepository.ExistClientByEmailAndIdentificationNumber(
+                medPersonInsuredsDto.Email,
+                medPersonInsuredsDto.DocumentNumber
+            );
+
+            if (!clientExist)
+            {
+                var client = new Repositories.Entities.Client
+                {
+                    Email = medPersonInsuredsDto.Email,
+                    PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate,
+                    DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId,
+                    IdentificationNumber = medPersonInsuredsDto.DocumentNumber,
+                    LastName = medPersonInsuredsDto.LastName,
+                    Name = medPersonInsuredsDto.Name,
+                    CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
+                    PhoneNumber = medPersonInsuredsDto.PhoneNumber,
+                };
+
+                await _clientRepository.Create(client);
+                clientId = client.Id;
+            }
+            else
+            {
+                var client = await _clientRepository.GetClientByEmailAndIdentificationNumber(
+                    medPersonInsuredsDto.Email,
+                    medPersonInsuredsDto.DocumentNumber
+                );
+                clientId = client.Id;
+            }
+
+            var medEnsuranceApplication = new Repositories.Entities.MedEnsuranceApplication()
+            {
+                ClientId = clientId,
+                MethodPaymentId = medPersonInsuredsDto.MethodPaymentId,
+                Status = (int)InsuranceStatesEnum.PendingToCreate,
             };
 
-            await _medEnsuranceApplicationRepository.Create(MedEnsuranceApplication);
+            await _medEnsuranceApplicationRepository.Create(medEnsuranceApplication);
 
-            var medPersonalInsureds = new List<Repositories.Entities.MedPersonInsureds>();
-            if (medPersonInsuredsDto != null && medPersonInsuredsDto.MedEnsuranceApplicationDto != null)
+            var beneficiaries = new List<Repositories.Entities.MedPersonInsureds>();
+
+            int order = 1;
+            foreach (var item in medPersonInsuredsDto.BeneficiaryInsurance)
             {
-                var insureds = new List<MedPersonInsuredsDto> { medPersonInsuredsDto };
-                foreach (var item in insureds)
+                var beneficiary = new Repositories.Entities.MedPersonInsureds
                 {
-                    var medPersonalInsured = new Repositories.Entities.MedPersonInsureds
-                    {
-                        DocumentTypeId = item.DocumentTypeId,
-                        DocumentNumber = item.DocumentNumber,
-                        Name = item.Name,
-                        Deleted = item.Deleted,
-                        Email = item.Email,
-                        PhoneNumber = item.PhoneNumber,
-                        MedEnsuraceApplicationId = MedEnsuranceApplication.Id,
-                        TreatPErsonalDatadate = item.TreatPErsonalDatadate
-                    };
+                    DocumentTypeId = item.DocumentTypeId,
+                    DocumentNumber = item.DocumentNumber,
+                    Name = item.Name,
+                    Email = item.Email,
+                    PhoneNumber = item.PhoneNumber,
+                    MedEnsuraceApplicationId = medEnsuranceApplication.Id,
+                    TreatPErsonalDatadate = item.TreatPErsonalDatadate,
+                };
 
-                    medPersonalInsureds.Add(medPersonalInsured);
-                }
+                beneficiaries.Add(beneficiary);
+                order++;
             }
 
-            if (medPersonalInsureds.Count > 0)
+            if (beneficiaries.Count > 0)
             {
-                await _medPersonalInsuredRepository.CreateBulk(medPersonalInsureds);
+                await _medPersonalInsuredRepository.CreateBulk(beneficiaries);
             }
 
-            result.Result = MedEnsuranceApplication.Id;
+            result.Result = medEnsuranceApplication.Id;
             scope.Complete();
             return result;
         }
+
+
     }
 }
