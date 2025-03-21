@@ -15,11 +15,11 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
     {
         private readonly IPetInsuranceApplicationRepository _petEnsuranceApplicationRepository;
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
-        private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        private readonly IMedInsuranceApplicationRepository _medEnsuranceApplicationRepository;
 
         public TransactionUpdateStateService(IPetInsuranceApplicationRepository petEnsuranceApplicationRepository,
             IApplicationTransactionRepository applicationTransactionRepository,
-            IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository)
+            IMedInsuranceApplicationRepository medEnsuranceApplicationRepository)
         {
             _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
             _applicationTransactionRepository = applicationTransactionRepository;

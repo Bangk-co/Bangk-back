@@ -16,17 +16,17 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
     public class CreateMedPersonalInsuredService : ICreateMedPersonalInsuredService
     {
         private readonly IMedPersonInsuredRepository _medPersonalInsuredRepository;
-        private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        private readonly IMedInsuranceApplicationRepository _medInsuranceApplicationRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
 
         public CreateMedPersonalInsuredService(IMedPersonInsuredRepository medPersonalInsuredRepository,
-            IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository, 
+            IMedInsuranceApplicationRepository medInsuranceApplicationRepository, 
             IClientRepository clientRepository, 
             IUserRepository userRepository)
         {
             _medPersonalInsuredRepository = medPersonalInsuredRepository;
-            _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
+            _medInsuranceApplicationRepository = medInsuranceApplicationRepository;
             _clientRepository = clientRepository;
             _userRepository = userRepository;
         }
@@ -81,7 +81,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
 
             var userReview = await _userRepository.GetUserWithLessApplication();
 
-            var medEnsuranceApplication = new Repositories.Entities.MedInsuranceApplication()
+            var medInsuranceApplication = new Repositories.Entities.MedInsuranceApplication()
             {
                 ClientId = clientId,
                 PaymentOcurrencyId = medPersonInsuredsDto.PaymentOcurrencyId,
@@ -89,7 +89,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 ReviewerId = userReview.Id
             };
 
-            await _medEnsuranceApplicationRepository.Create(medEnsuranceApplication);
+            await _medInsuranceApplicationRepository.Create(medInsuranceApplication);
 
             var beneficiaries = new List<Repositories.Entities.MedPersonInsureds>();
             foreach (var item in medPersonInsuredsDto.BeneficiaryInsurance)
@@ -101,7 +101,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                     Name = item.Name,
                     Email = item.Email,
                     PhoneNumber = item.PhoneNumber,
-                    MedEnsuraceApplicationId = medEnsuranceApplication.Id,
+                    MedEnsuraceApplicationId = medInsuranceApplication.Id,
                     TreatPErsonalDatadate = item.TreatPErsonalDatadate,
                     CountryCodePhoneId = item.CountryCodePhoneId,
                     LastName = item.LastName,
@@ -119,7 +119,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                     Name = medPersonInsuredsDto.Name,
                     Email = medPersonInsuredsDto.Email,
                     PhoneNumber = medPersonInsuredsDto.PhoneNumber,
-                    MedEnsuraceApplicationId = medEnsuranceApplication.Id,
+                    MedEnsuraceApplicationId = medInsuranceApplication.Id,
                     TreatPErsonalDatadate = medPersonInsuredsDto.TreatPErsonalDatadate,
                     CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
                     LastName = medPersonInsuredsDto.LastName,
@@ -133,7 +133,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 await _medPersonalInsuredRepository.CreateBulk(beneficiaries);
             }
 
-            result.Result = medEnsuranceApplication.Id;
+            result.Result = medInsuranceApplication.Id;
             scope.Complete();
             return result;
         }

@@ -24,12 +24,12 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
         private readonly IGetTransactionPaymentStatusService _getTransactionPaymentStatusService;
         private readonly IPetInsuranceApplicationRepository _petEnsuranceApplicationRepository;
-        private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        private readonly IMedInsuranceApplicationRepository _medEnsuranceApplicationRepository;
         public CreateTransactionBancolombiaService(IConfiguration configuration,
                                                    IGenerateIntegrityKeyService generateIntegrityKeyService,
                                                    IApplicationTransactionRepository applicationTransactionRepository,
                                                    IGetTransactionPaymentStatusService getTransactionPaymentStatusServi,
-                                                   IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository,
+                                                   IMedInsuranceApplicationRepository medEnsuranceApplicationRepository,
                                                    IPetInsuranceApplicationRepository petEnsuranceApplicationRepository)
         {
             _configuration = configuration;

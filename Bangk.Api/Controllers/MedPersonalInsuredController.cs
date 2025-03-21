@@ -39,7 +39,7 @@ namespace Bangk.Api.Controllers
 
             return Ok(new
             {
-                MedEnsuranceApplicationId = result.Result
+                MedInsuranceApplicationId = result.Result
             });
         }
 

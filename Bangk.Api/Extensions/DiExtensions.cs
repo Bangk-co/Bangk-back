@@ -88,7 +88,7 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IValidationSBSLogRepository, ValidationSBSLogRepository>();
             services.AddScoped<IScheduleIntegrationRepository, ScheduleIntegrationRepository>();
             services.AddScoped<IValidationSarlaftRepository, ValidationSarlaftRepository>();
-            services.AddScoped<IMedEnsuranceApplicationRepository, MEdEnsuranceApplicationRepository>();
+            services.AddScoped<IMedInsuranceApplicationRepository, MEdInsuranceApplicationRepository>();
             services.AddScoped<IMedPersonInsuredRepository, MedPersonInsuredRepository>();
             services.AddScoped<IPetInsuranceApplicationRepository, PetInsuranceApplicationRepository>();
             services.AddScoped<IPetRepository, PetRepository>();

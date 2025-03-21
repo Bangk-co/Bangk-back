@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bangk.Common.Dto
 {
-    public class MedEnsuranceApplicationDto
+    public class MedInsuranceApplicationDto
     {
         public int MethodPaymentId { get; set; }
         public long Delete { get; set; }

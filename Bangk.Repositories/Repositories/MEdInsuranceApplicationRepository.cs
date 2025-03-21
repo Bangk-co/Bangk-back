@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public class MEdEnsuranceApplicationRepository: GenericRepository<MedInsuranceApplication, MedEnsuranceApplicationDto>, IMedEnsuranceApplicationRepository
+    public class MEdInsuranceApplicationRepository: GenericRepository<MedInsuranceApplication, MedInsuranceApplicationDto>, IMedInsuranceApplicationRepository
     {
-        public MEdEnsuranceApplicationRepository(AppDbContext context) : base(context)
+        public MEdInsuranceApplicationRepository(AppDbContext context) : base(context)
         {
         }
 
