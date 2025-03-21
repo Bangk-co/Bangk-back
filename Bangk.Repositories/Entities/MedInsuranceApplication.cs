@@ -2,7 +2,7 @@
 
 namespace Bangk.Repositories.Entities
 {
-    public class MedEnsuranceApplication : EntityBase
+    public class MedInsuranceApplication : EntityBase
     {
         [ForeignKey("Setting")]
         public int PaymentOcurrencyId { get; set; }
@@ -12,6 +12,7 @@ namespace Bangk.Repositories.Entities
         public long? PaymentSourceId { get; set; }
         [ForeignKey("Client")]
         public int ClientId { get; set; }
-
+        [ForeignKey("User")]
+        public int ReviewerId { get; set; }
     }
 }

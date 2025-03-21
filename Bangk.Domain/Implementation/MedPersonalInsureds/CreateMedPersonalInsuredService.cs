@@ -18,11 +18,17 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
         private readonly IMedPersonInsuredRepository _medPersonalInsuredRepository;
         private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
         private readonly IClientRepository _clientRepository;
-        public CreateMedPersonalInsuredService(IMedPersonInsuredRepository medPersonalInsuredRepository, IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository, IClientRepository clientRepository)
+        private readonly IUserRepository _userRepository;
+
+        public CreateMedPersonalInsuredService(IMedPersonInsuredRepository medPersonalInsuredRepository,
+            IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository, 
+            IClientRepository clientRepository, 
+            IUserRepository userRepository)
         {
             _medPersonalInsuredRepository = medPersonalInsuredRepository;
             _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
             _clientRepository = clientRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseDto<int>> Execute(MedPersonInsuredsDto medPersonInsuredsDto)
@@ -73,11 +79,14 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 clientId = client.Id;
             }
 
-            var medEnsuranceApplication = new Repositories.Entities.MedEnsuranceApplication()
+            var userReview = await _userRepository.GetUserWithLessApplication();
+
+            var medEnsuranceApplication = new Repositories.Entities.MedInsuranceApplication()
             {
                 ClientId = clientId,
                 PaymentOcurrencyId = medPersonInsuredsDto.PaymentOcurrencyId,
                 Status = (int)InsuranceStatesEnum.PendingToCreate,
+                ReviewerId = userReview.Id
             };
 
             await _medEnsuranceApplicationRepository.Create(medEnsuranceApplication);

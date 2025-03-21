@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public class MEdEnsuranceApplicationRepository: GenericRepository<MedEnsuranceApplication, MedEnsuranceApplicationDto>, IMedEnsuranceApplicationRepository
+    public class MEdEnsuranceApplicationRepository: GenericRepository<MedInsuranceApplication, MedEnsuranceApplicationDto>, IMedEnsuranceApplicationRepository
     {
         public MEdEnsuranceApplicationRepository(AppDbContext context) : base(context)
         {
         }
 
-        public async Task<MedEnsuranceApplication> GetMedEnsuranceApplicationByReference(string reference)
+        public async Task<MedInsuranceApplication> GetMedEnsuranceApplicationByReference(string reference)
         {
-            return await Context.MedEnsuranceApplication.FirstOrDefaultAsync(p => p.TransactionReference == reference);
+            return await Context.MedInsuranceApplication.FirstOrDefaultAsync(p => p.TransactionReference == reference);
         }
     }
 }

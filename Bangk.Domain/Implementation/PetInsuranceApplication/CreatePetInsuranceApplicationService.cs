@@ -14,11 +14,17 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
         private readonly IPetInsuranceApplicationRepository _petInsuranceApplicationRepository;
         private readonly IPetRepository _petRepository;
         private readonly IClientRepository _clientRepository;
-        public CreatePetInsuranceApplicationService(IPetInsuranceApplicationRepository petInsuranceApplicationRepository, IPetRepository petRepository, IClientRepository clientRepository)
+        private readonly IUserRepository _userRepository;
+
+        public CreatePetInsuranceApplicationService(IPetInsuranceApplicationRepository petInsuranceApplicationRepository, 
+            IPetRepository petRepository, 
+            IClientRepository clientRepository, 
+            IUserRepository userRepository)
         {
             _petInsuranceApplicationRepository = petInsuranceApplicationRepository;
             _petRepository = petRepository;
             _clientRepository = clientRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseDto<int>> Execute(PetInsuranceDto petInsuranceDto)
@@ -66,11 +72,14 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 clientId = client.Id;
             }
 
+            var userReview = await _userRepository.GetUserWithLessApplication();
+
             var petInsuranceApplication = new Repositories.Entities.PetInsuranceApplication()
             {
                 ClientId = clientId,
                 PaymentOcurrencyId = petInsuranceDto.PaymentOcurrencyId,
-                Status = (int)InsuranceStatesEnum.PendingToCreate
+                Status = (int)InsuranceStatesEnum.PendingToCreate,
+                ReviewerId = userReview.Id
             };
 
             await _petInsuranceApplicationRepository.Create(petInsuranceApplication);

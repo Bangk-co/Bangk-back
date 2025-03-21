@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public interface IMedEnsuranceApplicationRepository: IGenericRepository<MedEnsuranceApplication, MedEnsuranceApplicationDto>
+    public interface IMedEnsuranceApplicationRepository: IGenericRepository<MedInsuranceApplication, MedEnsuranceApplicationDto>
     {
-        Task<MedEnsuranceApplication> GetMedEnsuranceApplicationByReference(string reference);
+        Task<MedInsuranceApplication> GetMedEnsuranceApplicationByReference(string reference);
     }
 }
