@@ -69,7 +69,7 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
             var petInsuranceApplication = new Repositories.Entities.PetInsuranceApplication()
             {
                 ClientId = clientId,
-                MethodPayment = petInsuranceDto.MethodPaymentId,
+                PaymentOcurrencyId = petInsuranceDto.PaymentOcurrencyId,
                 Status = (int)InsuranceStatesEnum.PendingToCreate
             };
 

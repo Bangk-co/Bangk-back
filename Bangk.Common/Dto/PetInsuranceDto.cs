@@ -5,7 +5,7 @@ namespace Bangk.Common.Dto
 {
     public class PetInsuranceDto
     {
-        public int MethodPaymentId { get; set; }
+        public int PaymentOcurrencyId { get; set; }
         public int DocumentTypeId { get; set; }
         public string DocumentNumber { get; set; }
         public string Name { get; set; }

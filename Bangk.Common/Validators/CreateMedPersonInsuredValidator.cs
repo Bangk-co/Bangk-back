@@ -25,7 +25,7 @@ namespace Bangk.Common.Validators
                 .NotEmpty().WithMessage("El número de identificación del cliente es obligatorio");
             RuleFor(x => x.DocumentTypeId)
                 .GreaterThan(0).WithMessage("El tipo de identificación  del cliente es obligatorio");
-            RuleFor(dto => dto.MethodPaymentId).GreaterThan(0).WithMessage("El metodo de pago es obligatorio"); ;
+            RuleFor(dto => dto.PaymentOcurrencyId).GreaterThan(0).WithMessage("El metodo de pago es obligatorio"); ;
 
             RuleForEach(dto => dto.BeneficiaryInsurance).SetValidator(new CreateMedEnsuraceApplicationValidator());
         }
@@ -35,8 +35,8 @@ namespace Bangk.Common.Validators
     {
         public CreateMedEnsuraceApplicationValidator()
         {
-            RuleFor(x => x.MedEnsuraceApplicationId)
-              .NotNull().WithMessage("La información de la solitud es obligatorio");
+            RuleFor(x => x.Email)
+              .EmailAddress().WithMessage("La información de la solitud es obligatorio");
 
         }
     }

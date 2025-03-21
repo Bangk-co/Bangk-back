@@ -20,8 +20,8 @@ namespace Bangk.Common.Validators
                 .NotEmpty().WithMessage("El número de identificación del cliente es obligatorio");
             RuleFor(x => x.DocumentTypeId)
                 .GreaterThan(0).WithMessage("El tipo de identificación  del cliente es obligatorio");
-            RuleFor(x => x.MethodPaymentId)
-              .GreaterThan(0).WithMessage("El tipo de identificación  del cliente es obligatorio");
+            RuleFor(x => x.PaymentOcurrencyId)
+              .GreaterThan(0).WithMessage("El plan de pago es obligatorio");
         }
     }
 }

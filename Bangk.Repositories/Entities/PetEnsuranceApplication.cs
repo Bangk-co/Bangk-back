@@ -6,7 +6,7 @@ namespace Bangk.Repositories.Entities
     public class PetInsuranceApplication : EntityBase
     {
         [ForeignKey("Setting")]
-        public int MethodPayment {  get; set; }
+        public int PaymentOcurrencyId {  get; set; }
         public int Status { get; set; }
         [ForeignKey("Client")]
         public int ClientId { get; set; }

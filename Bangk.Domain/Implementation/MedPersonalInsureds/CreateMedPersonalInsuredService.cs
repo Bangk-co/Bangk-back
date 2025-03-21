@@ -76,15 +76,13 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             var medEnsuranceApplication = new Repositories.Entities.MedEnsuranceApplication()
             {
                 ClientId = clientId,
-                MethodPaymentId = medPersonInsuredsDto.MethodPaymentId,
+                PaymentOcurrencyId = medPersonInsuredsDto.PaymentOcurrencyId,
                 Status = (int)InsuranceStatesEnum.PendingToCreate,
             };
 
             await _medEnsuranceApplicationRepository.Create(medEnsuranceApplication);
 
             var beneficiaries = new List<Repositories.Entities.MedPersonInsureds>();
-
-            int order = 1;
             foreach (var item in medPersonInsuredsDto.BeneficiaryInsurance)
             {
                 var beneficiary = new Repositories.Entities.MedPersonInsureds
@@ -96,10 +94,29 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                     PhoneNumber = item.PhoneNumber,
                     MedEnsuraceApplicationId = medEnsuranceApplication.Id,
                     TreatPErsonalDatadate = item.TreatPErsonalDatadate,
+                    CountryCodePhoneId = item.CountryCodePhoneId,
+                    LastName = item.LastName,
                 };
 
                 beneficiaries.Add(beneficiary);
-                order++;
+            }
+
+            if (medPersonInsuredsDto.IsBeneficiary)
+            {
+                var beneficiary = new Repositories.Entities.MedPersonInsureds
+                {
+                    DocumentTypeId = medPersonInsuredsDto.DocumentTypeId,
+                    DocumentNumber = medPersonInsuredsDto.DocumentNumber,
+                    Name = medPersonInsuredsDto.Name,
+                    Email = medPersonInsuredsDto.Email,
+                    PhoneNumber = medPersonInsuredsDto.PhoneNumber,
+                    MedEnsuraceApplicationId = medEnsuranceApplication.Id,
+                    TreatPErsonalDatadate = medPersonInsuredsDto.TreatPErsonalDatadate,
+                    CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
+                    LastName = medPersonInsuredsDto.LastName,
+                };
+
+                beneficiaries.Add(beneficiary);
             }
 
             if (beneficiaries.Count > 0)
