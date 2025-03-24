@@ -133,6 +133,8 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
                     };
+
+                    return response;
                 }
 
                 //Save tokenization
