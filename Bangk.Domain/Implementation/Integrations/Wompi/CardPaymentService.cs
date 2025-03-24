@@ -21,16 +21,19 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
         private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
         private readonly IPetInsuranceApplicationRepository _petEnsuranceApplicationRepository;
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
-        public CardPaymentService(IConfiguration configuration, IGetMerchantsTokenService getMerchantsTokenService, 
+        private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        public CardPaymentService(IConfiguration configuration, IGetMerchantsTokenService getMerchantsTokenService,
             IGenerateIntegrityKeyService generateIntegrityKeyService,
             IPetInsuranceApplicationRepository petEnsuranceApplicationRepository,
-            IApplicationTransactionRepository applicationTransactionRepository)
+            IApplicationTransactionRepository applicationTransactionRepository
+            , IMedEnsuranceApplicationRepository imedEnsuranceApplicationRepository)
         {
             _configuration = configuration;
             _getMerchantsTokenService = getMerchantsTokenService;
             _generateIntegrityKeyService = generateIntegrityKeyService;
             _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
             _applicationTransactionRepository = applicationTransactionRepository;
+            _medEnsuranceApplicationRepository = imedEnsuranceApplicationRepository;
         }
         public async Task<ResponseDto<PaymentCardResponseDto>> Execute(CardPaymentDto cardPaymentDto)
         {
@@ -108,7 +111,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 {
                     amount_in_cents = cardPaymentDto.Amount,
                     currency = "COP",
-                    signature = signature,
+                    signature,
                     customer_email = cardPaymentDto.Email,
                     payment_method = new
                     {
@@ -133,10 +136,45 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 }
 
                 //Save tokenization
-                var petApplication = await _petEnsuranceApplicationRepository.GetById(cardPaymentDto.PetApplicationId);
-                petApplication.PaymentSourceId = apiResponsePaymentSource.Data.Id;
-                petApplication.TransactionReference = reference;
-                await _petEnsuranceApplicationRepository.Update(petApplication);
+                if (cardPaymentDto.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
+                {
+                    var medApplicationInBD = await _medEnsuranceApplicationRepository.GetById(cardPaymentDto.ApplicationId);
+                    if (string.Equals(apiResponseTransaction["data"]["status"], "APPROVED"))
+                    {
+                        medApplicationInBD.Status = (int)InsuranceStatesEnum.Approve;
+                    }
+                    else if (string.Equals(apiResponseTransaction["data"]["status"], "DECLINED") ||
+                        string.Equals(apiResponseTransaction["data"]["status"], "VOIDED") ||
+                        string.Equals(apiResponseTransaction["data"]["status"], "ERROR"))
+                    {
+                        medApplicationInBD.Status = (int)InsuranceStatesEnum.Rejected;
+                    }
+
+                    medApplicationInBD.TokenPaymentSource = apiResponseCard.Data.Id;//Tokenizacion
+                    medApplicationInBD.TransactionReference = reference;
+                    medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
+                    await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
+                }
+                else if (cardPaymentDto.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
+                {
+                    var petApplication = await _petEnsuranceApplicationRepository.GetById(cardPaymentDto.ApplicationId);
+                    if (string.Equals(apiResponseTransaction["data"]["status"], "APPROVED"))
+                    {
+                        petApplication.Status = (int)InsuranceStatesEnum.Approve;
+                    }
+                    else if (string.Equals(apiResponseTransaction["data"]["status"], "DECLINED") ||
+                        string.Equals(apiResponseTransaction["data"]["status"], "VOIDED") ||
+                        string.Equals(apiResponseTransaction["data"]["status"], "ERROR"))
+                    {
+                        petApplication.Status = (int)InsuranceStatesEnum.Rejected;
+                    }
+
+                    petApplication.TokenPaymentSource = apiResponseCard.Data.Id;//Tokenizacion
+                    petApplication.TransactionReference = reference;
+                    petApplication.TransactionId = apiResponseTransaction["data"]["id"];
+                    await _petEnsuranceApplicationRepository.Update(petApplication);
+                }
+                
 
                 //Create log transaction
                 var transactionAdd = new ApplicationTransaction
@@ -155,8 +193,9 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 {
                     Amount = cardPaymentDto.Amount,
                     Status = transactionAdd.Status,
-                    TransactionReference = transactionAdd.Reference
-                };
+                    TransactionReference = transactionAdd.Reference,
+                    TransactionId = apiResponseTransaction["data"]["id"]
+                }; 
             }
 
             return response;

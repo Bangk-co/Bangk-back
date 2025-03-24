@@ -85,7 +85,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             {
                 ClientId = clientId,
                 PaymentOcurrencyId = medPersonInsuredsDto.PaymentOcurrencyId,
-                Status = (int)InsuranceStatesEnum.PendingToCreate,
+                Status = (int)InsuranceStatesEnum.PendingToApprove,
                 ReviewerId = userReview.Id
             };
 

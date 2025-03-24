@@ -1,10 +1,8 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.Integrations.Wompi;
-using Bangk.Domain.Implementation.Integrations.Wompi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers
@@ -13,23 +11,25 @@ namespace Bangk.Api.Controllers
     {
         private readonly IGenerateTokenTrxBancolombiaService _createBancolombiaButtonPaymentService;
         private readonly IGetTrxBancolombiaStatusService _getTrxBancolombiaStatusService;
-        private readonly IGetMerchantsTokenService _getMerchantsTokenService;
         private readonly IPaymentSourcesBancolombiaTransferService _paymentSourcesBancolombiaTransferService;
         private readonly ICardPaymentService _cardPaymentService;
-        private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
         private readonly ITransactionUpdateStateService _transactionUpdateStateService;
+        private readonly IGetStatusTransactionService _getStatusTransactionService;
         public WompiIntegrationController(IGenerateTokenTrxBancolombiaService createBancolombiaButtonPaymentService,
                                          IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
-                                         IGetMerchantsTokenService getMerchantsTokenService, IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService,
-                                         ICardPaymentService cardPaymentService, IGenerateIntegrityKeyService generateIntegrityKeyService, ITransactionUpdateStateService transactionUpdateStateService)
+                                         IGetMerchantsTokenService getMerchantsTokenService,
+                                         IPaymentSourcesBancolombiaTransferService paymentSourcesBancolombiaTransferService,
+                                         ICardPaymentService cardPaymentService,
+                                         IGenerateIntegrityKeyService generateIntegrityKeyService, 
+                                         ITransactionUpdateStateService transactionUpdateStateService,
+                                         IGetStatusTransactionService getStatusTransactionService)
         {
             _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
             _getTrxBancolombiaStatusService = getTrxBancolombiaStatusService;
-            _getMerchantsTokenService = getMerchantsTokenService;
             _paymentSourcesBancolombiaTransferService = paymentSourcesBancolombiaTransferService;
             _cardPaymentService = cardPaymentService;
-            _generateIntegrityKeyService = generateIntegrityKeyService;
             _transactionUpdateStateService = transactionUpdateStateService;
+            _getStatusTransactionService = getStatusTransactionService;
         }
 
         [HttpPost("GenerateTokenTrxBancolombia")]
@@ -76,6 +76,14 @@ namespace Bangk.Api.Controllers
 
             await _transactionUpdateStateService.Execute(transactionUpdateDto);
             return Ok();
+        }
+
+        [HttpGet("GetStatusTransaction")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ResponseDto<string>>> GetStatusTransaction(string transactionReference)
+        {
+            var result = await _getStatusTransactionService.Execute(transactionReference);
+            return Ok(result);
         }
     }
 }

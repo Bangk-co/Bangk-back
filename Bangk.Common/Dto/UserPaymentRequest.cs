@@ -14,6 +14,6 @@ namespace Bangk.Common.Dto
         public int Amount { get; set; }
         public string TypeApplication {  get; set; }
         public MethodPaymentTimeEnum TimeApplication { get; set; }
-
+        public string TokenPayment { get; set; }
     }
 }

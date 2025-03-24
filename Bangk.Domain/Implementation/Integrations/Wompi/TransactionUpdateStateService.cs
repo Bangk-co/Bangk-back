@@ -44,12 +44,12 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             {
                 case string reference when reference.Contains("PET"):
                     var petApplication = await _petEnsuranceApplicationRepository.GetPetApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
-                    petApplication.Status = (int)InsuranceStatesEnum.Created;
+                    petApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                     break;
                 case string reference when reference.Contains("MED"):
                     var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
-                    medApplication.Status = (int)InsuranceStatesEnum.Created;
+                    medApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     break;
             }
