@@ -108,10 +108,16 @@ namespace Bangk.Domain.Implementation.Integrations
 
                     await _applicationTransactionRepository.Create(transactionAdd);
 
+                    var menssage = new
+                    {
+                        idReferencia = reference,
+                        transactionNumber = apiResponseTransaction["data"]["id"]
+                    };
+
                     response = new ResponseDto<string>
                     {
                         HasErrors = false,
-                        Result = jsonResponse
+                        Result = menssage.ToString()
                     };
 
                 }

@@ -31,9 +31,9 @@ namespace Bangk.Domain.Implementation.Integrations
             _createTransactionBancolombiaService = createTransactionBancolombiaService;
         }
 
-        public async Task<ResponseDto<PaymentWompiResponseDto>> Execute(UserPaymentRequest userPaymentRequest)
+        public async Task<ResponseDto<string>> Execute(UserPaymentRequest userPaymentRequest)
         {
-            var response = new ResponseDto<PaymentWompiResponseDto>();
+            var response = new ResponseDto<string>();
 
             var merchantsInfo = await _getMerchantsTokenService.Execute();
 
@@ -66,18 +66,14 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
                     var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentWompiResponseDto>(jsonResponse);
-                    //Logs.WriteInfoLog($"Response: {jsonResponse}");
-                    response = new ResponseDto<PaymentWompiResponseDto>
-                    {
-                        HasErrors = false,
-                        Result = apiResponseBancolombia
-                    };
 
                     userPaymentRequest.PaymentSourceId = apiResponseBancolombia.Data.Id;
                     var resultTransaction = await _createTransactionBancolombiaService.Execute(userPaymentRequest);
+
+                    response = resultTransaction;
                     if (resultTransaction.HasErrors)
                     {
-                        response = new ResponseDto<PaymentWompiResponseDto>
+                        response = new ResponseDto<string>
                         {
                             HasErrors = true,
                             Errors = new List<string> { resultTransaction.Errors.First() }
@@ -88,7 +84,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     var errorMessage = await apiResponse.Content.ReadAsStringAsync();
                     //Logs.WriteErrorLog($"Error: {errorMessage} - StatusCode: {apiResponse.StatusCode}");
-                    response = new ResponseDto<PaymentWompiResponseDto>
+                    response = new ResponseDto<string>
                     {
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}" }
