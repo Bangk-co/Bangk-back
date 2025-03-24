@@ -1,6 +1,8 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.Integrations.Wompi;
+using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -13,8 +15,6 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
     public class GetStatusTransactionService : IGetStatusTransactionService
     {
         private readonly IConfiguration _configuration;
-        private readonly IGetMerchantsTokenService _getMerchantsTokenService;
-        private readonly IGenerateIntegrityKeyService _generateIntegrityKeyService;
         private readonly IPetInsuranceApplicationRepository _petEnsuranceApplicationRepository;
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
         private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
@@ -25,8 +25,6 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository)
         {
             _configuration = configuration;
-            _getMerchantsTokenService = getMerchantsTokenService;
-            _generateIntegrityKeyService = generateIntegrityKeyService;
             _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
             _applicationTransactionRepository = applicationTransactionRepository;
             _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
@@ -66,10 +64,74 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     return response;
                 }
 
+                if (string.Equals(apiResponseStatus.Data.Status, "APPROVED"))
+                {
+                    await ApprovedTransactionProcess(apiResponseStatus.Data.Reference);
+                    await _applicationTransactionRepository.Create(CreateTransactionDto(apiResponseStatus));
+                }
+                else if (string.Equals(apiResponseStatus.Data.Status, "DECLINED") ||
+                      string.Equals(apiResponseStatus.Data.Status, "VOIDED") ||
+                      string.Equals(apiResponseStatus.Data.Status, "ERROR"))
+                {
+                    await RejectedTransactionProcess(apiResponseStatus.Data.Reference);
+                    await _applicationTransactionRepository.Create(CreateTransactionDto(apiResponseStatus));
+                }
+
+                
                 response.Result = apiResponseStatus.Data.Status;
             }
 
             return response;
+        }
+
+        private ApplicationTransaction CreateTransactionDto(StatusTransactionResponseDto apiResponseStatus)
+        {
+            //Create log transaction
+            return new ApplicationTransaction
+            {
+                Amount = apiResponseStatus.Data.Amount_In_Cents,
+                Currency = apiResponseStatus.Data.Currency,
+                Reference = apiResponseStatus.Data.Reference,
+                Status = apiResponseStatus.Data.Status,
+                TransactionCreationDate = apiResponseStatus.Data.Created_At,
+                TransactionNumber = apiResponseStatus.Data.Id,
+                PaymentMethodType = apiResponseStatus.Data.Payment_Method_Type
+            };
+        }
+
+        private async Task ApprovedTransactionProcess(string referenceApplication)
+        {
+            switch (referenceApplication)
+            {
+                case string reference when reference.Contains("PET"):
+                    var petApplication = await _petEnsuranceApplicationRepository.GetPetApplicationByReference(referenceApplication);
+                    petApplication.Status = (int)InsuranceStatesEnum.Approve;
+                    await _petEnsuranceApplicationRepository.Update(petApplication);
+                    break;
+                case string reference when reference.Contains("MED"):
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(referenceApplication);
+                    medApplication.Status = (int)InsuranceStatesEnum.Approve;
+                    await _medEnsuranceApplicationRepository.Update(medApplication);
+                    break;
+            }
+        }
+
+
+        private async Task RejectedTransactionProcess(string referenceApplication)
+        {
+            switch (referenceApplication)
+            {
+                case string reference when reference.Contains("PET"):
+                    var petApplication = await _petEnsuranceApplicationRepository.GetPetApplicationByReference(reference);
+                    petApplication.Status = (int)InsuranceStatesEnum.Rejected;
+                    await _petEnsuranceApplicationRepository.Update(petApplication);
+                    break;
+                case string reference when reference.Contains("MED"):
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(reference);
+                    medApplication.Status = (int)InsuranceStatesEnum.Rejected;
+                    await _medEnsuranceApplicationRepository.Update(medApplication);
+                    break;
+            }
         }
     }
 }
