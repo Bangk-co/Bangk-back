@@ -57,7 +57,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 signature = integrityKey, //Firma de integridad
                 customer_email = userPaymentRequest.Email, // Email del usuario
                 reference = reference, // Referencia única de pago
-                payment_source_id = userPaymentRequest.IdTransaction
+                payment_source_id = userPaymentRequest.PaymentSourceId
             };
 
             var jsonContent = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
@@ -92,7 +92,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     if (userPaymentRequest.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
                     {
                         var medApplicationInBD = await _medEnsuranceApplicationRepository.GetById(userPaymentRequest.ApplicationId);
-                        medApplicationInBD.TokenPaymentSource = userPaymentRequest.TokenPayment;
+                        medApplicationInBD.TokenPaymentSource = userPaymentRequest.PaymentSourceId;
                         medApplicationInBD.TransactionReference = reference;
                         medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
                         await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
@@ -100,7 +100,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     else if (userPaymentRequest.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
                     {
                         var petApplicationInBD = await _petEnsuranceApplicationRepository.GetById(userPaymentRequest.ApplicationId);
-                        petApplicationInBD.TokenPaymentSource = userPaymentRequest.TokenPayment;
+                        petApplicationInBD.TokenPaymentSource = userPaymentRequest.PaymentSourceId;
                         petApplicationInBD.TransactionReference = reference;
                         petApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
                         await _petEnsuranceApplicationRepository.Update(petApplicationInBD);
