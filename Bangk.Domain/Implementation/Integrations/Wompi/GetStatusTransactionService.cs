@@ -84,7 +84,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             return response;
         }
 
-        private ApplicationTransaction CreateTransactionDto(StatusTransactionResponseDto apiResponseStatus)
+        private static ApplicationTransaction CreateTransactionDto(StatusTransactionResponseDto apiResponseStatus)
         {
             //Create log transaction
             return new ApplicationTransaction
