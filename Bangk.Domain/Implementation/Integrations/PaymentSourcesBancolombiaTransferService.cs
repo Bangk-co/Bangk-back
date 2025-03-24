@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Bangk.Repositories.Repositories;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 namespace Bangk.Domain.Implementation.Integrations
 {
@@ -73,6 +74,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     };
 
                     userPaymentRequest.IdTransaction = apiResponseBancolombia.Data.Id;
+                    userPaymentRequest.TokenPayment = apiResponseBancolombia.Data.Token;
                     var resultTransaction = await _createTransactionBancolombiaService.Execute(userPaymentRequest);
                     if (resultTransaction.HasErrors)
                     {

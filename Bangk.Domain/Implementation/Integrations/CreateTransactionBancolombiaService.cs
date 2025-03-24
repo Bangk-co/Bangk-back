@@ -92,15 +92,17 @@ namespace Bangk.Domain.Implementation.Integrations
                     if (userPaymentRequest.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
                     {
                         var medApplicationInBD = await _medEnsuranceApplicationRepository.GetById(userPaymentRequest.ApplicationId);
-                        medApplicationInBD.PaymentSourceId = userPaymentRequest.IdTransaction;
+                        medApplicationInBD.TokenPaymentSource = userPaymentRequest.TokenPayment;
                         medApplicationInBD.TransactionReference = reference;
+                        medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
                         await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
                     }
                     else if (userPaymentRequest.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
                     {
                         var petApplicationInBD = await _petEnsuranceApplicationRepository.GetById(userPaymentRequest.ApplicationId);
-                        petApplicationInBD.PaymentSourceId = userPaymentRequest.IdTransaction;
+                        petApplicationInBD.TokenPaymentSource = userPaymentRequest.TokenPayment;
                         petApplicationInBD.TransactionReference = reference;
+                        petApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
                         await _petEnsuranceApplicationRepository.Update(petApplicationInBD);
                     }
 
