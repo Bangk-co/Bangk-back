@@ -150,7 +150,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                         medApplicationInBD.Status = (int)InsuranceStatesEnum.Rejected;
                     }
 
-                    medApplicationInBD.TokenPaymentSource = apiResponseCard.Data.Id;//Tokenizacion
+                    medApplicationInBD.TokenPaymentSource = apiResponsePaymentSource.Data.Id;//Tokenizacion
                     medApplicationInBD.TransactionReference = reference;
                     medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
                     await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
@@ -169,7 +169,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                         petApplication.Status = (int)InsuranceStatesEnum.Rejected;
                     }
 
-                    petApplication.TokenPaymentSource = apiResponseCard.Data.Id;//Tokenizacion
+                    petApplication.TokenPaymentSource = apiResponsePaymentSource.Data.Id;//Tokenizacion
                     petApplication.TransactionReference = reference;
                     petApplication.TransactionId = apiResponseTransaction["data"]["id"];
                     await _petEnsuranceApplicationRepository.Update(petApplication);

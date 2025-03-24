@@ -12,9 +12,9 @@ namespace Bangk.Repositories.Entities
         public int ClientId { get; set; }
         public string TransactionReference { get; set; }
         [ForeignKey("User")]
-        public int ReviewerId { get; set; }
+        public int? ReviewerId { get; set; }
 
         public string TransactionId { get; set; }
-        public string TokenPaymentSource { get; set; }
+        public int? TokenPaymentSource { get; set; }
     }
 }

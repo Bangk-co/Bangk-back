@@ -45,7 +45,7 @@ namespace Bangk.Domain.Implementation.Integrations
             var query = new
             {
                 type = "BANCOLOMBIA_TRANSFER",
-                token = userPaymentRequest.TransactionToken,
+                token = userPaymentRequest.TokenPayment,
                 payment_description = "Pago Bangk",
                 customer_email = userPaymentRequest.Email,
                 acceptance_token = merchantsInfo.Result.Data.Presigned_Acceptance.Acceptance_Token,
@@ -73,8 +73,7 @@ namespace Bangk.Domain.Implementation.Integrations
                         Result = apiResponseBancolombia
                     };
 
-                    userPaymentRequest.IdTransaction = apiResponseBancolombia.Data.Id;
-                    userPaymentRequest.TokenPayment = apiResponseBancolombia.Data.Token;
+                    userPaymentRequest.PaymentSourceId = apiResponseBancolombia.Data.Id;
                     var resultTransaction = await _createTransactionBancolombiaService.Execute(userPaymentRequest);
                     if (resultTransaction.HasErrors)
                     {

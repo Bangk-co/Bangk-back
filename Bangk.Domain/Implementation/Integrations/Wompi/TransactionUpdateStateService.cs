@@ -3,6 +3,7 @@ using Bangk.Common.Enums;
 using Bangk.Domain.Contract.Integrations.Wompi;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,9 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             {
                 await ApprovedTransactionProcess(transactionUpdateDto);
             }
-            else
+            else if (string.Equals(transactionUpdateDto.Data.Transaction.Status, "DECLINED") ||
+                     string.Equals(transactionUpdateDto.Data.Transaction.Status, "VOIDED") ||
+                     string.Equals(transactionUpdateDto.Data.Transaction.Status, "ERROR"))
             {
                 await RejectedTransactionProcess(transactionUpdateDto);
             }
