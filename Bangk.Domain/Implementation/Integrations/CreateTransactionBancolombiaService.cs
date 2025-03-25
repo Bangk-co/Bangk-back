@@ -40,9 +40,9 @@ namespace Bangk.Domain.Implementation.Integrations
             _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
         }
 
-        public async Task<ResponseDto<string>> Execute(UserPaymentRequest userPaymentRequest)
+        public async Task<ResponseDto<PaymentButtonBancolombiaResponseDto>> Execute(UserPaymentRequest userPaymentRequest)
         {
-            var response = new ResponseDto<string>();
+            var response = new ResponseDto<PaymentButtonBancolombiaResponseDto>();
             var currency = "COP";
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
@@ -52,11 +52,11 @@ namespace Bangk.Domain.Implementation.Integrations
             wompiUrl = $"{wompiUrl}transactions";
             var query = new
             {
-                amount_in_cents = userPaymentRequest.Amount, // Monto current centavos
-                currency = currency, // Moneda
-                signature = integrityKey, //Firma de integridad
-                customer_email = userPaymentRequest.Email, // Email del usuario
-                reference = reference, // Referencia única de pago
+                amount_in_cents = userPaymentRequest.Amount, 
+                currency = currency, 
+                signature = integrityKey, 
+                customer_email = userPaymentRequest.Email, 
+                reference = reference, 
                 payment_source_id = userPaymentRequest.PaymentSourceId
             };
 
@@ -108,24 +108,22 @@ namespace Bangk.Domain.Implementation.Integrations
 
                     await _applicationTransactionRepository.Create(transactionAdd);
 
-                    var menssage = new
+                    var menssage = new PaymentButtonBancolombiaResponseDto
                     {
-                        idReferencia = reference,
-                        transactionNumber = apiResponseTransaction["data"]["id"]
+                        TransactionReference = reference,
+                        TransactionId = apiResponseTransaction["data"]["id"]
                     };
 
-                    response = new ResponseDto<string>
+                    response = new ResponseDto<PaymentButtonBancolombiaResponseDto>
                     {
                         HasErrors = false,
-                        Result = menssage.ToString()
+                        Result = menssage
                     };
-
                 }
                 else
                 {
                     var errorMessage = await apiResponse.Content.ReadAsStringAsync();
-                    //Logs.WriteErrorLog($"Error: {errorMessage} - StatusCode: {apiResponse.StatusCode}");
-                    response = new ResponseDto<string>
+                    response = new ResponseDto<PaymentButtonBancolombiaResponseDto>
                     {
                         HasErrors = true,
                         Errors = new List<string> { errorMessage }

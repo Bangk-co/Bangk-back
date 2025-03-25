@@ -31,9 +31,9 @@ namespace Bangk.Domain.Implementation.Integrations
             _createTransactionBancolombiaService = createTransactionBancolombiaService;
         }
 
-        public async Task<ResponseDto<string>> Execute(UserPaymentRequest userPaymentRequest)
+        public async Task<ResponseDto<PaymentButtonBancolombiaResponseDto>> Execute(UserPaymentRequest userPaymentRequest)
         {
-            var response = new ResponseDto<string>();
+            var response = new ResponseDto<PaymentButtonBancolombiaResponseDto>();
 
             var merchantsInfo = await _getMerchantsTokenService.Execute();
 
@@ -73,7 +73,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     response = resultTransaction;
                     if (resultTransaction.HasErrors)
                     {
-                        response = new ResponseDto<string>
+                        response = new ResponseDto<PaymentButtonBancolombiaResponseDto>
                         {
                             HasErrors = true,
                             Errors = new List<string> { resultTransaction.Errors.First() }
@@ -84,7 +84,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 {
                     var errorMessage = await apiResponse.Content.ReadAsStringAsync();
                     //Logs.WriteErrorLog($"Error: {errorMessage} - StatusCode: {apiResponse.StatusCode}");
-                    response = new ResponseDto<string>
+                    response = new ResponseDto<PaymentButtonBancolombiaResponseDto>
                     {
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}" }
