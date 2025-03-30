@@ -65,10 +65,10 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 if (!jsonResponse.IsSuccessStatusCode || apiResponseCard.Status != "CREATED")
                 {
-                    response = new ResponseDto<PaymentCardResponseDto>
+                    return response = new ResponseDto<PaymentCardResponseDto>
                     {
                         HasErrors = true,
-                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
+                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud o los datos de la tarjeta no son correctos, por favor intenta de nuevo." }
                     };
                 }
 
@@ -97,7 +97,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 if (!responsePaymentSource.IsSuccessStatusCode || apiResponsePaymentSource.Data.Status != "AVAILABLE")
                 {
-                    response = new ResponseDto<PaymentCardResponseDto>
+                   return response = new ResponseDto<PaymentCardResponseDto>
                     {
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
