@@ -62,6 +62,10 @@ namespace Bangk.Api.Controllers
         public async Task<ActionResult<ResponseDto<PaymentCardResponseDto>>> CardPayment(CardPaymentDto cardPaymentDto)
         {
             var result = await _cardPaymentService.Execute(cardPaymentDto);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
 
@@ -83,6 +87,10 @@ namespace Bangk.Api.Controllers
         public async Task<ActionResult<ResponseDto<string>>> GetStatusTransaction(string transactionReference)
         {
             var result = await _getStatusTransactionService.Execute(transactionReference);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
     }
