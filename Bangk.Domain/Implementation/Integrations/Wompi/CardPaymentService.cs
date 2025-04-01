@@ -106,10 +106,10 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 //Transaction
                 var reference = $"{cardPaymentDto.TypeApplication}-{Guid.NewGuid().ToString("N")}";
-                var signature = await _generateIntegrityKeyService.Execute(cardPaymentDto.Amount, reference);
+                var signature = await _generateIntegrityKeyService.Execute((cardPaymentDto.Amount * 100), reference);
                 var transaction = new
                 {
-                    amount_in_cents = cardPaymentDto.Amount,
+                    amount_in_cents = cardPaymentDto.Amount * 100,
                     currency = "COP",
                     signature,
                     customer_email = cardPaymentDto.Email,
