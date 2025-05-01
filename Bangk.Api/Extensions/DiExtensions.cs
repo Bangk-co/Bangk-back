@@ -7,6 +7,7 @@ using Bangk.Domain.Contract.Clientify;
 using Bangk.Domain.Contract.Costumer;
 using Bangk.Domain.Contract.Country;
 using Bangk.Domain.Contract.Files;
+using Bangk.Domain.Contract.GEA;
 using Bangk.Domain.Contract.GroupSettings;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.Integrations.Wompi;
@@ -31,6 +32,7 @@ using Bangk.Domain.Implementation.Client;
 using Bangk.Domain.Implementation.Clientify;
 using Bangk.Domain.Implementation.Country;
 using Bangk.Domain.Implementation.Files;
+using Bangk.Domain.Implementation.GEA;
 using Bangk.Domain.Implementation.GroupSettings;
 using Bangk.Domain.Implementation.Integrations;
 using Bangk.Domain.Implementation.Integrations.Wompi;
@@ -161,7 +163,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ITransactionUpdateStateService, TransactionUpdateStateService>();
             services.AddTransient<IGetTransactionPaymentStatusService, GetTransactionPaymentStatusService>();
             services.AddTransient<IGetStatusTransactionService, GetStatusTransactionService>();
-            
+            services.AddTransient<IGetApplicationTokenGEAService, GetApplicationTokenGEAService>();
+            services.AddTransient<ICreateMedAssistenceService, CreateMedAssistenceService>();
+            services.AddTransient<ICreatePetAssistenceService, CreatePetAssistenceService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

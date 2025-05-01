@@ -1,5 +1,6 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Enums;
+using Bangk.Domain.Contract.GEA;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.Integrations.Wompi;
 using Bangk.Repositories.Entities;
@@ -18,16 +19,22 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
         private readonly IPetInsuranceApplicationRepository _petEnsuranceApplicationRepository;
         private readonly IApplicationTransactionRepository _applicationTransactionRepository;
         private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        private readonly ICreateMedAssistenceService _createMedAssistenceService;
+        private readonly ICreatePetAssistenceService _createPetAssistenceService;
         public GetStatusTransactionService(IConfiguration configuration, IGetMerchantsTokenService getMerchantsTokenService, 
             IGenerateIntegrityKeyService generateIntegrityKeyService,
             IPetInsuranceApplicationRepository petEnsuranceApplicationRepository,
             IApplicationTransactionRepository applicationTransactionRepository,
-            IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository)
+            IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository,
+            ICreateMedAssistenceService createMedAssistenceService, 
+            ICreatePetAssistenceService createPetAssistenceService)
         {
             _configuration = configuration;
             _petEnsuranceApplicationRepository = petEnsuranceApplicationRepository;
             _applicationTransactionRepository = applicationTransactionRepository;
             _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
+            _createMedAssistenceService = createMedAssistenceService;
+            _createPetAssistenceService = createPetAssistenceService;
         }
         public async Task<ResponseDto<string>> Execute(string transactionReferences)
         {
@@ -107,11 +114,15 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     var petApplication = await _petEnsuranceApplicationRepository.GetPetApplicationByReference(referenceApplication);
                     petApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _petEnsuranceApplicationRepository.Update(petApplication);
+                    //Create Assistence in GEA
+                    await _createPetAssistenceService.Execute(referenceApplication);
                     break;
                 case string reference when reference.Contains("MED"):
                     var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(referenceApplication);
                     medApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
+                    //Create Assistence in GEA
+                    await _createMedAssistenceService.Execute(referenceApplication);
                     break;
             }
         }

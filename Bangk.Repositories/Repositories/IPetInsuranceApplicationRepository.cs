@@ -8,5 +8,6 @@ namespace Bangk.Repositories.Repositories
     public interface IPetInsuranceApplicationRepository : IGenericRepository<PetInsuranceApplication, PetInsuranceDto>
     {
         Task<PetInsuranceApplication> GetPetApplicationByReference(string reference);
+        Task<CreatePetAssistenceGEADto> GetPetAssistenceGEA(string reference);
     }
 }
