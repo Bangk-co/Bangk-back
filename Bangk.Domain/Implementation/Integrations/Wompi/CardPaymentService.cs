@@ -1,5 +1,6 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Enums;
+using Bangk.Common.Utils;
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Domain.Contract.Integrations.Wompi;
 using Bangk.Repositories.Entities;
@@ -44,14 +45,17 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             var wompiUrl = $"{baseUrl}tokens/cards";
             var paymentSourceUrl = $"{baseUrl}payment_sources";
             var transactionUrl = $"{baseUrl}transactions";
+
+            var key = _configuration.GetSection("PasswordConfig:Key").Value;
+            var iv = _configuration.GetSection("PasswordConfig:IV").Value;
+
             var card = new CardDto
             {
-                card_holder = cardPaymentDto.CardHolder,
-                cvc = cardPaymentDto.CVC,
-                exp_month = cardPaymentDto.ExpiredMonth,
-                exp_year = cardPaymentDto.ExpiredYear,
-                number = cardPaymentDto.CardNumber
-
+                card_holder = PasswordUtils.DecryptPassword(cardPaymentDto.CardHolder, key, iv),
+                cvc = PasswordUtils.DecryptPassword(cardPaymentDto.CVC, key, iv),
+                exp_month = PasswordUtils.DecryptPassword(cardPaymentDto.ExpiredMonth, key, iv),
+                exp_year = PasswordUtils.DecryptPassword(cardPaymentDto.ExpiredYear, key, iv),
+                number = PasswordUtils.DecryptPassword(cardPaymentDto.CardNumber, key, iv)
             };
 
             using (HttpClient client = new HttpClient())
@@ -97,7 +101,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 if (!responsePaymentSource.IsSuccessStatusCode || apiResponsePaymentSource.Data.Status != "AVAILABLE")
                 {
-                   return response = new ResponseDto<PaymentCardResponseDto>
+                    return response = new ResponseDto<PaymentCardResponseDto>
                     {
                         HasErrors = true,
                         Errors = new List<string> { $"Se ha generado un error procesando la solicitud" }
@@ -176,7 +180,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     petApplication.TransactionId = apiResponseTransaction["data"]["id"];
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                 }
-                
+
 
                 //Create log transaction
                 var transactionAdd = new ApplicationTransaction
@@ -197,7 +201,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     Status = transactionAdd.Status,
                     TransactionReference = transactionAdd.Reference,
                     TransactionId = apiResponseTransaction["data"]["id"]
-                }; 
+                };
             }
 
             return response;
