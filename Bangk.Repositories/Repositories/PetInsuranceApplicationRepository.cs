@@ -1,8 +1,10 @@
 ﻿using Bangk.Common.Dto;
+using Bangk.Common.Enums;
 using Bangk.Repositories.Context;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,5 +50,27 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<List<PaymentJobDto>> GetPetAssistencePendingToPay(DateTime dateTime)
+        {
+            var query = from p in Context.PetInsuranceApplication
+                        join t in Context.ApplicationTransaction on p.TransactionReference equals t.Reference
+                        join c in Context.Clients on p.ClientId equals c.Id
+                        where p.NextPaymentDate.Value.Date == dateTime.Date && p.Status == (int)InsuranceStatesEnum.Approve && t.Status == "APPROVED"
+                        select new PaymentJobDto
+                        {
+                            ApplicationId = p.Id,
+                            ClientId = p.ClientId,
+                            NextPaymentDate = p.NextPaymentDate,
+                            TokenPaymentSource = p.TokenPaymentSource,
+                            TransactionReference = p.TransactionReference,
+                            Amount = t.Amount,
+                            PaymentInstallments = t.PaymentInstallments,
+                            Email = c.Email,
+                        };
+
+            return await query.ToListAsync();
+        }
+
     }
 }

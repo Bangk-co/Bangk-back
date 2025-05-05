@@ -95,6 +95,7 @@ namespace Bangk.Api.Extensions
             services.AddScoped<IPetInsuranceApplicationRepository, PetInsuranceApplicationRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IApplicationTransactionRepository, ApplicationTransactionRepository>();
+            services.AddScoped<ITryPaymentJobRepository, TryPaymentJobRepository>(); 
             // Domains
             services.AddTransient<ILogDomain, LogDomain>();
             services.AddTransient<IUserLoginService, UserLoginService>();
@@ -165,7 +166,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetStatusTransactionService, GetStatusTransactionService>();
             services.AddTransient<IGetApplicationTokenGEAService, GetApplicationTokenGEAService>();
             services.AddTransient<ICreateMedAssistenceService, CreateMedAssistenceService>();
-            services.AddTransient<ICreatePetAssistenceService, CreatePetAssistenceService>(); 
+            services.AddTransient<ICreatePetAssistenceService, CreatePetAssistenceService>();
+            services.AddTransient<IPaymentAssistanceJobService, PaymentAssistanceJobService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -173,6 +175,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<ReportSarlaftJob>();
             services.AddTransient<RetryIntegrationsJob>();
             services.AddTransient<CompleteApplicationJob>();
+            services.AddTransient<PaymentAssistanceJob>();
+            
         }
     }
 }

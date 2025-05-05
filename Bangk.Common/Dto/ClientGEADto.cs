@@ -4,12 +4,12 @@ namespace Bangk.Common.Dto
 {
     public class ClientGEADto
     {
-        public ClientDatosDto clientes { get; set; }
+        public List<ClientDatosDto> clientes { get; set; }
     }
 
     public class ClientDatosDto
     {
-        public List<DataGEADto> datos { get; set; }
+        public DataGEADto datos { get; set; }
     }
 
     public class ClientGEAPetDto

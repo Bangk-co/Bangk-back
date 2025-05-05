@@ -15,7 +15,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             _configuration = configuration;
         }
 
-        public async Task<string> Execute(int amount, string paymentReference)
+        public async Task<string> Execute(long amount, string paymentReference)
         {
             var integrityKey = _configuration.GetSection("WompiKeys:IntegrityKey").Value;
             var secretKey = _configuration.GetSection("WompiKeys:SecretKey").Value;

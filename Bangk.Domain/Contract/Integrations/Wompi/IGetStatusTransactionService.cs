@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.Integrations.Wompi
 {
     public interface IGetStatusTransactionService
     {
-        Task<ResponseDto<string>> Execute(string transactionReferences);
+        Task<ResponseDto<string>> Execute(string transactionReferences, bool updateStatus = true);
     }
 }

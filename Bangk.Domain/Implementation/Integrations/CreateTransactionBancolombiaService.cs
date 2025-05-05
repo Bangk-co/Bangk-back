@@ -80,7 +80,7 @@ namespace Bangk.Domain.Implementation.Integrations
 
                     var transactionAdd = new ApplicationTransaction
                     {
-                        Amount = userPaymentRequest.Amount,
+                        Amount = userPaymentRequest.Amount * 100,
                         Currency = apiResponseTransaction["data"]["currency"],
                         Reference = apiResponseTransaction["data"]["reference"],
                         Status = transactionStatus.Result["data"]["status"].ToString(),

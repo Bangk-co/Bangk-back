@@ -8,6 +8,6 @@ namespace Bangk.Domain.Contract.Integrations.Wompi
 {
     public interface IGenerateIntegrityKeyService
     {
-        Task<string> Execute(int amount, string paymentReference);
+        Task<string> Execute(long amount, string paymentReference);
     }
 }

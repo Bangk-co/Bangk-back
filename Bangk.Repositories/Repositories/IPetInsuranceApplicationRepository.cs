@@ -1,6 +1,8 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Repositories.Entities;
 using Bangk.Repositories.Infrastructure;
+using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
@@ -9,5 +11,6 @@ namespace Bangk.Repositories.Repositories
     {
         Task<PetInsuranceApplication> GetPetApplicationByReference(string reference);
         Task<CreatePetAssistenceGEADto> GetPetAssistenceGEA(string reference);
+        Task<List<PaymentJobDto>> GetPetAssistencePendingToPay(DateTime dateTime);
     }
 }

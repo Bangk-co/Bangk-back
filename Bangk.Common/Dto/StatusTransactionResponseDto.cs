@@ -16,6 +16,11 @@ namespace Bangk.Common.Dto
         public string Payment_Method_Type { get; set; }
         public DateTime Created_At { get; set; }
         public string Id { get; set; }
-        
+        public PaymentMethodDto Payment_Method { get; set; }
+    }
+
+    public class PaymentMethodDto 
+    {
+        public int? Installments { get; set; }
     }
 }

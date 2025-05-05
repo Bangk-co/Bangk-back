@@ -185,13 +185,14 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 //Create log transaction
                 var transactionAdd = new ApplicationTransaction
                 {
-                    Amount = cardPaymentDto.Amount,
+                    Amount = cardPaymentDto.Amount * 100,
                     Currency = apiResponseTransaction["data"]["currency"],
                     Reference = apiResponseTransaction["data"]["reference"],
                     Status = apiResponseTransaction["data"]["status"],
                     TransactionCreationDate = apiResponseTransaction["data"]["created_at"],
                     TransactionNumber = apiResponseTransaction["data"]["id"],
                     PaymentMethodType = apiResponseTransaction["data"]["payment_method_type"],
+                    PaymentInstallments = cardPaymentDto.PaymentInstallments
                 };
 
                 await _applicationTransactionRepository.Create(transactionAdd);

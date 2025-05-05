@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bangk.Repositories.Entities
 {
@@ -15,5 +16,6 @@ namespace Bangk.Repositories.Entities
         public int? ReviewerId { get; set; }
         public string TransactionId { get; set; }
         public int? TokenPaymentSource { get; set; }
+        public DateTime? NextPaymentDate { get; set; }
     }
 }

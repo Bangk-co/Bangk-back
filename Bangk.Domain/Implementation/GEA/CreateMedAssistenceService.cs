@@ -68,9 +68,12 @@ namespace Bangk.Domain.Implementation.GEA
 
                     var request = new ClientGEADto
                     {
-                        clientes = new ClientDatosDto
+                        clientes = new List<ClientDatosDto>
                         {
-                            datos = new List<DataGEADto> { gea }
+                            new ClientDatosDto
+                            {
+                                datos = gea 
+                            }
                         }
                     };
 

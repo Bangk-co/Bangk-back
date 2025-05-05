@@ -16,5 +16,6 @@ namespace Bangk.Repositories.Entities
 
         public string TransactionId { get; set; }
         public int? TokenPaymentSource { get; set; }
+        public DateTime? NextPaymentDate { get; set; }
     }
 }

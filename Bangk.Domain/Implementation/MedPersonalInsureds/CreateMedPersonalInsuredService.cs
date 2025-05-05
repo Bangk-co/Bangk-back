@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bangk.Domain.Implementation.MedPersonalInsureds
 {
@@ -80,7 +81,6 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             }
 
             var userReview = await _userRepository.GetUserWithLessApplication();
-
             var medEnsuranceApplication = new Repositories.Entities.MedInsuranceApplication()
             {
                 ClientId = clientId,
@@ -90,6 +90,16 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             };
 
             await _medEnsuranceApplicationRepository.Create(medEnsuranceApplication);
+
+            var nextPaymentDate = medPersonInsuredsDto.PaymentOcurrencyId switch
+            {
+                (int)MethodPaymentTimeEnum.Mensual => medEnsuranceApplication.CreationDate.AddMonths(1),
+                (int)MethodPaymentTimeEnum.Semestral => medEnsuranceApplication.CreationDate.AddMonths(6),
+                _ => medEnsuranceApplication.CreationDate.AddYears(1)
+            };
+
+            medEnsuranceApplication.NextPaymentDate = nextPaymentDate;
+            await _medEnsuranceApplicationRepository.Update(medEnsuranceApplication);
 
             var beneficiaries = new List<Repositories.Entities.MedPersonInsureds>();
             foreach (var item in medPersonInsuredsDto.BeneficiaryInsurance)

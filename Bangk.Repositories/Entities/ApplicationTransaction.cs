@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Bangk.Repositories.Entities
 {
@@ -16,5 +11,6 @@ namespace Bangk.Repositories.Entities
         public DateTime TransactionCreationDate { get; set; }
         public long Amount { get; set; }
         public string PaymentMethodType { get; set; }
+        public int? PaymentInstallments { get; set; }
     }
 }

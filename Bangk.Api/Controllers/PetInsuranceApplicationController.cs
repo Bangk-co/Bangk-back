@@ -2,7 +2,6 @@
 using Bangk.Domain.Contract.PetInsuranceApplication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bangk.Api.Controllers

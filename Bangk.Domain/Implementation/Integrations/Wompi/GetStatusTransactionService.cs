@@ -36,7 +36,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             _createMedAssistenceService = createMedAssistenceService;
             _createPetAssistenceService = createPetAssistenceService;
         }
-        public async Task<ResponseDto<string>> Execute(string transactionReferences)
+        public async Task<ResponseDto<string>> Execute(string transactionReferences, bool updateStatus = true)
         {
             var response = new ResponseDto<string>();
             var baseUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
@@ -80,7 +80,11 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                       string.Equals(apiResponseStatus.Data.Status, "VOIDED") ||
                       string.Equals(apiResponseStatus.Data.Status, "ERROR"))
                 {
-                    await RejectedTransactionProcess(apiResponseStatus.Data.Reference);
+                    if (updateStatus)
+                    {
+                        await RejectedTransactionProcess(apiResponseStatus.Data.Reference);
+                    }
+                   
                     await _applicationTransactionRepository.Create(CreateTransactionDto(apiResponseStatus));
                 }
 
@@ -102,7 +106,8 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 Status = apiResponseStatus.Data.Status,
                 TransactionCreationDate = apiResponseStatus.Data.Created_At,
                 TransactionNumber = apiResponseStatus.Data.Id,
-                PaymentMethodType = apiResponseStatus.Data.Payment_Method_Type
+                PaymentMethodType = apiResponseStatus.Data.Payment_Method_Type,
+                PaymentInstallments = apiResponseStatus.Data?.Payment_Method?.Installments,
             };
         }
 

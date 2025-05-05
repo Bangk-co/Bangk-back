@@ -1,6 +1,7 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.PetInsuranceApplication;
+using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,6 +84,16 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
             };
 
             await _petInsuranceApplicationRepository.Create(petInsuranceApplication);
+            var nextPaymentDate = petInsuranceApplication.PaymentOcurrencyId switch
+            {
+                (int)MethodPaymentTimeEnum.Mensual => petInsuranceApplication.CreationDate.AddMonths(1),
+                (int)MethodPaymentTimeEnum.Semestral => petInsuranceApplication.CreationDate.AddMonths(6),
+                _ => petInsuranceApplication.CreationDate.AddYears(1)
+            };
+
+            petInsuranceApplication.NextPaymentDate = nextPaymentDate;
+            await _petInsuranceApplicationRepository.Update(petInsuranceApplication);
+
             var pets = new List<Repositories.Entities.Pet>();
             if (petInsuranceDto.Pets.Count > 0)
             {
