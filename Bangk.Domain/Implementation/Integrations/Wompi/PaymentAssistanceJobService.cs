@@ -59,7 +59,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 {
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {privateKey}");
                     var reference = $"PET-{Guid.NewGuid():N}";
-                    var signature = await _generateIntegrityKeyService.Execute((item.Amount), reference);
+                    var signature = await _generateIntegrityKeyService.Execute((item.Amount.Value), reference);
                     var transaction = new
                     {
                         amount_in_cents = item.Amount,
@@ -83,7 +83,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     {
                         var transactionAdd = new ApplicationTransaction
                         {
-                            Amount = item.Amount,
+                            Amount = item.Amount.Value,
                             Currency = apiResponseTransaction["data"]["currency"],
                             Reference = apiResponseTransaction["data"]["reference"],
                             Status = apiResponseTransaction["data"]["status"],
@@ -140,7 +140,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 {
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {privateKey}");
                     var reference = $"MED-{Guid.NewGuid():N}";
-                    var signature = await _generateIntegrityKeyService.Execute((item.Amount), reference);
+                    var signature = await _generateIntegrityKeyService.Execute((item.Amount.Value), reference);
                     var transaction = new
                     {
                         amount_in_cents = item.Amount,
@@ -164,7 +164,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     {
                         var transactionAdd = new ApplicationTransaction
                         {
-                            Amount = item.Amount,
+                            Amount = item.Amount.Value,
                             Currency = apiResponseTransaction["data"]["currency"],
                             Reference = apiResponseTransaction["data"]["reference"],
                             Status = apiResponseTransaction["data"]["status"],

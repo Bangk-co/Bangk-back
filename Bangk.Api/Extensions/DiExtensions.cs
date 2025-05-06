@@ -167,7 +167,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IGetApplicationTokenGEAService, GetApplicationTokenGEAService>();
             services.AddTransient<ICreateMedAssistenceService, CreateMedAssistenceService>();
             services.AddTransient<ICreatePetAssistenceService, CreatePetAssistenceService>();
-            services.AddTransient<IPaymentAssistanceJobService, PaymentAssistanceJobService>(); 
+            services.AddTransient<IPaymentAssistanceJobService, PaymentAssistanceJobService>();
+            services.AddTransient<IPaymentAssistanceTryService, PaymentAssistanceTryService>(); 
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -176,7 +177,9 @@ namespace Bangk.Api.Extensions
             services.AddTransient<RetryIntegrationsJob>();
             services.AddTransient<CompleteApplicationJob>();
             services.AddTransient<PaymentAssistanceJob>();
-            
+            services.AddTransient<PaymentAssistanceTryOneJob>();
+            services.AddTransient<PaymentAssistanceTryTwoJob>();
+            services.AddTransient<PaymentAssistanceTryThreeJob>();
         }
     }
 }

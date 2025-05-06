@@ -54,18 +54,39 @@ namespace Bangk.Repositories.Repositories
         public async Task<List<PaymentJobDto>> GetPetAssistencePendingToPay(DateTime dateTime)
         {
             var query = from p in Context.PetInsuranceApplication
-                        join t in Context.ApplicationTransaction on p.TransactionReference equals t.Reference
                         join c in Context.Clients on p.ClientId equals c.Id
-                        where p.NextPaymentDate.Value.Date == dateTime.Date && p.Status == (int)InsuranceStatesEnum.Approve && t.Status == "APPROVED"
+                        where p.NextPaymentDate.Value.Date == dateTime.Date && p.Status == (int)InsuranceStatesEnum.Approve
                         select new PaymentJobDto
                         {
                             ApplicationId = p.Id,
                             ClientId = p.ClientId,
+                            ClientName = $"{c.Name} {c.LastName}",
                             NextPaymentDate = p.NextPaymentDate,
                             TokenPaymentSource = p.TokenPaymentSource,
                             TransactionReference = p.TransactionReference,
-                            Amount = t.Amount,
-                            PaymentInstallments = t.PaymentInstallments,
+                            Amount = p.Amount,
+                            PaymentInstallments = p.PaymentInstallments,
+                            Email = c.Email,
+                        };
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<PaymentJobDto>> GetPetAssistencePayment(string applicationReference)
+        {
+            var query = from p in Context.PetInsuranceApplication
+                        join c in Context.Clients on p.ClientId equals c.Id
+                        where p.TransactionReference == applicationReference
+                        select new PaymentJobDto
+                        {
+                            ApplicationId = p.Id,
+                            ClientId = p.ClientId,
+                            ClientName = $"{c.Name} {c.LastName}",
+                            NextPaymentDate = p.NextPaymentDate,
+                            TokenPaymentSource = p.TokenPaymentSource,
+                            TransactionReference = p.TransactionReference,
+                            Amount = p.Amount,
+                            PaymentInstallments = p.PaymentInstallments,
                             Email = c.Email,
                         };
 

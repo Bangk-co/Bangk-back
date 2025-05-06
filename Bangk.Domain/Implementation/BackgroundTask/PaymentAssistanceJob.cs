@@ -1,5 +1,4 @@
 ﻿using Bangk.Domain.Contract.Integrations.Wompi;
-using Bangk.Repositories.Repositories;
 using Coravel.Invocable;
 using System.Threading.Tasks;
 

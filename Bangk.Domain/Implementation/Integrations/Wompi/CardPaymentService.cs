@@ -145,39 +145,21 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 if (cardPaymentDto.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
                 {
                     var medApplicationInBD = await _medEnsuranceApplicationRepository.GetById(cardPaymentDto.ApplicationId);
-                    //if (string.Equals(apiResponseTransaction["data"]["status"], "APPROVED"))
-                    //{
-                    //    medApplicationInBD.Status = (int)InsuranceStatesEnum.Approve;
-                    //}
-                    //else if (string.Equals(apiResponseTransaction["data"]["status"], "DECLINED") ||
-                    //    string.Equals(apiResponseTransaction["data"]["status"], "VOIDED") ||
-                    //    string.Equals(apiResponseTransaction["data"]["status"], "ERROR"))
-                    //{
-                    //    medApplicationInBD.Status = (int)InsuranceStatesEnum.Rejected;
-                    //}
-
                     medApplicationInBD.TokenPaymentSource = apiResponsePaymentSource.Data.Id;//Tokenizacion
                     medApplicationInBD.TransactionReference = reference;
                     medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
+                    medApplicationInBD.Amount = cardPaymentDto.Amount * 100;
+                    medApplicationInBD.PaymentInstallments = cardPaymentDto.PaymentInstallments;
                     await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
                 }
                 else if (cardPaymentDto.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
                 {
                     var petApplication = await _petEnsuranceApplicationRepository.GetById(cardPaymentDto.ApplicationId);
-                    //if (string.Equals(apiResponseTransaction["data"]["status"], "APPROVED"))
-                    //{
-                    //    petApplication.Status = (int)InsuranceStatesEnum.Approve;
-                    //}
-                    //else if (string.Equals(apiResponseTransaction["data"]["status"], "DECLINED") ||
-                    //    string.Equals(apiResponseTransaction["data"]["status"], "VOIDED") ||
-                    //    string.Equals(apiResponseTransaction["data"]["status"], "ERROR"))
-                    //{
-                    //    petApplication.Status = (int)InsuranceStatesEnum.Rejected;
-                    //}
-
                     petApplication.TokenPaymentSource = apiResponsePaymentSource.Data.Id;//Tokenizacion
                     petApplication.TransactionReference = reference;
                     petApplication.TransactionId = apiResponseTransaction["data"]["id"];
+                    petApplication.Amount = cardPaymentDto.Amount * 100;
+                    petApplication.PaymentInstallments = cardPaymentDto.PaymentInstallments;
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                 }
 

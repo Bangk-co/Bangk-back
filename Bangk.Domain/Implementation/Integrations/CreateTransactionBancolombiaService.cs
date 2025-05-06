@@ -95,6 +95,7 @@ namespace Bangk.Domain.Implementation.Integrations
                         medApplicationInBD.TokenPaymentSource = userPaymentRequest.PaymentSourceId;
                         medApplicationInBD.TransactionReference = reference;
                         medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
+                        medApplicationInBD.Amount = userPaymentRequest.Amount * 100;
                         await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
                     }
                     else if (userPaymentRequest.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
@@ -103,6 +104,7 @@ namespace Bangk.Domain.Implementation.Integrations
                         petApplicationInBD.TokenPaymentSource = userPaymentRequest.PaymentSourceId;
                         petApplicationInBD.TransactionReference = reference;
                         petApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
+                        petApplicationInBD.Amount = userPaymentRequest.Amount * 100;
                         await _petEnsuranceApplicationRepository.Update(petApplicationInBD);
                     }
 

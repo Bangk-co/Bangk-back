@@ -43,7 +43,7 @@ namespace Bangk.Repositories.Context
         public DbSet<PetInsuranceApplication> PetInsuranceApplication { get; set; }
         public DbSet<Pet> Pets { get; set; }
         public DbSet<ApplicationTransaction> ApplicationTransaction { get; set; }
-        public DbSet<TryPaymentJob> TryPaymentJob { get; set; }
+        public DbSet<TryPaymentJob> TryPaymentJobs { get; set; }
         
 
     }
