@@ -141,7 +141,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                         {
                             if (countFailed != 3)
                             {
-                                await CreateNextTryPayment(reference);
+                                await CreateNextTryPayment(item.TransactionReference, reference);
                             }
                             else
                             {
@@ -234,7 +234,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                         {
                             if(countFailed != 3)
                             {
-                                await CreateNextTryPayment(reference);
+                                await CreateNextTryPayment(item.TransactionReference, reference);
                             }
                             else
                             {
@@ -250,10 +250,11 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             }
         }
 
-        public async Task CreateNextTryPayment(string reference)
+        public async Task CreateNextTryPayment(string reference, string newReference)
         {
             var entity = await _tryPaymentJobRepository.GetryPaymentJobByReference(reference);
             entity.CountFailed += 1;
+            entity.ApplicationReference = newReference;
             await _tryPaymentJobRepository.Update(entity);
         }
 
