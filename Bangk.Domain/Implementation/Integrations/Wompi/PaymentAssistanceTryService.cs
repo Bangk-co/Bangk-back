@@ -133,7 +133,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                             petApp.NextPaymentDate = nextPaymentDate;
                             await _petInsuranceApplicationRepository.Update(petApp);
-                            await DeleteNeNextTryPayment(reference);
+                            await DeleteNeNextTryPayment(item.TransactionReference);
                         }
                         else if (string.Equals(status, "DECLINED") ||
                               string.Equals(status, "VOIDED") ||
@@ -147,7 +147,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                             {
                                 var templateId = _configuration.GetSection("SendGridEmailSender:CancelSuscriptionPets").Value;
                                 await SendNotification(item.Email, templateId, item.ClientName);
-                                await DeleteNeNextTryPayment(reference);
+                                await DeleteNeNextTryPayment(item.TransactionReference);
                                 petApp.Status = (int)InsuranceStatesEnum.Rejected;
                                 await _petInsuranceApplicationRepository.Update(petApp);
                             }
@@ -226,7 +226,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                             medApp.NextPaymentDate = nextPaymentDate;
                             await _medEnsuranceApplicationRepository.Update(medApp);
 
-                            await DeleteNeNextTryPayment(reference);
+                            await DeleteNeNextTryPayment(item.TransactionReference);
                         }
                         else if (string.Equals(status, "DECLINED") ||
                               string.Equals(status, "VOIDED") ||
@@ -240,7 +240,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                             {
                                 var templateId = _configuration.GetSection("SendGridEmailSender:CancelSuscriptionTelemedicina").Value;
                                 await SendNotification(item.Email, templateId, item.ClientName);
-                                await DeleteNeNextTryPayment(reference);
+                                await DeleteNeNextTryPayment(item.TransactionReference);
                                 medApp.Status = (int)InsuranceStatesEnum.Rejected;
                                 await _medEnsuranceApplicationRepository.Update(medApp);
                             }
