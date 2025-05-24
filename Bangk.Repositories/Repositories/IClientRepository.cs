@@ -23,6 +23,10 @@ namespace Bangk.Repositories.Repositories
         List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId);
         List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId);
         Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId);
-        Task<Client> GetClientByEmailAndIdentificationNumber(string email, string identificationNumber);
+        Task<Client> GetClientByEmail(string email);
+
+        Task<Client> GetClientByIdentification(string identificationNumber);
+        Task<Client> GetClientByIdentificationNumberAndType(int documentType, string identificationNumber);
+        Task<Client> GetClientByIdentificationNumberDocumentTypeEmail(int documentType, string identificationNumber, string email);
     }
 }

@@ -1,16 +1,11 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.MedPersonalInsureds;
-using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
-using FluentValidation;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Bangk.Domain.Implementation.MedPersonalInsureds
 {
@@ -49,35 +44,45 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             }
 
             int clientId = 0;
-            var clientExist = await _clientRepository.ExistClientByEmailAndIdentificationNumber(
-                medPersonInsuredsDto.Email,
-                medPersonInsuredsDto.DocumentNumber
-            );
+            var clientExist = await _clientRepository.GetClientByIdentificationNumberDocumentTypeEmail(medPersonInsuredsDto.DocumentTypeId, medPersonInsuredsDto.DocumentNumber, medPersonInsuredsDto.Email);
 
-            if (!clientExist)
+            if (clientExist == null)
             {
-                var client = new Repositories.Entities.Client
+                var clientExistByDocument = await _clientRepository.GetClientByIdentificationNumberAndType(medPersonInsuredsDto.DocumentTypeId, medPersonInsuredsDto.DocumentNumber);
+                if (clientExistByDocument == null)
                 {
-                    Email = medPersonInsuredsDto.Email,
-                    PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate,
-                    DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId,
-                    IdentificationNumber = medPersonInsuredsDto.DocumentNumber,
-                    LastName = medPersonInsuredsDto.LastName,
-                    Name = medPersonInsuredsDto.Name,
-                    CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
-                    PhoneNumber = medPersonInsuredsDto.PhoneNumber,
-                };
+                    var client = new Repositories.Entities.Client
+                    {
+                        Email = medPersonInsuredsDto.Email,
+                        PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate,
+                        DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId,
+                        IdentificationNumber = medPersonInsuredsDto.DocumentNumber,
+                        LastName = medPersonInsuredsDto.LastName,
+                        Name = medPersonInsuredsDto.Name,
+                        CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
+                        PhoneNumber = medPersonInsuredsDto.PhoneNumber,
+                    };
 
-                await _clientRepository.Create(client);
-                clientId = client.Id;
+                    await _clientRepository.Create(client);
+                    clientId = client.Id;
+                }
+                else
+                {
+                    clientExistByDocument.Email = medPersonInsuredsDto.Email;
+                    clientExistByDocument.PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate;
+                    clientExistByDocument.DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId;
+                    clientExistByDocument.IdentificationNumber = medPersonInsuredsDto.DocumentNumber;
+                    clientExistByDocument.LastName = medPersonInsuredsDto.LastName;
+                    clientExistByDocument.Name = medPersonInsuredsDto.Name;
+                    clientExistByDocument.CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId;
+                    clientExistByDocument.PhoneNumber = medPersonInsuredsDto.PhoneNumber;
+                    await _clientRepository.Update(clientExistByDocument);
+                    clientId = clientExistByDocument.Id;
+                }
             }
             else
             {
-                var client = await _clientRepository.GetClientByEmailAndIdentificationNumber(
-                    medPersonInsuredsDto.Email,
-                    medPersonInsuredsDto.DocumentNumber
-                );
-                clientId = client.Id;
+                clientId = clientExist.Id;
             }
 
             var userReview = await _userRepository.GetUserWithLessApplication();

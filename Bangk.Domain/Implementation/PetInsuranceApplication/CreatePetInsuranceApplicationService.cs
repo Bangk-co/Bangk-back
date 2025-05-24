@@ -47,30 +47,45 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
             using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
             int clientId = 0;
-            var clientExist = await _clientRepository.ExistClientByEmailAndIdentificationNumber(petInsuranceDto.Email, petInsuranceDto.DocumentNumber);
+            var clientExist = await _clientRepository.GetClientByIdentificationNumberDocumentTypeEmail(petInsuranceDto.DocumentTypeId, petInsuranceDto.DocumentNumber, petInsuranceDto.Email);
 
-            if (!clientExist)
+            if (clientExist == null)
             {
-                var client = new Repositories.Entities.Client
+                var clientExistByDocument = await _clientRepository.GetClientByIdentificationNumberAndType(petInsuranceDto.DocumentTypeId, petInsuranceDto.DocumentNumber);
+                if (clientExistByDocument == null)
                 {
-                    Email = petInsuranceDto.Email,
-                    PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate,
-                    DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId,
-                    IdentificationNumber = petInsuranceDto.DocumentNumber,
-                    LastName = petInsuranceDto.LastName,
-                    Name = petInsuranceDto.Name,
-                    CountryCodePhoneId = petInsuranceDto.CountryCodePhoneId,
-                    PhoneNumber = petInsuranceDto.PhoneNumber,
+                    var client = new Repositories.Entities.Client
+                    {
+                        Email = petInsuranceDto.Email,
+                        PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate,
+                        DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId,
+                        IdentificationNumber = petInsuranceDto.DocumentNumber,
+                        LastName = petInsuranceDto.LastName,
+                        Name = petInsuranceDto.Name,
+                        CountryCodePhoneId = petInsuranceDto.CountryCodePhoneId,
+                        PhoneNumber = petInsuranceDto.PhoneNumber,
+                    };
 
-                };
-
-                await _clientRepository.Create(client);
-                clientId = client.Id;
+                    await _clientRepository.Create(client);
+                    clientId = client.Id;
+                }
+                else
+                {
+                    clientExistByDocument.Email = petInsuranceDto.Email;
+                    clientExistByDocument.PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate;
+                    clientExistByDocument.DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId;
+                    clientExistByDocument.IdentificationNumber = petInsuranceDto.DocumentNumber;
+                    clientExistByDocument.LastName = petInsuranceDto.LastName;
+                    clientExistByDocument.Name = petInsuranceDto.Name;
+                    clientExistByDocument.CountryCodePhoneId = petInsuranceDto.CountryCodePhoneId;
+                    clientExistByDocument.PhoneNumber = petInsuranceDto.PhoneNumber;
+                    await _clientRepository.Update(clientExistByDocument);
+                    clientId = clientExistByDocument.Id;
+                } 
             }
             else
             {
-                var client = await _clientRepository.GetClientByEmailAndIdentificationNumber(petInsuranceDto.Email, petInsuranceDto.DocumentNumber);
-                clientId = client.Id;
+                clientId = clientExist.Id;
             }
 
             var userReview = await _userRepository.GetUserWithLessApplication();

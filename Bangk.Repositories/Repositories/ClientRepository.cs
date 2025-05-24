@@ -93,7 +93,7 @@ namespace Bangk.Repositories.Repositories
 
         public async Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
-            return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
+            return await Context.Clients.AnyAsync(e => string.Equals(e.Email.ToLower(), email.ToLower()) || string.Equals(e.IdentificationNumber, identificationNumber));
         }
 
         public async Task<Client> GetClientByLoanApplicationId(int loanApplicationId)
@@ -105,9 +105,6 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
-
-
-
 
         public IQueryable<ClientReportDto> GetReportClientsSarlaft(ApplicationStateHistoryEnum stateloanApplication)
         {
@@ -348,9 +345,25 @@ namespace Bangk.Repositories.Repositories
             return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
         }
 
-        public async Task<Client> GetClientByEmailAndIdentificationNumber(string email, string identificationNumber)
+        public async Task<Client> GetClientByEmail(string email)
         {
-            return await Context.Clients.FirstAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
+            return await Context.Clients.FirstOrDefaultAsync(e => string.Equals(e.Email.ToLower(), email.ToLower()));
+        }
+
+        public async Task<Client> GetClientByIdentification(string identificationNumber)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => string.Equals(e.IdentificationNumber, identificationNumber));
+        }
+
+        public async Task<Client> GetClientByIdentificationNumberAndType(int documentType, string identificationNumber)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => e.DocumenIdentificationTypeId == documentType && string.Equals(e.IdentificationNumber, identificationNumber));
+        }
+
+        public async Task<Client> GetClientByIdentificationNumberDocumentTypeEmail(int documentType, string identificationNumber, string email)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => e.DocumenIdentificationTypeId == documentType && string.Equals(e.IdentificationNumber, identificationNumber)
+            && string.Equals(e.Email.ToLower(), email.ToLower()));
         }
     }
 }

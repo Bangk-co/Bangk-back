@@ -21,11 +21,11 @@ namespace Bangk.Api.Controllers
         private readonly ICreateClientNotLoanApplicationService _createClientNotLoanApplicationService;
         private readonly IUpdateProfileService _updateProfileService;
         private readonly IGetClientPolicyService _getClientPolicyService;
-        
+        private readonly IValidateClientService _validateClientService;
 
         public ClientController(ICostumerService getClientService, IClientInfoService getClientInfoService, ICreateClientService createClientService,
             IUpdateClientService updateClientService, ICreateUserService createUserService, ICreateClientNotLoanApplicationService createClientNotLoanApplicationService, 
-            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy)
+            IUpdateProfileService updateProfileService, IGetClientPolicyService getClientPolicy, IValidateClientService validateClientService)
         {
             _getClientService = getClientService;
             _getClientInfoService = getClientInfoService;
@@ -35,7 +35,7 @@ namespace Bangk.Api.Controllers
             _createClientNotLoanApplicationService = createClientNotLoanApplicationService;
             _updateProfileService = updateProfileService;
             _getClientPolicyService = getClientPolicy;
-            
+            _validateClientService = validateClientService;
         }
 
         [HttpGet("GetClientService")]
@@ -155,5 +155,17 @@ namespace Bangk.Api.Controllers
             });
         }
 
+        [HttpPost("ValidateClientService")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ResponseDto<bool>>> ValidateClientService(string documentNumber, string email, int documentType)
+        {
+            var result = await _validateClientService.Execute(documentNumber, email, documentType);
+            if (result.HasErrors)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 }
