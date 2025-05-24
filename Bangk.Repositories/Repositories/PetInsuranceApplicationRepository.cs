@@ -34,7 +34,7 @@ namespace Bangk.Repositories.Repositories
                             DocumentNumber = c.IdentificationNumber,
                             DocumentType = c.DocumenIdentificationTypeId,
                             Email = c.Email,
-                            Name = $"{c.Name}{c.LastName}",
+                            Name = $"{c.Name} {c.LastName}",
                             PaymentOcurrencyId = a.PaymentOcurrencyId,
                             Phone = c.PhoneNumber,
                             Pets = Context.Pets.Where(p => p.PetInsuranceApplicationId == a.Id).Select(p => new CreatePetGEADto

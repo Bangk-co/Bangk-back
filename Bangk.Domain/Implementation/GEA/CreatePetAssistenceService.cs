@@ -31,6 +31,8 @@ namespace Bangk.Domain.Implementation.GEA
         {
             var token = await _getApplicationTokenGEAService.Execute();
             var baseUrl = _configuration.GetSection("GeaKeys:GeaUrl").Value;
+            var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
+            var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
             var application = await _petInsuranceApplicationRepository.GetPetAssistenceGEA(applicationReference);
             var count = 1;
             foreach (var item in application.Pets)
@@ -39,10 +41,7 @@ namespace Bangk.Domain.Implementation.GEA
                 {
                     var clients = new ClientGEAPetDto();
                     var clientPets = new List<DatosWrapperDto>();
-
                     DatosWrapperDto datos = new DatosWrapperDto();
-                    var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
-                    var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
                     var tipoCveAfiliado = application.DocumentType switch
                     {
                         (int)DocumenIdentificationTypeEnum.Cc => 1,
@@ -66,13 +65,14 @@ namespace Bangk.Domain.Implementation.GEA
                     var gea = new DataGEADto
                     {
                         cveafiliado = $"{application.DocumentNumber}-{count}",
-                        tipo_cveafiliado = tipoCveAfiliado,
+                        tipo_cveafiliado = 11,
                         cuenta = cuentaId,
                         plan = planId,
                         fecha_inicio_vigencia = fechaInicio,
                         fecha_fin_vigencia = fechaFin.ToString("yyyy-MM-dd"),
                         estado = "ACTIVO",
-                        identificacion_pagador = application.DocumentNumber,
+                        identificacion = application.DocumentNumber,
+                        tipo_identificacion = tipoCveAfiliado,
                         nombres = application.Name,
                         email = application.Email.Trim(),
                         telefono_personal = application.Phone,
@@ -80,13 +80,11 @@ namespace Bangk.Domain.Implementation.GEA
 
                     var datosExtra = new DataGEAExtrasDto
                     {
-                        color_mascota = item.Color,
-                        cuenta = cuentaId,
-                        cveafiliado = $"{application.DocumentNumber}-{count}",
-                        edad_mascota = item.Age,
-                        nombre_mascota = item.Name,
-                        raza_mascota = item.Breed,
                         tipo_mascota = petType,
+                        edad_mascota = item.Age,
+                        raza_mascota = item.Breed,
+                        color_mascota = item.Color,
+                        nombre_mascota = item.Name
                     };
 
                     datos.datos = gea;

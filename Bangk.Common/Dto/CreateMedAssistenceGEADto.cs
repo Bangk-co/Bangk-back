@@ -20,5 +20,8 @@ namespace Bangk.Common.Dto
     {
         public string DocumentNumber { get; set; }
         public int DocumentType { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }

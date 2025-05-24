@@ -29,13 +29,19 @@ namespace Bangk.Domain.Implementation.GEA
         {
             var token = await _getApplicationTokenGEAService.Execute();
             var baseUrl = _configuration.GetSection("GeaKeys:GeaUrl").Value;
+            var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
+            var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
             var application = await _medEnsuranceApplicationRepository.GetMedAssistenceGEA(applicationReference);
+            var datosExtras = new DataGEAExtrasMedDto
+            {
+                identificacion_pagador = application.DocumentNumber,
+                nombre_pagador = application.Name,
+            };
+
             foreach (var item in application.MedPersons)
             {
                 using (HttpClient client = new())
                 {
-                    var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
-                    var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
                     var tipoCveAfiliado = item.DocumentType switch
                     {
                         76 => 1,
@@ -54,16 +60,17 @@ namespace Bangk.Domain.Implementation.GEA
                     var gea = new DataGEADto
                     {
                         cveafiliado = item.DocumentNumber,
-                        tipo_cveafiliado = tipoCveAfiliado,
+                        tipo_cveafiliado = 1,
                         cuenta = cuentaId,
                         plan = planId,
                         fecha_inicio_vigencia = fechaInicio,
                         fecha_fin_vigencia = fechaFin.ToString("yyyy-MM-dd"),
                         estado = "ACTIVO",
-                        identificacion_pagador = application.DocumentNumber,
-                        nombres = application.Name,
-                        email = application.Email,
-                        telefono_personal = application.Phone,
+                        identificacion = item.DocumentNumber,
+                        tipo_identificacion = tipoCveAfiliado,
+                        nombres = item.Name,
+                        email = item.Email,
+                        telefono_personal = item.PhoneNumber,
                     };
 
                     var request = new ClientGEADto
@@ -72,7 +79,8 @@ namespace Bangk.Domain.Implementation.GEA
                         {
                             new ClientDatosDto
                             {
-                                datos = gea 
+                                datos = gea,
+                                datos_extras = datosExtras
                             }
                         }
                     };

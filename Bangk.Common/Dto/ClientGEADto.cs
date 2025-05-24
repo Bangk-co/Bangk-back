@@ -10,6 +10,13 @@ namespace Bangk.Common.Dto
     public class ClientDatosDto
     {
         public DataGEADto datos { get; set; }
+        public DataGEAExtrasMedDto datos_extras { get; set; }
+    }
+
+    public class DataGEAExtrasMedDto
+    {
+        public string identificacion_pagador { get; set; }
+        public string nombre_pagador { get; set; }
     }
 
     public class ClientGEAPetDto
@@ -25,6 +32,9 @@ namespace Bangk.Common.Dto
 
     public class DataGEADto
     {
+        public string identificacion;
+
+        public int tipo_identificacion;
         public string cveafiliado { get; set; }
         public int tipo_cveafiliado { get; set; }
         public int cuenta { get; set; }
@@ -32,7 +42,6 @@ namespace Bangk.Common.Dto
         public string fecha_inicio_vigencia { get; set; }
         public string fecha_fin_vigencia { get; set; }
         public string estado { get; set; }
-        public string identificacion_pagador { get; set; }
         public string nombres { get; set; }
         public string email { get; set; }
         public string telefono_personal { get; set; }
@@ -40,8 +49,6 @@ namespace Bangk.Common.Dto
 
     public class DataGEAExtrasDto
     {
-        public string cveafiliado { get; set; }
-        public int cuenta { get; set; }
         public string tipo_mascota { get; set; }
         public int edad_mascota { get; set; }
         public string raza_mascota { get; set; }

@@ -31,16 +31,16 @@ namespace Bangk.Repositories.Repositories
                         {
                             CreatedDate = m.CreationDate,
                             ApplicationId = m.Id,
-                            DocumentNumber = c.IdentificationNumber,
-                            DocumentType = c.DocumenIdentificationTypeId,
-                            Email = c.Email,
-                            Name = $"{c.Name}{c.LastName}",
+                            Name = $"{c.Name} {c.LastName}",
                             PaymentOcurrencyId = m.PaymentOcurrencyId,
-                            Phone = c.PhoneNumber,
+                            DocumentNumber = c.IdentificationNumber,
                             MedPersons = Context.MedPersonInsureds.Where(p => p.MedEnsuraceApplicationId == m.Id).Select(p => new CreateMedGEADto
                             {
                                 DocumentNumber = p.DocumentNumber,
-                                DocumentType = p.DocumentTypeId
+                                DocumentType = p.DocumentTypeId,
+                                Name = $"{p.Name} {p.LastName}",
+                                Email = p.Email,
+                                PhoneNumber = p.PhoneNumber,
                             }).ToList(),
                         };
             return await query.FirstOrDefaultAsync();
