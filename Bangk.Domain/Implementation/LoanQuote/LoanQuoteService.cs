@@ -60,7 +60,7 @@ namespace Bangk.Domain.Implementation.LoanQuote
             var url = _configuration.GetSection("ValidateLoanStateQuote").Value + $"?loanApplicationId={loanApplicationInfo.Id}";
             var sendEmail = new SendGridEmailDto
             {
-                email = clientInfo.Result.Email,
+                Email = clientInfo.Result.Email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

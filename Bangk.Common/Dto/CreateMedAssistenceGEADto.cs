@@ -14,6 +14,7 @@ namespace Bangk.Common.Dto
         public int PaymentOcurrencyId { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<CreateMedGEADto> MedPersons { get; set; }
+        public long? Amount { get; set; }
     }
 
     public class CreateMedGEADto
@@ -23,5 +24,6 @@ namespace Bangk.Common.Dto
         public string Name { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public int Id { get; set; }
     }
 }

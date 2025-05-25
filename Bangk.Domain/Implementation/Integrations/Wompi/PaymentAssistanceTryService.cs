@@ -269,7 +269,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
             var sendEmail = new SendGridEmailDto
             {
-                email = email,
+                Email = email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

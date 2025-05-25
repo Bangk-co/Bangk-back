@@ -9,6 +9,6 @@ namespace Bangk.Domain.Contract.GEA
 {
     public interface ICreatePetAssistenceService
     {
-        Task<ResponseDto<bool>> Execute(string applicationReference);
+        Task<ResponseDto<bool>> Execute(string applicationReference, DateTime CreatedTransactionDate);
     }
 }

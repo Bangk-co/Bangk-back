@@ -37,6 +37,7 @@ namespace Bangk.Repositories.Repositories
                             Name = $"{c.Name} {c.LastName}",
                             PaymentOcurrencyId = a.PaymentOcurrencyId,
                             Phone = c.PhoneNumber,
+                            Amount = a.Amount,
                             Pets = Context.Pets.Where(p => p.PetInsuranceApplicationId == a.Id).Select(p => new CreatePetGEADto
                             {
                                 Age = p.Age,

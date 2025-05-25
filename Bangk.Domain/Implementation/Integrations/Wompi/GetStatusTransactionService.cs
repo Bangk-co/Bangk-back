@@ -7,6 +7,7 @@ using Bangk.Repositories.Entities;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
 
                 if (string.Equals(apiResponseStatus.Data.Status, "APPROVED"))
                 {
-                    await ApprovedTransactionProcess(apiResponseStatus.Data.Reference);
+                    await ApprovedTransactionProcess(apiResponseStatus.Data.Reference, apiResponseStatus.Data.Created_At);
                     await _applicationTransactionRepository.Create(CreateTransactionDto(apiResponseStatus));
                 }
                 else if (string.Equals(apiResponseStatus.Data.Status, "DECLINED") ||
@@ -111,7 +112,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             };
         }
 
-        private async Task ApprovedTransactionProcess(string referenceApplication)
+        private async Task ApprovedTransactionProcess(string referenceApplication, DateTime CreatedTransactionDate)
         {
             switch (referenceApplication)
             {
@@ -120,14 +121,14 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     petApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                     //Create Assistence in GEA
-                    await _createPetAssistenceService.Execute(referenceApplication);
+                    await _createPetAssistenceService.Execute(referenceApplication, CreatedTransactionDate);
                     break;
                 case string reference when reference.Contains("MED"):
                     var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(referenceApplication);
                     medApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     //Create Assistence in GEA
-                    await _createMedAssistenceService.Execute(referenceApplication);
+                    await _createMedAssistenceService.Execute(referenceApplication, CreatedTransactionDate);
                     break;
             }
         }

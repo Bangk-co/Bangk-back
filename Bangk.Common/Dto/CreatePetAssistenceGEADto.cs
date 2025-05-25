@@ -14,6 +14,7 @@ namespace Bangk.Common.Dto
         public int PaymentOcurrencyId { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<CreatePetGEADto> Pets { get; set; }
+        public long? Amount { get; set; }
     }
 
     public class CreatePetGEADto

@@ -1,10 +1,13 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.GEA;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +28,7 @@ namespace Bangk.Domain.Implementation.GEA
             _getApplicationTokenGEAService = getApplicationTokenGEAService;
         }
 
-        public async Task<ResponseDto<bool>> Execute(string applicationReference)
+        public async Task<ResponseDto<bool>> Execute(string applicationReference, DateTime CreatedTransactionDate)
         {
             var token = await _getApplicationTokenGEAService.Execute();
             var baseUrl = _configuration.GetSection("GeaKeys:GeaUrl").Value;
@@ -90,10 +93,9 @@ namespace Bangk.Domain.Implementation.GEA
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
                     HttpResponseMessage jsonResponse = await client.PostAsync(baseUrl + "v1/afiliacion/now", content);
                     string result = await jsonResponse.Content.ReadAsStringAsync();
-                    var apiResponseCard = JsonConvert.DeserializeObject<CardTokenResponseDto>(result);
-
                     if (!jsonResponse.IsSuccessStatusCode)
                     {
+                        await SendEmailFailedCreationGEA(application, CreatedTransactionDate);
                         return new ResponseDto<bool>
                         {
                             Result = false,
@@ -109,6 +111,57 @@ namespace Bangk.Domain.Implementation.GEA
                 HasErrors = false,
                 Result = true
             };
+        }
+
+        private  async Task SendEmailFailedCreationGEA(CreateMedAssistenceGEADto application, DateTime CreatedTransactionDate)
+        {
+            
+            var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var sendEmail = new SendGridEmailDto
+            {
+                Email = _configuration.GetSection("GeaKeys:EmailErrorGea").Value,
+                Cc = _configuration.GetSection("GeaKeys:EmailCopyErrorGea").Value,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = _configuration.GetSection("SendGridEmailSender:GEAFailedTelemedicina").Value,
+
+                Data = new
+                {
+                    Beneficiaries = application.MedPersons.Select(m => new {
+                        NameBeneficiary = m.Name,
+                        DocumentTypeBeneficiary = m.DocumentType switch
+                        {
+                            76 => "Cédula de ciudadania",
+                            77 => "Cédula de extranjeria",
+                            _ => "Tarjeta Identidad"
+                        },
+                        DocumentNumberBeneficiary = m.DocumentNumber,
+                        EmailBeneficiary = m.Email,
+                        PhoneBeneficiary = m.PhoneNumber
+                    }),
+                    Name = application.Name,
+                    DocumentNumber = application.DocumentNumber,
+                    Email = application.Email,
+                    Phone = application.Phone,
+                    Amount = application.Amount / 100,
+                    PaymentDate = CreatedTransactionDate.ToString("dd/MM/yyyy HH:mm"),
+                    DocumentType = application.DocumentType switch
+                    {
+                        76 => "Cédula de ciudadania",
+                        77 => "Cédula de extranjeria",
+                        _ => "Tarjeta Identidad"
+                    },
+                    Frecuency = application.PaymentOcurrencyId switch
+                    {
+                        (int)MethodPaymentTimeEnum.Mensual => "Mensual",
+                        (int)MethodPaymentTimeEnum.Semestral => "Semestral",
+                        _ => "Anual"
+                    }
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
         }
     }
 }
