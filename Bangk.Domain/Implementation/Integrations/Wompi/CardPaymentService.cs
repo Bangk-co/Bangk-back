@@ -55,7 +55,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 cvc = PasswordUtils.DecryptPassword(cardPaymentDto.CVC, key, iv),
                 exp_month = PasswordUtils.DecryptPassword(cardPaymentDto.ExpiredMonth, key, iv),
                 exp_year = PasswordUtils.DecryptPassword(cardPaymentDto.ExpiredYear, key, iv),
-                number = PasswordUtils.DecryptPassword(cardPaymentDto.CardNumber, key, iv)
+                number = PasswordUtils.DecryptPassword(cardPaymentDto.CardNumber, key, iv).Replace(" ", "")
             };
 
             using (HttpClient client = new HttpClient())
