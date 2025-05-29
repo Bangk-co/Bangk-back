@@ -19,7 +19,8 @@ namespace Bangk.Repositories.Repositories
         IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication);
         IQueryable<ClientReport2Dto> GetReportClientsSarlaftLogs(ApplicationStateHistoryEnum stateloanApplication);
         string GetDiseasesNames(string diseaseIds);
-        Task<List<ClientPolicyDto>> GetPolicyClient(int clientId);
+        //Task<List<ClientPolicyDto>> GetPolicyClient(int clientId);
+        IQueryable<ClientPolicyDto> GetPolicyClient(int clientId);
         List<Beneficiaries2JobDto> GetBeneficiariesByPolicyIdLogs(int policyId);
         List<BeneficiariesJobDto> GetBeneficiariesByPolicyId(int policyId);
         Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId);
