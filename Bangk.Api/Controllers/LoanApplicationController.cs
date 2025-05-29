@@ -1,6 +1,5 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.LoanApplication;
-using Bangk.Domain.Implementation.LoanApplication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,13 +15,18 @@ namespace Bangk.Api.Controllers
         private readonly IGetLoadApplicationByIdService _getLoadApplicationByIdService;
         private readonly IUpdateLoanApplicationService _updateLoanApplicationService;
         private readonly IGetLoanApplicationInfoByLoanApplicationIdService _getLoanApplicationInfoByLoanApplicationIdService;
+        private readonly IGetLoanApplicationFirstThreeService _getLoanApplicationFirstThreeService;
+        private readonly ICreateLoanApplicationService _createLoanApplicationService;
         public LoanApplicationController(ILoanApplicationServices getLoanApplicationServices, IGetLoadApplicationByIdService getLoadApplicationByIdService, 
-            IUpdateLoanApplicationService updateLoanApplicationService, IGetLoanApplicationInfoByLoanApplicationIdService getLoanApplicationInfoByLoanApplicationIdService)
+            IUpdateLoanApplicationService updateLoanApplicationService, IGetLoanApplicationInfoByLoanApplicationIdService getLoanApplicationInfoByLoanApplicationIdService,
+            IGetLoanApplicationFirstThreeService getLoanApplicationFirstThreeService, ICreateLoanApplicationService createLoanApplicationService)
         {
             _getLoanApplicationServices = getLoanApplicationServices;
             _getLoadApplicationByIdService = getLoadApplicationByIdService;
             _updateLoanApplicationService = updateLoanApplicationService;
             _getLoanApplicationInfoByLoanApplicationIdService = getLoanApplicationInfoByLoanApplicationIdService;
+            _getLoanApplicationFirstThreeService = getLoanApplicationFirstThreeService;
+            _createLoanApplicationService = createLoanApplicationService;
         }
 
         [HttpGet("GetLoanApplicationService")]
@@ -79,6 +83,26 @@ namespace Bangk.Api.Controllers
             {
                 result
             });
+        }
+
+        [HttpGet("GetLoanApplicationFirstThree")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<ClientPolicyDto>>> GetLoanApplicationFirstThree(int clientId)
+        {
+            var result = await _getLoanApplicationFirstThreeService.Execute(clientId);
+            return Ok(new
+            {
+                loanApplications = result
+            });
+        }
+
+
+        [HttpPost("CreateLoanApplication")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<bool>> CreateLoanApplication([FromForm] NewLoadAplicacionDto newLoadAplicacionDto)
+        {
+            var result = await _createLoanApplicationService.Execute(newLoadAplicacionDto);
+            return Ok(result);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Bangk.Domain.Implementation.Login
             var codeEncrypted = PasswordUtils.EncryptAes(code, key, iv);
             var sendEmail = new SendGridEmailDto
             {
-                email = sendCodeValidationEmailDto.Email,
+                Email = sendCodeValidationEmailDto.Email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

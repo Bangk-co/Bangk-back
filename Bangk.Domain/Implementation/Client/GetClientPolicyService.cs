@@ -20,9 +20,9 @@ namespace Bangk.Domain.Implementation.Client
 
         public async Task<List<ClientPolicyDto>> Execute(int clientId)
         {
-            var query =  _clientRepository.GetPolicyClient(clientId);
+            return await _clientRepository.GetPolicyClient(clientId);
 
-            return query.ToList();
+            
         }
     }
 }

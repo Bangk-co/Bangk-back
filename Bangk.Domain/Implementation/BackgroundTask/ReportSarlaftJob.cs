@@ -36,7 +36,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task Invoke()
         {
-            Logs.WriteInfoLog($"Running Scheduled Task: ReportSarlaftJob");
             await Execute();
         }
 

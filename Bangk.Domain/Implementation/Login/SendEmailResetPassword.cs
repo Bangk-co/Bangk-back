@@ -44,7 +44,7 @@ namespace Bangk.Domain.Implementation.Login
 
             var sendEmail = new SendGridEmailDto
             {
-                email = email,
+                Email = email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

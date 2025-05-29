@@ -124,11 +124,15 @@ namespace Bangk.Api
                 .Tuesday()
                 .Wednesday()
                 .Thursday()
-                .Friday().PreventOverlapping(nameof(ReportSarlaftJob)); 
+                .Friday().PreventOverlapping(nameof(ReportSarlaftJob));
                 scheduler.Schedule<ReportSarlaftJob>().DailyAt(17, 0)
                 .Saturday().PreventOverlapping(nameof(ReportSarlaftJob));
                 scheduler.Schedule<RetryIntegrationsJob>().EveryMinute().PreventOverlapping(nameof(RetryIntegrationsJob));
                 scheduler.Schedule<CompleteApplicationJob>().EveryFiveMinutes().PreventOverlapping(nameof(CompleteApplicationJob));
+                scheduler.Schedule<PaymentAssistanceJob>().DailyAtHour(0).PreventOverlapping(nameof(PaymentAssistanceJob));
+                scheduler.Schedule<PaymentAssistanceTryOneJob>().DailyAt(6, 0).PreventOverlapping(nameof(PaymentAssistanceTryOneJob));
+                scheduler.Schedule<PaymentAssistanceTryTwoJob>().DailyAt(12, 0).PreventOverlapping(nameof(PaymentAssistanceTryTwoJob));
+                scheduler.Schedule<PaymentAssistanceTryThreeJob>().DailyAt(23, 0).PreventOverlapping(nameof(PaymentAssistanceTryThreeJob));
             });
         }
     }

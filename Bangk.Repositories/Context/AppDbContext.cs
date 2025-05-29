@@ -39,7 +39,12 @@ namespace Bangk.Repositories.Context
         public DbSet<ScheduleIntegration> ScheduleIntegrations { get; set; }
         public DbSet<ValidationSarlaftLog> ValidationSarlaftLogs { get; set; }
         public DbSet<MedPersonInsureds> MedPersonInsureds { get; set; }
-        public DbSet<MedEnsuranceApplication> MedEnsuranceApplication { get; set; }
+        public DbSet<MedInsuranceApplication> MedInsuranceApplication { get; set; }
+        public DbSet<PetInsuranceApplication> PetInsuranceApplication { get; set; }
+        public DbSet<Pet> Pets { get; set; }
+        public DbSet<ApplicationTransaction> ApplicationTransaction { get; set; }
+        public DbSet<TryPaymentJob> TryPaymentJobs { get; set; }
+        
 
     }
 }

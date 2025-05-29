@@ -64,7 +64,7 @@ namespace Bangk.Domain.Implementation.LoanForm
                 var url = _configuration.GetSection("CreateClientAccount:UrlFront").Value + $"?requestId={client.Result.Id}&email={client.Result.Email}";
                 var sendEmail = new SendGridEmailDto
                 {
-                    email = client.Result.Email,
+                    Email = client.Result.Email,
                     From = _configuration.GetSection("SendGridEmailSender:From").Value,
                     Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                     Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

@@ -18,9 +18,14 @@ namespace Bangk.Business.Extension.SenderGrid
             }
 
             var client = new SendGridClient(sendGridApiKey);
-            var msg = MailHelper.CreateSingleTemplateEmail(new EmailAddress(sendGridEmailDto.From, sendGridEmailDto.Name), new EmailAddress(sendGridEmailDto.email.Trim()),
+            var msg = MailHelper.CreateSingleTemplateEmail(new EmailAddress(sendGridEmailDto.From, sendGridEmailDto.Name), new EmailAddress(sendGridEmailDto.Email.Trim()),
                 sendGridEmailDto.TemplateId, sendGridEmailDto.Data);
 
+            if (!string.IsNullOrEmpty(sendGridEmailDto.Cc))
+            {
+                msg.AddCc(sendGridEmailDto.Cc);
+            }
+            
             if (sendGridEmailDto.Attachments != null && sendGridEmailDto.Attachments.Count > 0)
             {
                 foreach (var attachment in sendGridEmailDto.Attachments)
@@ -30,9 +35,6 @@ namespace Bangk.Business.Extension.SenderGrid
             }
 
             var response = await client.SendEmailAsync(msg);
-            Logs.WriteInfoLog(response.IsSuccessStatusCode
-                               ? $"Email to {sendGridEmailDto.email} queued successfully!"
-                               : $"Failure Email to {sendGridEmailDto.email}");
         }
     }
 }
