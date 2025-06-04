@@ -93,7 +93,7 @@ namespace Bangk.Repositories.Repositories
 
         public async Task<bool> ExistClientByEmailAndIdentificationNumber(string email, string identificationNumber)
         {
-            return await Context.Clients.AnyAsync(e => string.Equals(e.Email, email) || string.Equals(e.IdentificationNumber, identificationNumber));
+            return await Context.Clients.AnyAsync(e => string.Equals(e.Email.ToLower(), email.ToLower()) || string.Equals(e.IdentificationNumber, identificationNumber));
         }
 
         public async Task<Client> GetClientByLoanApplicationId(int loanApplicationId)
@@ -105,9 +105,6 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
-
-
-
 
         public IQueryable<ClientReportDto> GetReportClientsSarlaft(ApplicationStateHistoryEnum stateloanApplication)
         {
@@ -170,7 +167,7 @@ namespace Bangk.Repositories.Repositories
                 }).ToList();
         }
 
-        public IQueryable<int> GetLoanApplicationIdsWithState (ApplicationStateHistoryEnum stateloanApplication)
+        public IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication)
         {
             var query = from l in Context.LoanApplication
                         join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
@@ -261,9 +258,8 @@ namespace Bangk.Repositories.Repositories
                             LifeEnsure = lp.LifeEnsure,
                             NameBank = st.Name,
                             NitBank = st.Code
-                           
+
                         };
-            
 
             return query;
         }
@@ -299,6 +295,29 @@ namespace Bangk.Repositories.Repositories
                                select setting.Name;
             return string.Join(", ", diseaseNames);
         }
+
+        //public async Task<List<ClientPolicyDto>> GetPolicyClient(int clientId)
+        //{
+        //    var query = from l in Context.LoanApplication
+        //                join c in Context.Clients on l.ClientId equals c.Id
+        //                join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
+        //                from sj in settingsGroup.DefaultIfEmpty()
+        //                where c.Id == clientId
+        //                select new ClientPolicyDto
+        //                {
+        //                    LoanApplicationId = l.Id,
+        //                    PolicyId = null,
+        //                    LoanType = sj.Name,
+        //                    CreationDateLoanApplication = l.CreationDate,
+        //                    CreationDatePolicy = null,
+        //                    StateName = Context.LoanApplicationStateHistory
+        //                                 .Where(m => m.LoanApplicationId == l.Id)
+        //                                 .OrderByDescending(lh => lh.CreationDate)
+        //                                 .Select(lh => lh.State.Name)
+        //                                 .FirstOrDefault()
+        //                };
+        //    return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
+        //}
 
         public IQueryable<ClientPolicyDto> GetPolicyClient(int clientId)
         {
@@ -358,8 +377,51 @@ namespace Bangk.Repositories.Repositories
             return result.AsQueryable();
         }
 
+        public async Task<List<ClientPolicyDto>> GetLoanApplicationLastThreeByClient(int clientId)
+        {
+            var query = from l in Context.LoanApplication
+                        join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId into t
+                        from sublp in t.DefaultIfEmpty()
+                        join c in Context.Clients on l.ClientId equals c.Id
+                        join s in Context.Settings on l.LoanTypeId equals s.Id into settingsGroup
+                        from sj in settingsGroup.DefaultIfEmpty()
+                        where c.Id == clientId
+                        select new ClientPolicyDto
+                        {
+                            LoanApplicationId = l.Id,
+                            PolicyId = null,
+                            LoanType = sj.Name,
+                            CreationDateLoanApplication = l.CreationDate,
+                            CreationDatePolicy = null,
+                            StateName = Context.LoanApplicationStateHistory
+                                         .Where(m => m.LoanApplicationId == l.Id)
+                                         .OrderByDescending(lh => lh.CreationDate)
+                                         .Select(lh => lh.State.Name)
+                                         .FirstOrDefault()
+                        };
 
+            return await query.OrderByDescending(q => q.CreationDateLoanApplication).Take(3).ToListAsync();
+        }
 
+        public async Task<Client> GetClientByEmail(string email)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => string.Equals(e.Email.ToLower(), email.ToLower()));
+        }
 
+        public async Task<Client> GetClientByIdentification(string identificationNumber)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => string.Equals(e.IdentificationNumber, identificationNumber));
+        }
+
+        public async Task<Client> GetClientByIdentificationNumberAndType(int documentType, string identificationNumber)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => e.DocumenIdentificationTypeId == documentType && string.Equals(e.IdentificationNumber, identificationNumber));
+        }
+
+        public async Task<Client> GetClientByIdentificationNumberDocumentTypeEmail(int documentType, string identificationNumber, string email)
+        {
+            return await Context.Clients.FirstOrDefaultAsync(e => e.DocumenIdentificationTypeId == documentType && string.Equals(e.IdentificationNumber, identificationNumber)
+            && string.Equals(e.Email.ToLower(), email.ToLower()));
+        }
     }
 }

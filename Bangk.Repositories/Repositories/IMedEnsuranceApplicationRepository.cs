@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 
 namespace Bangk.Repositories.Repositories
 {
-    public interface IMedEnsuranceApplicationRepository: IGenericRepository<MedEnsuranceApplication, MedEnsuranceApplicationDto>
+    public interface IMedEnsuranceApplicationRepository: IGenericRepository<MedInsuranceApplication, MedEnsuranceApplicationDto>
     {
+        Task<MedInsuranceApplication> GetMedEnsuranceApplicationByReference(string reference);
+        Task<CreateMedAssistenceGEADto> GetMedAssistenceGEA(string reference);
+        Task<List<PaymentJobDto>> GetMedAssistencePendingToPay(DateTime dateTime);
+        Task<List<PaymentJobDto>> GetMedAssistencePayment(string applicationReference);
     }
 }

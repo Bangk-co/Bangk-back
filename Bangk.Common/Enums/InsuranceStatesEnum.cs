@@ -8,7 +8,8 @@ namespace Bangk.Common.Enums
 {
     public enum InsuranceStatesEnum
     {
-        PendingToCreate = 720,
-        Created = 721,
+        PendingToApprove = 720,
+        Approve = 721,
+        Rejected = 722
     }
 }

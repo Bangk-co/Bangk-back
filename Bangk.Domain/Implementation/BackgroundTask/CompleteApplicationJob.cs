@@ -26,7 +26,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task Invoke()
         {
-            Logs.WriteInfoLog($"Running Scheduled Task: CompleteApplicationJob");
             await Execute();
         }
 
@@ -60,7 +59,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             var url = _configuration.GetSection("LoanInsurancePolicy:UrlFront").Value;
             var sendEmail = new SendGridEmailDto
             {
-                email = notificationDto.ClientEmail,
+                Email = notificationDto.ClientEmail,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

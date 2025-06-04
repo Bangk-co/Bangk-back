@@ -41,11 +41,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             try
             {
                 _client.Connect();
-                if (_client.IsConnected)
-                {
-                    Logs.WriteInfoLog("Conexión establecida correctamente.");
-                }
-                else
+                if (!_client.IsConnected)
                 {
                     throw new SftpConnectionException("No se pudo establecer la conexión al servidor SFTP.");
                 }
@@ -72,7 +68,6 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             if (_client.IsConnected)
             {
                 _client.Disconnect();
-                Logs.WriteInfoLog("Conexión cerrada correctamente.");
             }
         }
 
@@ -87,7 +82,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             {
                 var sendEmail = new SendGridEmailDto
                 {
-                    email = emailName,
+                    Email = emailName,
                     From = _configuration.GetSection("SendGridEmailSender:From").Value,
                     Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                     Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

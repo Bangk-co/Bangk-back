@@ -12,5 +12,6 @@ namespace Bangk.Repositories.Repositories
         IQueryable<LoanApplicationStateHistoryDto> GetLoanApplicationStateHistory (int loanApplicationId);
         Task<LoanApplicationStateHistory> GetLoanApplicationStateHistoryByStateAndLoanApplicationId(int stateId, int loanApplicationId);
         Task<List<LoanApplicationStateDto>> GetLoanApplicationQuoteAccepted();
+        Task<LoanApplicationStateHistory> GetLastStateByLoanApplicationId(int loanApplicationId);
     }
 }

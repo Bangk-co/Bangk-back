@@ -30,6 +30,7 @@ namespace Bangk.Domain.Implementation.Integrations
         private readonly IScheduleIntegrationRepository _scheduleIntegrationRepository;
         private readonly IChangeStatusDealService _changeStatusDealService;
         private readonly IChangeStateDealService _changeStateDealService;
+
         public ValidationSarlaftService(ILoanInsurancePolicyRepository loanInsurancePolicyRepository, IConfiguration configuration, IClientRepository clientRepository,
             ILoanApplicationStateHistoryRepository loanApplicationStateHistoryRepository, IScheduleIntegrationService scheduleIntegrationService,
             IValidationSarlaftRepository validationSarlaftRepository,
@@ -160,7 +161,7 @@ namespace Bangk.Domain.Implementation.Integrations
             var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
             var sendEmail = new SendGridEmailDto
             {
-                email = clientInfo.Email,
+                Email = clientInfo.Email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
