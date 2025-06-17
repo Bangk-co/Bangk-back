@@ -27,7 +27,7 @@ namespace Bangk.Common.Dto
     public class DatosWrapperDto
     {
         public DataGEADto datos { get; set; }
-        public DataGEAExtrasDto datosExtras { get; set; }
+        public DataGEAExtrasDto datos_extras { get; set; }
     }
 
     public class DataGEADto
