@@ -91,7 +91,7 @@ namespace Bangk.Domain.Implementation.GEA
                     };
 
                     datos.datos = gea;
-                    datos.datosExtras = datosExtra;
+                    datos.datos_extras = datosExtra;
                     clientPets.Add(datos);
                     clients.clientes = clientPets;
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.Result}");
