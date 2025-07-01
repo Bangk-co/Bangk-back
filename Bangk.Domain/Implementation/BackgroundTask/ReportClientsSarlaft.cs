@@ -150,9 +150,9 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 
                 foreach (var client in clientList)
                 {
-                    worksheet.Cells[row, 1].Value = "3";
+                    worksheet.Cells[row, 1].Value = 3;
                     worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
-                    worksheet.Cells[row, 3].Value = "128";
+                    worksheet.Cells[row, 3].Value = 128;
                     worksheet.Cells[row, 4].Value = "VIDA GRUPO";
                     string caratula = (await _settingRepository.GetById((int)CaratulaEnum.CaratulaNumber)).Code;
                     worksheet.Cells[row, 7].Value = caratula;
@@ -178,7 +178,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     else
                     {
 
-                        plan = "Plan sin definir";
+                        plan = "Plan sin definir"; 
                     }
 
                     worksheet.Cells[row, 9].Value = plan;
@@ -202,7 +202,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     int consecutive = lastConsecutive == 0 ? int.Parse((await _settingRepository.GetById((int)ConsecutiveEnum.ConsecutiveNumber)).Code) : lastConsecutive + 1;
                     worksheet.Cells[row, 11].Value = $"BK128{consecutive}";
                     worksheet.Cells[row, 12].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
-                    worksheet.Cells[row, 13].Value = client.IdentificationNumber;
+                    worksheet.Cells[row, 13].Value = !string.IsNullOrEmpty(client.IdentificationNumber) ? long.Parse(client.IdentificationNumber) : null;
                     worksheet.Cells[row, 14].Value = client.Name;
                     worksheet.Cells[row, 15].Value = client.LastName;
                     worksheet.Cells[row, 17].Value = client.Address;
@@ -210,23 +210,23 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 19].Value = client.CityName;
                     worksheet.Cells[row, 20].Value = client.StateName;
                     worksheet.Cells[row, 21].Value = client.CountryName;
-                    worksheet.Cells[row, 24].Value = client.PhoneNumber;
-                    worksheet.Cells[row, 25].Value = client.Email;
-                    worksheet.Cells[row, 26].Value = client.BirthDate?.ToString("yyyyMMdd");
+                    worksheet.Cells[row, 24].Value = !string.IsNullOrEmpty(client.PhoneNumber) ? long.Parse(client.PhoneNumber) : null;
+                    worksheet.Cells[row, 25].Value = client.Email.Trim();
+                    worksheet.Cells[row, 26].Value = client.BirthDate.HasValue ? int.Parse(client.BirthDate?.ToString("yyyyMMdd")) : null;
                     worksheet.Cells[row, 30].Value = client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Cc ? 1 : client.DocumenIdentificationTypeId == (int)DocumenIdentificationTypeEnum.Ce ? 2 : null;
-                    worksheet.Cells[row, 31].Value = client.IdentificationNumber;
+                    worksheet.Cells[row, 31].Value = !string.IsNullOrEmpty(client.IdentificationNumber) ? int.Parse(client.IdentificationNumber) : null;
                     worksheet.Cells[row, 32].Value = client.Name;
                     worksheet.Cells[row, 33].Value = client.LastName;
                     worksheet.Cells[row, 46].Value = "AP";
                     worksheet.Cells[row, 47].Value = "Activo";
                     worksheet.Cells[row, 50].Value = "BUILDING LIFE TECHNOLOGIES S.A.S. - 901647130-5";
-                    worksheet.Cells[row, 51].Value = client.CreationDatePolicy.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 52].Value = DateTime.UtcNow.ToString("yyyyMMdd");
-                    worksheet.Cells[row, 53].Value = DateTime.UtcNow.AddYears(1).ToString("yyyyMMdd");
+                    worksheet.Cells[row, 51].Value = !string.IsNullOrEmpty(client.CreationDatePolicy.ToString("yyyyMMdd")) ? int.Parse(client.CreationDatePolicy.ToString("yyyyMMdd")) : null;
+                    worksheet.Cells[row, 52].Value = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd"));
+                    worksheet.Cells[row, 53].Value = int.Parse(DateTime.UtcNow.AddYears(1).ToString("yyyyMMdd"));
                     worksheet.Cells[row, 56].Value = "1A";
                     worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
                     worksheet.Cells[row, 58].Value = "Oneroso";
-                    worksheet.Cells[row, 59].Value = "100.000";
+                    worksheet.Cells[row, 59].Value = 100.000;
 
                     int beneficiaryColumn = 60;
                     var clientBeneficiaries = _clientRepository.GetBeneficiariesByPolicyId(client.LoanPolicyId);
@@ -248,7 +248,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     }
                     worksheet.Cells[row, 84].Value = client.LoanBalance;
                     worksheet.Cells[row, 85].Value = client.YearlyFee;
-                    worksheet.Cells[row, 94].Value = client.LoanNumber;
+                    worksheet.Cells[row, 94].Value = !string.IsNullOrEmpty(client.LoanNumber) ? long.Parse(client.LoanNumber) : null;
 
                     row++;
                     await SaveCaratula(caratula, client.LoanPolicyId);
