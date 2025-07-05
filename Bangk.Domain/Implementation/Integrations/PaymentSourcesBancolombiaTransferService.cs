@@ -1,15 +1,13 @@
 ﻿using Bangk.Common.Dto;
 using Bangk.Domain.Contract.Integrations;
+using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Bangk.Repositories.Repositories;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 namespace Bangk.Domain.Implementation.Integrations
 {

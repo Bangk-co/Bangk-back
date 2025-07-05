@@ -226,6 +226,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 56].Value = "1A";
                     worksheet.Cells[row, 57].Value = client.NameBank + " - " + client.NitBank;
                     worksheet.Cells[row, 58].Value = "Oneroso";
+                    worksheet.Cells[row, 59].Style.Numberformat.Format = "0.000";
                     worksheet.Cells[row, 59].Value = 100.000;
 
                     int beneficiaryColumn = 60;
