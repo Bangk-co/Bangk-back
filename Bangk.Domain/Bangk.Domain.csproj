@@ -6,6 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Contract\Beneficiary\**" />
+    <Compile Remove="Contract\MedEnsuranceApplication\**" />
+    <Compile Remove="Implementation\MedEnsuranceApplication\**" />
+    <EmbeddedResource Remove="Contract\Beneficiary\**" />
+    <EmbeddedResource Remove="Contract\MedEnsuranceApplication\**" />
+    <EmbeddedResource Remove="Implementation\MedEnsuranceApplication\**" />
+    <None Remove="Contract\Beneficiary\**" />
+    <None Remove="Contract\MedEnsuranceApplication\**" />
+    <None Remove="Implementation\MedEnsuranceApplication\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Connected Services\ValidacionOFAC\ConnectedService.json" />
     <None Remove="Implementation\Login\ResetPasswordService.cs~RF44887912.TMP" />
   </ItemGroup>
@@ -40,10 +52,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Bangk.Common\Bangk.Common.csproj" />
     <ProjectReference Include="..\Bangk.Repositories\Bangk.Repositories.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Contract\Beneficiary\" />
   </ItemGroup>
 
 </Project>

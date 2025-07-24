@@ -119,7 +119,7 @@ namespace Bangk.Domain.Implementation.Client
                     var url = _configuration.GetSection("PolicyNotIssued:UrlFront").Value;
                     var sendEmail = new SendGridEmailDto
                     {
-                        email = clientInfo.Result.Email,
+                        Email = clientInfo.Result.Email,
                         From = _configuration.GetSection("SendGridEmailSender:From").Value,
                         Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                         Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
@@ -195,7 +195,7 @@ namespace Bangk.Domain.Implementation.Client
             var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
             var sendEmail = new SendGridEmailDto
             {
-                email = email,
+                Email = email,
                 From = _configuration.GetSection("SendGridEmailSender:From").Value,
                 Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                 Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
