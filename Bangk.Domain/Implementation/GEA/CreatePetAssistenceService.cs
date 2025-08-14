@@ -35,7 +35,7 @@ namespace Bangk.Domain.Implementation.GEA
             var token = await _getApplicationTokenGEAService.Execute();
             var baseUrl = _configuration.GetSection("GeaKeys:GeaUrl").Value;
             var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
-            var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
+            var planId = int.Parse(_configuration["GeaKeys:IdPlanMascota"]);
             var application = await _petInsuranceApplicationRepository.GetPetAssistenceGEA(applicationReference);
             var count = 1;
             foreach (var item in application.Pets)

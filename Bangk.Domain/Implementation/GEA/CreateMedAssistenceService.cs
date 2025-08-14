@@ -33,7 +33,7 @@ namespace Bangk.Domain.Implementation.GEA
             var token = await _getApplicationTokenGEAService.Execute();
             var baseUrl = _configuration.GetSection("GeaKeys:GeaUrl").Value;
             var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
-            var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
+            var planId = int.Parse(_configuration["GeaKeys:IdPlanTelemedicina"]);
             var application = await _medEnsuranceApplicationRepository.GetMedAssistenceGEA(applicationReference);
             var datosExtras = new DataGEAExtrasMedDto
             {
