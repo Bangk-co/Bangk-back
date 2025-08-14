@@ -82,7 +82,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             {
                 var sendEmail = new SendGridEmailDto
                 {
-                    email = emailName,
+                    Email = emailName,
                     From = _configuration.GetSection("SendGridEmailSender:From").Value,
                     Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
                     Name = _configuration.GetSection("SendGridEmailSender:Name").Value,

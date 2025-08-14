@@ -20,6 +20,6 @@ namespace Bangk.Repositories.Entities
         public DateTime? DocumentIssueDate {  get; set; }
         public DateTime? ValidateClientOtp { get; set; }
 
-        public int State {  get; set; }
+        public int? State {  get; set; }
     }
 }

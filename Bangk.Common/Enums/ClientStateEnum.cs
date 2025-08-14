@@ -70,7 +70,8 @@ namespace Bangk.Common.Enums
     public enum DocumenIdentificationTypeEnum
     {
         Cc = 76,
-        Ce = 77
+        Ce = 77,
+        TI = 723
     }
 
     public enum ConsecutiveEnum
@@ -90,5 +91,11 @@ namespace Bangk.Common.Enums
     public enum StateClientifyDeal
     {
         Lost = 4
+    }
+
+    public enum PetType
+    {
+        Dog = 718,
+        Cat = 719
     }
 }
