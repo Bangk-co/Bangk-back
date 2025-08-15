@@ -31,6 +31,8 @@ namespace Bangk.Domain.Implementation.Integrations
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var publicKey = _configuration.GetSection("WompiKeys:PublicKey").Value;
 
+
+
             wompiUrl = $"{wompiUrl}tokens/bancolombia_transfer";
             var query = new
             {
@@ -68,7 +70,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     response = new ResponseDto<Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = true,
-                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}" }
+                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}. URL: {wompiUrl}, KEY: {publicKey}" }
                     };
                 }
             }
