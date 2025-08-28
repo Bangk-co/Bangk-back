@@ -44,7 +44,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
             var transactionUrl = $"{baseUrl}transactions";
 
-            var petPendingToPay = await _petInsuranceApplicationRepository.GetPetAssistencePendingToPay(DateTime.UtcNow);
+            var petPendingToPay = await _petInsuranceApplicationRepository.GetPetAssistancePendingToPay(DateTime.UtcNow);
             await PetPaymentAssistence(petPendingToPay, privateKey, transactionUrl);
 
             var medPendingToPay = await _medEnsuranceApplicationRepository.GetMedAssistencePendingToPay(DateTime.UtcNow);
