@@ -1,4 +1,5 @@
-﻿using Bangk.Common.Dto;
+﻿using Bangk.Business.Extension.SenderGrid;
+using Bangk.Common.Dto;
 using Bangk.Common.Enums;
 using Bangk.Domain.Contract.GEA;
 using Bangk.Domain.Contract.Integrations;
@@ -10,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace Bangk.Domain.Implementation.Integrations.Wompi
@@ -122,6 +124,9 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                     //Create Assistence in GEA
                     await _createPetAssistenceService.Execute(referenceApplication, CreatedTransactionDate);
+                    var petClient = await _petEnsuranceApplicationRepository.GetPetAssistanceByReference(referenceApplication);
+                    var templateId = _configuration.GetSection("SendGridEmailSender:WelcomeSuscriptionPets").Value;
+                    await SendNotification(petClient.Email, templateId, petClient.ClientName, petClient.PaymentOcurrency, petClient.Number);
                     break;
                 case string reference when reference.Contains("MED"):
                     var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(referenceApplication);
@@ -129,10 +134,41 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     //Create Assistence in GEA
                     await _createMedAssistenceService.Execute(referenceApplication, CreatedTransactionDate);
+                    var medCliente = await _medEnsuranceApplicationRepository.GetMedAssistanceByReference(referenceApplication);
+                    var templateMedId = _configuration.GetSection("SendGridEmailSender:WelcomeSuscriptionTelemedicina").Value;
+                    await SendNotification(medCliente.Email, templateMedId, medCliente.ClientName, medCliente.PaymentOcurrency, medCliente.Number);
+                    break;
                     break;
             }
         }
 
+        private async Task SendNotification(string email, string templateId, string clientName, int paymentOcurrency, int number)
+        {
+            var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var nextPayment = paymentOcurrency switch
+            {
+                (int)MethodPaymentTimeEnum.Mensual => "Mensual",
+                (int)MethodPaymentTimeEnum.Semestral => "Semestral",
+                _ => "Anual"
+            };
+            var sendEmail = new SendGridEmailDto
+            {
+                Email = email,
+                From = _configuration.GetSection("SendGridEmailSender:From").Value,
+                Key = _configuration.GetSection("SendGridEmailSender:Key").Value,
+                Name = _configuration.GetSection("SendGridEmailSender:Name").Value,
+                TemplateId = templateId,
+
+                Data = new
+                {
+                    clientname = clientName,
+                    paymentocurrency = nextPayment,
+                    number = number,
+                }
+            };
+
+            await SendGridEmailSender.SendEmailAsync(sendEmail);
+        }
 
         private async Task RejectedTransactionProcess(string referenceApplication)
         {

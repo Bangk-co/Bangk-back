@@ -88,9 +88,26 @@ namespace Bangk.Repositories.Repositories
                             Amount = p.Amount,
                             PaymentInstallments = p.PaymentInstallments,
                             Email = c.Email,
+                            PaymentOcurrency = p.PaymentOcurrencyId
                         };
 
             return await query.ToListAsync();
+        }
+
+        public async Task<PaymentJobDto> GetMedAssistanceByReference(string applicationReference)
+        {
+            var query = from p in Context.MedInsuranceApplication
+                        join c in Context.Clients on p.ClientId equals c.Id
+                        where p.TransactionReference == applicationReference
+                        select new PaymentJobDto
+                        {
+                            ClientName = $"{c.Name} {c.LastName}",
+                            Email = c.Email,
+                            PaymentOcurrency = p.PaymentOcurrencyId,
+                            Number = Context.MedPersonInsureds.Count(x => x.MedEnsuraceApplicationId == p.Id)
+                        };
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 switch (item.ApplicationReference)
                 {
                     case string reference when reference.Contains("PET"):
-                        var petApplication = await _petInsuranceApplicationRepository.GetPetAssistencePayment(reference);
+                        var petApplication = await _petInsuranceApplicationRepository.GetPetAssistancePayment(reference);
                         await PetPaymentAssistence(petApplication, privateKey, transactionUrl, countFailed);
                         break;
                     case string reference when reference.Contains("MED"):
@@ -146,7 +146,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                             else
                             {
                                 var templateId = _configuration.GetSection("SendGridEmailSender:CancelSuscriptionPets").Value;
-                                await SendNotification(item.Email, templateId, item.ClientName);
+                                await SendNotification(item.Email, templateId, item.ClientName, item.PaymentOcurrency);
                                 await DeleteNeNextTryPayment(item.TransactionReference);
                                 petApp.Status = (int)InsuranceStatesEnum.Rejected;
                                 await _petInsuranceApplicationRepository.Update(petApp);
@@ -239,7 +239,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                             else
                             {
                                 var templateId = _configuration.GetSection("SendGridEmailSender:CancelSuscriptionTelemedicina").Value;
-                                await SendNotification(item.Email, templateId, item.ClientName);
+                                await SendNotification(item.Email, templateId, item.ClientName, item.PaymentOcurrency);
                                 await DeleteNeNextTryPayment(item.TransactionReference);
                                 medApp.Status = (int)InsuranceStatesEnum.Rejected;
                                 await _medEnsuranceApplicationRepository.Update(medApp);
@@ -264,9 +264,15 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             await _tryPaymentJobRepository.Delete(entity);
         }
 
-        private async Task SendNotification(string email, string templateId, string clientName)
+        private async Task SendNotification(string email, string templateId, string clientName, int PaymentOcurrency)
         {
             var url = _configuration.GetSection("LoanApplicationAssigned:UrlFront").Value;
+            var nextPayment = PaymentOcurrency switch
+            {
+                (int)MethodPaymentTimeEnum.Mensual => "Mensual",
+                (int)MethodPaymentTimeEnum.Semestral => "Semestral",
+                _ => "Anual"
+            };
             var sendEmail = new SendGridEmailDto
             {
                 Email = email,
@@ -278,6 +284,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 Data = new
                 {
                     clientname = clientName,
+                    paymentocurrency = nextPayment,
                 }
             };
 

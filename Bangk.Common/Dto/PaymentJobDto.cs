@@ -13,5 +13,7 @@ namespace Bangk.Common.Dto
         public string Email { get; set; }
         public int ApplicationId { get; set; }
         public string ClientName { get; set; }
+        public int PaymentOcurrency { get; set; }
+        public int Number { get; set; }
     }
 }
