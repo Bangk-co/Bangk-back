@@ -125,24 +125,6 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 beneficiaries.Add(beneficiary);
             }
 
-            if (medPersonInsuredsDto.IsBeneficiary)
-            {
-                var beneficiary = new Repositories.Entities.MedPersonInsureds
-                {
-                    DocumentTypeId = medPersonInsuredsDto.DocumentTypeId,
-                    DocumentNumber = medPersonInsuredsDto.DocumentNumber,
-                    Name = medPersonInsuredsDto.Name,
-                    Email = medPersonInsuredsDto.Email,
-                    PhoneNumber = medPersonInsuredsDto.PhoneNumber,
-                    MedEnsuraceApplicationId = medEnsuranceApplication.Id,
-                    TreatPErsonalDatadate = medPersonInsuredsDto.TreatPErsonalDatadate,
-                    CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
-                    LastName = medPersonInsuredsDto.LastName,
-                };
-
-                beneficiaries.Add(beneficiary);
-            }
-
             if (beneficiaries.Count > 0)
             {
                 await _medPersonalInsuredRepository.CreateBulk(beneficiaries);
