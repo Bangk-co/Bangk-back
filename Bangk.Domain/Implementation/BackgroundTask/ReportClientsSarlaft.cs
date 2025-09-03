@@ -39,7 +39,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         public async Task<byte[]> CreateSarlaftReport()
         {
 
-            string fileName = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
+            string fileName =  "REMOVE " + DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
             string remoteDirectory = "/Ingestas/";
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaft(stateloanApplication);
@@ -90,20 +90,26 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task<byte[]> GenerateExcel(string remoteDirectory, string fileName, IQueryable<ClientReportDto> clients)
         {
-            var result = new byte[0];
             try
             {
-                result = await CreateExcel(clients);
-                //using (MemoryStream stream = new MemoryStream(result))
-                //{
-                //    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
+                var result = await CreateExcel(clients);
+                var remotePath = Path.Combine(remoteDirectory, fileName);
+                using (MemoryStream stream = new MemoryStream(result))
+                {
+                    _sftpClient.UploadFile(stream, remotePath);
 
-                //}
-                return result;
+                }
+
+                using (var downloadStream = new MemoryStream())
+                {
+                    _sftpClient.DownloadFile(remotePath, downloadStream);
+                    downloadStream.Position = 0;
+                    return downloadStream.ToArray();
+                }
             }
             catch (Exception ex)
             {
-                result = await CreateExcel(clients);
+                var result = await CreateExcel(clients);
                 Logs.WriteErrorLog($"Error en el método Crear Ingesta Bangk Polizas  -> {ex.Message}");
                 return result;
             }
@@ -265,7 +271,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task<byte[]> CreateSarlaftReportLogs()
         {
-            string fileName = DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logs de aceptacion BangK.xlsx";
+            string fileName = "REMOVE " + DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta con Logs de aceptacion BangK.xlsx";
             string remoteDirectory = "/Ingestas/";
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaftLogs(stateloanApplication);
@@ -275,19 +281,25 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task<byte[]> GenerateExcelLogs(string remoteDirectory, string fileName, IQueryable<ClientReport2Dto> clients)
         {
-            var result = new byte[0];
             try
             {
-                result = await CreateExcelLogs(clients);
-                //using (MemoryStream stream = new MemoryStream(result))
-                //{
-                //    _sftpClient.UploadFile(stream, Path.Combine(remoteDirectory, fileName));
-                //}
-                return result;
+                var result = await CreateExcelLogs(clients);
+                var remotePath = Path.Combine(remoteDirectory, fileName);
+                using (MemoryStream stream = new MemoryStream(result))
+                {
+                    _sftpClient.UploadFile(stream, remotePath);
+                }
+
+                using (var downloadStream = new MemoryStream())
+                {
+                    _sftpClient.DownloadFile(remotePath, downloadStream);
+                    downloadStream.Position = 0;
+                    return downloadStream.ToArray();
+                }
             }
             catch (Exception ex)
             {
-                result = await CreateExcelLogs(clients);
+                var result = await CreateExcelLogs(clients);
                 Logs.WriteErrorLog($"Error en el método Crear Ingesta con logs de aceptacion  -> {ex.Message}");
                 return result;
             }
