@@ -47,12 +47,12 @@ namespace Bangk.Domain.Implementation.Integrations
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
             var reference = $"{userPaymentRequest.TypeApplication}-{Guid.NewGuid().ToString("N")}";
-            var integrityKey = await _generateIntegrityKeyService.Execute(userPaymentRequest.Amount, reference);
+            var integrityKey = await _generateIntegrityKeyService.Execute(userPaymentRequest.Amount * 100, reference);
 
             wompiUrl = $"{wompiUrl}transactions";
             var query = new
             {
-                amount_in_cents = userPaymentRequest.Amount, 
+                amount_in_cents = userPaymentRequest.Amount * 100, 
                 currency = currency, 
                 signature = integrityKey, 
                 customer_email = userPaymentRequest.Email, 
