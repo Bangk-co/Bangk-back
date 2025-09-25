@@ -57,7 +57,13 @@ namespace Bangk.Domain.Implementation.Integrations
                 signature = integrityKey, 
                 customer_email = userPaymentRequest.Email, 
                 reference = reference, 
-                payment_source_id = userPaymentRequest.PaymentSourceId
+                payment_source_id = userPaymentRequest.PaymentSourceId,
+                payment_method = new
+                {
+                    type = "BANCOLOMBIA_TRANSFER",
+                    payment_description = "Pago de prueba sandbox",
+                    sandbox_status = "DECLINED" // también puede ser "ERROR" o "APPROVED"
+                }
             };
 
             var jsonContent = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
