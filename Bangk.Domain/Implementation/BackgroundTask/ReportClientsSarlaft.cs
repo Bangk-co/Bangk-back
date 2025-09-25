@@ -39,7 +39,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         public async Task<byte[]> CreateSarlaftReport()
         {
 
-            string fileName =  "REMOVE " + DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
+            string fileName =  DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
             string remoteDirectory = "/Ingestas/";
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaft(stateloanApplication);
