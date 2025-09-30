@@ -170,7 +170,8 @@ namespace Bangk.Api.Extensions
             services.AddTransient<IPaymentAssistanceJobService, PaymentAssistanceJobService>();
             services.AddTransient<IPaymentAssistanceTryService, PaymentAssistanceTryService>();
             services.AddTransient<IValidateClientService, ValidateClientService>();
-            services.AddTransient<ISendCodeOtpEmailService, SendCodeOtpEmailService>(); 
+            services.AddTransient<ISendCodeOtpEmailService, SendCodeOtpEmailService>();
+            services.AddTransient<IGetBancolombiaTransactionIdService, GetBancolombiaTransactionIdService>();
             // Add AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
