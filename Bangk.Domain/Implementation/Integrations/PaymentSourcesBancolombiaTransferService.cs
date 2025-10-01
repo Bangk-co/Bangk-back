@@ -32,10 +32,10 @@ namespace Bangk.Domain.Implementation.Integrations
             _petInsuranceApplicationRepository = petInsuranceApplicationRepository;
         }
 
-        public async Task<ResponseDto<PaymentButtonBancolombiaResponseDto>> Execute(UserPaymentRequest userPaymentRequest)
+        public async Task<ResponseDto<PaymentButtonBancolombiaResponseDto>> Execute(RequestUserPaymentDto userPaymentRequest)
         {
             var response = new ResponseDto<PaymentButtonBancolombiaResponseDto>();
-
+            UserPaymentRequest userPayment = new UserPaymentRequest();
             var merchantsInfo = await _getMerchantsTokenService.Execute();
 
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
@@ -46,14 +46,14 @@ namespace Bangk.Domain.Implementation.Integrations
             if (userPaymentRequest.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
             {
                 var medApp = await _medEnsuranceApplicationRepository.GetMedAssistanceByApplicationId(userPaymentRequest.ApplicationId);
-                userPaymentRequest.Email = medApp.Email;
-                userPaymentRequest.Amount = medApp.Amount.Value;
+                userPayment.Email = medApp.Email;
+                userPayment.Amount = medApp.Amount.Value;
             }
             else
             {
                 var petApp = await _petInsuranceApplicationRepository.GetPetAssistanceByApplicationId(userPaymentRequest.ApplicationId);
-                userPaymentRequest.Email = petApp.Email;
-                userPaymentRequest.Amount = petApp.Amount.Value;
+                userPayment.Email = petApp.Email;
+                userPayment.Amount = petApp.Amount.Value;
             }
 
             var query = new
@@ -61,7 +61,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 type = "BANCOLOMBIA_TRANSFER",
                 token = userPaymentRequest.TokenPayment, //transactionId
                 payment_description = "Pago Bangk",
-                customer_email = userPaymentRequest.Email.Trim(),
+                customer_email = userPayment.Email.Trim(),
                 acceptance_token = merchantsInfo.Result.Data.Presigned_Acceptance.Acceptance_Token,
                 accept_personal_auth = merchantsInfo.Result.Data.Presigned_Personal_Data_Auth.Acceptance_Token
             };
@@ -80,8 +80,12 @@ namespace Bangk.Domain.Implementation.Integrations
                     var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
                     var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentWompiResponseDto>(jsonResponse);
 
-                    userPaymentRequest.PaymentSourceId = apiResponseBancolombia.Data.Id;
-                    var resultTransaction = await _createTransactionBancolombiaService.Execute(userPaymentRequest);
+                    userPayment.PaymentSourceId = apiResponseBancolombia.Data.Id;
+                    userPayment.TokenPayment = userPaymentRequest.TokenPayment;
+                    userPayment.ApplicationId = userPaymentRequest.ApplicationId;
+                    userPayment.TypeApplication = userPaymentRequest.TypeApplication;
+                    
+                    var resultTransaction = await _createTransactionBancolombiaService.Execute(userPayment);
 
                     response = resultTransaction;
                     if (resultTransaction.HasErrors)
