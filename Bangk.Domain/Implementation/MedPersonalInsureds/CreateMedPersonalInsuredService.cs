@@ -53,7 +53,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 {
                     var client = new Repositories.Entities.Client
                     {
-                        Email = medPersonInsuredsDto.Email,
+                        Email = medPersonInsuredsDto.Email.Trim(),
                         PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate,
                         DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId,
                         IdentificationNumber = medPersonInsuredsDto.DocumentNumber,
@@ -68,7 +68,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 }
                 else
                 {
-                    clientExistByDocument.Email = medPersonInsuredsDto.Email;
+                    clientExistByDocument.Email = medPersonInsuredsDto.Email.Trim();
                     clientExistByDocument.PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate;
                     clientExistByDocument.DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId;
                     clientExistByDocument.IdentificationNumber = medPersonInsuredsDto.DocumentNumber;

@@ -56,7 +56,7 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 {
                     var client = new Repositories.Entities.Client
                     {
-                        Email = petInsuranceDto.Email,
+                        Email = petInsuranceDto.Email.Trim(),
                         PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate,
                         DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId,
                         IdentificationNumber = petInsuranceDto.DocumentNumber,
@@ -71,7 +71,7 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 }
                 else
                 {
-                    clientExistByDocument.Email = petInsuranceDto.Email;
+                    clientExistByDocument.Email = petInsuranceDto.Email.Trim();
                     clientExistByDocument.PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate;
                     clientExistByDocument.DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId;
                     clientExistByDocument.IdentificationNumber = petInsuranceDto.DocumentNumber;
