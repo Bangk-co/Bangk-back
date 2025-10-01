@@ -46,13 +46,13 @@ namespace Bangk.Domain.Implementation.Integrations
             if (userPaymentRequest.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
             {
                 var medApp = await _medEnsuranceApplicationRepository.GetMedAssistanceByApplicationId(userPaymentRequest.ApplicationId);
-                userPayment.Email = medApp.Email;
+                userPayment.Email = medApp.Email.Trim();
                 userPayment.Amount = medApp.Amount.Value;
             }
             else
             {
                 var petApp = await _petInsuranceApplicationRepository.GetPetAssistanceByApplicationId(userPaymentRequest.ApplicationId);
-                userPayment.Email = petApp.Email;
+                userPayment.Email = petApp.Email.Trim();
                 userPayment.Amount = petApp.Amount.Value;
             }
 
