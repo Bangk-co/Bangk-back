@@ -2,6 +2,7 @@
 using Bangk.Domain.Contract.Integrations;
 using Bangk.Repositories.Repositories;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -15,18 +16,20 @@ namespace Bangk.Domain.Implementation.Integrations
     {
         private readonly IConfiguration _configuration;
         private readonly IGetMerchantsTokenService _getMerchantsTokenService;
-        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
         private readonly ICreateTransactionBancolombiaService _createTransactionBancolombiaService;
-
+        private readonly IMedEnsuranceApplicationRepository _medEnsuranceApplicationRepository;
+        private readonly IPetInsuranceApplicationRepository _petInsuranceApplicationRepository;
         public PaymentSourcesBancolombiaTransferService(IConfiguration configuration,
                                                         IGetMerchantsTokenService getMerchantsTokenService,
-                                                        IApplicationTransactionRepository applicationTransactionRepository,
-                                                        ICreateTransactionBancolombiaService createTransactionBancolombiaService)
+                                                        ICreateTransactionBancolombiaService createTransactionBancolombiaService,
+                                                        IMedEnsuranceApplicationRepository medEnsuranceApplicationRepository,
+                                                        IPetInsuranceApplicationRepository petInsuranceApplicationRepository)
         {
             _configuration = configuration;
             _getMerchantsTokenService = getMerchantsTokenService;
-            _applicationTransactionRepository = applicationTransactionRepository;
             _createTransactionBancolombiaService = createTransactionBancolombiaService;
+            _medEnsuranceApplicationRepository = medEnsuranceApplicationRepository;
+            _petInsuranceApplicationRepository = petInsuranceApplicationRepository;
         }
 
         public async Task<ResponseDto<PaymentButtonBancolombiaResponseDto>> Execute(UserPaymentRequest userPaymentRequest)
@@ -40,15 +43,27 @@ namespace Bangk.Domain.Implementation.Integrations
 
             wompiUrl = $"{wompiUrl}payment_sources";
 
+            if (userPaymentRequest.TypeApplication.Equals("MED", StringComparison.OrdinalIgnoreCase))
+            {
+                var medApp = await _medEnsuranceApplicationRepository.GetMedAssistanceByApplicationId(userPaymentRequest.ApplicationId);
+                userPaymentRequest.Email = medApp.Email;
+                userPaymentRequest.Amount = medApp.Amount.Value;
+            }
+            else
+            {
+                var petApp = await _petInsuranceApplicationRepository.GetPetAssistanceByApplicationId(userPaymentRequest.ApplicationId);
+                userPaymentRequest.Email = petApp.Email;
+                userPaymentRequest.Amount = petApp.Amount.Value;
+            }
+
             var query = new
             {
                 type = "BANCOLOMBIA_TRANSFER",
-                token = userPaymentRequest.TokenPayment,
+                token = userPaymentRequest.TokenPayment, //transactionId
                 payment_description = "Pago Bangk",
-                customer_email = userPaymentRequest.Email,
+                customer_email = userPaymentRequest.Email.Trim(),
                 acceptance_token = merchantsInfo.Result.Data.Presigned_Acceptance.Acceptance_Token,
                 accept_personal_auth = merchantsInfo.Result.Data.Presigned_Personal_Data_Auth.Acceptance_Token
-
             };
 
             var jsonContent = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
@@ -89,7 +104,6 @@ namespace Bangk.Domain.Implementation.Integrations
                     };
                 }
             }
-
 
             return response;
         }

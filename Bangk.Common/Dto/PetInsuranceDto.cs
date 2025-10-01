@@ -15,6 +15,8 @@ namespace Bangk.Common.Dto
         public DateTime TreatPersonalDataDate { get; set; }
         public List<PetsDto> Pets { get; set; }
         public int? CountryCodePhoneId { get; set; }
+        public long Amount { get; set; }
+
     }
 
     public class PetsDto

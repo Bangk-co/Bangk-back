@@ -110,5 +110,19 @@ namespace Bangk.Repositories.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<PaymentJobDto> GetPetAssistanceByApplicationId(int applicationId)
+        {
+            var query = from p in Context.PetInsuranceApplication
+                        join c in Context.Clients on p.ClientId equals c.Id
+                        where p.Id == applicationId
+                        select new PaymentJobDto
+                        {
+                            Amount = p.Amount,
+                            Email = c.Email
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

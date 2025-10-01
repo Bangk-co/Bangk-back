@@ -95,7 +95,8 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 ClientId = clientId,
                 PaymentOcurrencyId = petInsuranceDto.PaymentOcurrencyId,
                 Status = (int)InsuranceStatesEnum.PendingToApprove,
-                ReviewerId = userReview.Id
+                ReviewerId = userReview.Id,
+                Amount = petInsuranceDto.Amount * 100,
             };
 
             await _petInsuranceApplicationRepository.Create(petInsuranceApplication);

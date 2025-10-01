@@ -9,10 +9,11 @@ namespace Bangk.Repositories.Repositories
 {
     public interface IMedEnsuranceApplicationRepository: IGenericRepository<MedInsuranceApplication, MedEnsuranceApplicationDto>
     {
-        Task<MedInsuranceApplication> GetMedEnsuranceApplicationByReference(string reference);
-        Task<CreateMedAssistenceGEADto> GetMedAssistenceGEA(string reference);
-        Task<List<PaymentJobDto>> GetMedAssistencePendingToPay(DateTime dateTime);
-        Task<List<PaymentJobDto>> GetMedAssistencePayment(string applicationReference);
+        Task<MedInsuranceApplication> GetMedInsuranceApplicationByReference(string reference);
+        Task<CreateMedAssistenceGEADto> GetMedAssistanceGEA(string reference);
+        Task<List<PaymentJobDto>> GetMedAssistancePendingToPay(DateTime dateTime);
+        Task<List<PaymentJobDto>> GetMedAssistancePayment(string applicationReference);
         Task<PaymentJobDto> GetMedAssistanceByReference(string applicationReference);
+        Task<PaymentJobDto> GetMedAssistanceByApplicationId(int applicationId);
     }
 }
