@@ -45,7 +45,7 @@ namespace Bangk.Api.Controllers
 
         [HttpPost("PaymentSourcesBancolombiaTransfer")]
         [AllowAnonymous]
-        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer(UserPaymentRequest userPaymentRequest)
+        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer(RequestUserPaymentDto userPaymentRequest)
         {
             var result = await _paymentSourcesBancolombiaTransferService.Execute(userPaymentRequest);
             return Ok(result);

@@ -11,4 +11,10 @@ namespace Bangk.Common.Dto
         public string TypeApplication {  get; set; }
         public string TokenPayment { get; set; }
     }
+    public class RequestUserPaymentDto
+    {
+        public int ApplicationId { get; set; }
+        public string TypeApplication { get; set; }
+        public string TokenPayment { get; set; }
+    }
 }
