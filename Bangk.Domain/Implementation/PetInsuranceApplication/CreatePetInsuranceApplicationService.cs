@@ -56,7 +56,7 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 {
                     var client = new Repositories.Entities.Client
                     {
-                        Email = petInsuranceDto.Email,
+                        Email = petInsuranceDto.Email.Trim(),
                         PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate,
                         DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId,
                         IdentificationNumber = petInsuranceDto.DocumentNumber,
@@ -71,7 +71,7 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 }
                 else
                 {
-                    clientExistByDocument.Email = petInsuranceDto.Email;
+                    clientExistByDocument.Email = petInsuranceDto.Email.Trim();
                     clientExistByDocument.PermissionTreatPersonalDataDate = petInsuranceDto.TreatPersonalDataDate;
                     clientExistByDocument.DocumenIdentificationTypeId = petInsuranceDto.DocumentTypeId;
                     clientExistByDocument.IdentificationNumber = petInsuranceDto.DocumentNumber;
@@ -95,7 +95,8 @@ namespace Bangk.Domain.Implementation.PetInsuranceApplication
                 ClientId = clientId,
                 PaymentOcurrencyId = petInsuranceDto.PaymentOcurrencyId,
                 Status = (int)InsuranceStatesEnum.PendingToApprove,
-                ReviewerId = userReview.Id
+                ReviewerId = userReview.Id,
+                Amount = petInsuranceDto.Amount * 100,
             };
 
             await _petInsuranceApplicationRepository.Create(petInsuranceApplication);

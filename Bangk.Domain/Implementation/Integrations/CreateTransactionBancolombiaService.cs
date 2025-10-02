@@ -47,12 +47,12 @@ namespace Bangk.Domain.Implementation.Integrations
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
             var privateKey = _configuration.GetSection("WompiKeys:PrivateKey").Value;
             var reference = $"{userPaymentRequest.TypeApplication}-{Guid.NewGuid().ToString("N")}";
-            var integrityKey = await _generateIntegrityKeyService.Execute(userPaymentRequest.Amount * 100, reference);
+            var integrityKey = await _generateIntegrityKeyService.Execute(userPaymentRequest.Amount, reference);
 
             wompiUrl = $"{wompiUrl}transactions";
             var query = new
             {
-                amount_in_cents = userPaymentRequest.Amount * 100, 
+                amount_in_cents = userPaymentRequest.Amount, 
                 currency = currency, 
                 signature = integrityKey, 
                 customer_email = userPaymentRequest.Email, 
@@ -80,7 +80,7 @@ namespace Bangk.Domain.Implementation.Integrations
 
                     var transactionAdd = new ApplicationTransaction
                     {
-                        Amount = userPaymentRequest.Amount * 100,
+                        Amount = userPaymentRequest.Amount,
                         Currency = apiResponseTransaction["data"]["currency"],
                         Reference = apiResponseTransaction["data"]["reference"],
                         Status = transactionStatus.Result["data"]["status"].ToString(),
@@ -95,7 +95,7 @@ namespace Bangk.Domain.Implementation.Integrations
                         medApplicationInBD.TokenPaymentSource = userPaymentRequest.PaymentSourceId;
                         medApplicationInBD.TransactionReference = reference;
                         medApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
-                        medApplicationInBD.Amount = userPaymentRequest.Amount * 100;
+                        medApplicationInBD.Amount = userPaymentRequest.Amount;
                         await _medEnsuranceApplicationRepository.Update(medApplicationInBD);
                     }
                     else if (userPaymentRequest.TypeApplication.Equals("PET", StringComparison.OrdinalIgnoreCase))
@@ -104,7 +104,7 @@ namespace Bangk.Domain.Implementation.Integrations
                         petApplicationInBD.TokenPaymentSource = userPaymentRequest.PaymentSourceId;
                         petApplicationInBD.TransactionReference = reference;
                         petApplicationInBD.TransactionId = apiResponseTransaction["data"]["id"];
-                        petApplicationInBD.Amount = userPaymentRequest.Amount * 100;
+                        petApplicationInBD.Amount = userPaymentRequest.Amount;
                         await _petEnsuranceApplicationRepository.Update(petApplicationInBD);
                     }
 

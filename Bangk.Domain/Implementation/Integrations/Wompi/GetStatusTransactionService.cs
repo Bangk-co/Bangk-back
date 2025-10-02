@@ -50,7 +50,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     transactionId = petApplication.TransactionId;
                     break;
                 case string reference when reference.Contains("MED"):
-                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(reference);
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedInsuranceApplicationByReference(reference);
                     transactionId = medApplication.TransactionId; 
                     break;
             }
@@ -124,7 +124,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     await _createPetAssistenceService.Execute(referenceApplication, CreatedTransactionDate);
                     break;
                 case string reference when reference.Contains("MED"):
-                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(referenceApplication);
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedInsuranceApplicationByReference(referenceApplication);
                     medApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     //Create Assistence in GEA
@@ -144,7 +144,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                     break;
                 case string reference when reference.Contains("MED"):
-                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(reference);
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedInsuranceApplicationByReference(reference);
                     medApplication.Status = (int)InsuranceStatesEnum.Rejected;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     break;

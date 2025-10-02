@@ -15,6 +15,7 @@ namespace Bangk.Api.Controllers
         private readonly ICardPaymentService _cardPaymentService;
         private readonly ITransactionUpdateStateService _transactionUpdateStateService;
         private readonly IGetStatusTransactionService _getStatusTransactionService;
+        private readonly IGetBancolombiaTransactionIdService _getBancolombiaTransactionIdService;
         public WompiIntegrationController(IGenerateTokenTrxBancolombiaService createBancolombiaButtonPaymentService,
                                          IGetTrxBancolombiaStatusService getTrxBancolombiaStatusService,
                                          IGetMerchantsTokenService getMerchantsTokenService,
@@ -22,7 +23,8 @@ namespace Bangk.Api.Controllers
                                          ICardPaymentService cardPaymentService,
                                          IGenerateIntegrityKeyService generateIntegrityKeyService, 
                                          ITransactionUpdateStateService transactionUpdateStateService,
-                                         IGetStatusTransactionService getStatusTransactionService)
+                                         IGetStatusTransactionService getStatusTransactionService,
+                                         IGetBancolombiaTransactionIdService getBancolombiaTransactionIdService)
         {
             _createBancolombiaButtonPaymentService = createBancolombiaButtonPaymentService;
             _getTrxBancolombiaStatusService = getTrxBancolombiaStatusService;
@@ -30,19 +32,20 @@ namespace Bangk.Api.Controllers
             _cardPaymentService = cardPaymentService;
             _transactionUpdateStateService = transactionUpdateStateService;
             _getStatusTransactionService = getStatusTransactionService;
+            _getBancolombiaTransactionIdService = getBancolombiaTransactionIdService;
         }
 
         [HttpPost("GenerateTokenTrxBancolombia")]
         [AllowAnonymous]
-        public async Task<IActionResult> GenerateTokenTrxBancolombia()
+        public async Task<IActionResult> GenerateTokenTrxBancolombia(int applicationId, bool isMed)
         {
-            var result = await _createBancolombiaButtonPaymentService.Execute();
+            var result = await _createBancolombiaButtonPaymentService.Execute(applicationId, isMed);
             return Ok(result);
         }
 
         [HttpPost("PaymentSourcesBancolombiaTransfer")]
         [AllowAnonymous]
-        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer(UserPaymentRequest userPaymentRequest)
+        public async Task<IActionResult> PaymentSourcesBancolombiaTransfer(RequestUserPaymentDto userPaymentRequest)
         {
             var result = await _paymentSourcesBancolombiaTransferService.Execute(userPaymentRequest);
             return Ok(result);
@@ -91,6 +94,14 @@ namespace Bangk.Api.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpGet("GetBancolombiaTransactionId")]
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> GetBancolombiaTransactionId(int applicationId, bool isMed)
+        {
+            var result = await _getBancolombiaTransactionIdService.Execute(applicationId, isMed);
             return Ok(result);
         }
     }
