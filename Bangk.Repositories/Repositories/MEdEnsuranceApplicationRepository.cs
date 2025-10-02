@@ -18,12 +18,12 @@ namespace Bangk.Repositories.Repositories
         {
         }
 
-        public async Task<MedInsuranceApplication> GetMedEnsuranceApplicationByReference(string reference)
+        public async Task<MedInsuranceApplication> GetMedInsuranceApplicationByReference(string reference)
         {
             return await Context.MedInsuranceApplication.FirstOrDefaultAsync(p => p.TransactionReference == reference);
         }
-        
-        public async Task<CreateMedAssistenceGEADto> GetMedAssistenceGEA(string reference)
+
+        public async Task<CreateMedAssistenceGEADto> GetMedAssistanceGEA(string reference)
         {
             var query = from m in Context.MedInsuranceApplication
                         join c in Context.Clients on m.ClientId equals c.Id
@@ -51,7 +51,7 @@ namespace Bangk.Repositories.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<PaymentJobDto>> GetMedAssistencePendingToPay(DateTime dateTime)
+        public async Task<List<PaymentJobDto>> GetMedAssistancePendingToPay(DateTime dateTime)
         {
             var query = from p in Context.MedInsuranceApplication
                         join c in Context.Clients on p.ClientId equals c.Id
@@ -72,7 +72,7 @@ namespace Bangk.Repositories.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<List<PaymentJobDto>> GetMedAssistencePayment(string applicationReference)
+        public async Task<List<PaymentJobDto>> GetMedAssistancePayment(string applicationReference)
         {
             var query = from p in Context.MedInsuranceApplication
                         join c in Context.Clients on p.ClientId equals c.Id
@@ -91,6 +91,36 @@ namespace Bangk.Repositories.Repositories
                         };
 
             return await query.ToListAsync();
+        }
+
+        public async Task<PaymentJobDto> GetMedAssistanceByReference(string applicationReference)
+        {
+            var query = from p in Context.MedInsuranceApplication
+                        join c in Context.Clients on p.ClientId equals c.Id
+                        where p.TransactionReference == applicationReference
+                        select new PaymentJobDto
+                        {
+                            ClientName = $"{c.Name} {c.LastName}",
+                            Email = c.Email,
+                            PaymentOcurrency = p.PaymentOcurrencyId,
+                            Number = Context.MedPersonInsureds.Count(x => x.MedEnsuraceApplicationId == p.Id)
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<PaymentJobDto> GetMedAssistanceByApplicationId(int applicationId)
+        {
+            var query = from p in Context.MedInsuranceApplication
+                        join c in Context.Clients on p.ClientId equals c.Id
+                        where p.Id == applicationId
+                        select new PaymentJobDto
+                        {
+                            Amount = p.Amount,
+                            Email = c.Email,
+                        };
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

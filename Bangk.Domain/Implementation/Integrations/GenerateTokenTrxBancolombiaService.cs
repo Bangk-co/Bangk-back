@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,14 +19,19 @@ namespace Bangk.Domain.Implementation.Integrations
     public class GenerateTokenTrxBancolombiaService : IGenerateTokenTrxBancolombiaService
     {
         private readonly IConfiguration _configuration;
-        private readonly IApplicationTransactionRepository _applicationTransactionRepository;
-
-        public GenerateTokenTrxBancolombiaService(IConfiguration configuration, IApplicationTransactionRepository applicationTransactionRepository)
+        private readonly IMedEnsuranceApplicationRepository _medInsuranceApplicationRepository;
+        private readonly IPetInsuranceApplicationRepository _petInsuranceApplicationRepository;
+        public GenerateTokenTrxBancolombiaService(IConfiguration configuration,
+            IApplicationTransactionRepository applicationTransactionRepository,
+            IMedEnsuranceApplicationRepository medInsuranceApplicationRepository,
+            IPetInsuranceApplicationRepository petInsuranceApplicationRepository)
         {
             _configuration = configuration;
-            _applicationTransactionRepository = applicationTransactionRepository;
+            _medInsuranceApplicationRepository = medInsuranceApplicationRepository;
+            _petInsuranceApplicationRepository = petInsuranceApplicationRepository;
         }
-        public async Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>> Execute()
+        public async Task<ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>>
+            Execute(int applicationId, bool isMed)
         {
             var response = new ResponseDto<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>();
             var wompiUrl = _configuration.GetSection("WompiKeys:UrlWompipayment").Value;
@@ -34,7 +40,7 @@ namespace Bangk.Domain.Implementation.Integrations
             wompiUrl = $"{wompiUrl}tokens/bancolombia_transfer";
             var query = new
             {
-                redirect_url = _configuration.GetSection("WompiKeys:RedirectBankgUrl").Value,
+                redirect_url = _configuration.GetSection("WompiKeys:RedirectBankgUrl").Value + "&ApplicationId=" + applicationId + "&Type=" + (isMed ? "0" : "1"),
                 type_auth = "TOKEN"
             };
 
@@ -53,7 +59,18 @@ namespace Bangk.Domain.Implementation.Integrations
                     var apiResponseBancolombia = Newtonsoft.Json.JsonConvert.DeserializeObject<Bangk.Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>(jsonResponse);
                     //Logs.WriteInfoLog($"Response: {jsonResponse}");
 
-
+                    if (isMed)
+                    {
+                        var application = await _medInsuranceApplicationRepository.GetById(applicationId);
+                        application.BancolombiaTransactionId = apiResponseBancolombia.Data.Id;
+                        await _medInsuranceApplicationRepository.Update(application);
+                    }
+                    else
+                    {
+                        var application = await _petInsuranceApplicationRepository.GetById(applicationId);
+                        application.BancolombiaTransactionId = apiResponseBancolombia.Data.Id;
+                        await _petInsuranceApplicationRepository.Update(application);
+                    }
 
                     response = new ResponseDto<Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
@@ -68,7 +85,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     response = new ResponseDto<Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
                     {
                         HasErrors = true,
-                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}. URL: {wompiUrl}, KEY: {publicKey}, redirect: {query.redirect_url} " }
+                        Errors = new List<string> { $"Se ha generado un error procesando la solicitud: {errorMessage}" }
                     };
                 }
             }

@@ -47,7 +47,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
             var petPendingToPay = await _petInsuranceApplicationRepository.GetPetAssistencePendingToPay(DateTime.UtcNow);
             await PetPaymentAssistence(petPendingToPay, privateKey, transactionUrl);
 
-            var medPendingToPay = await _medEnsuranceApplicationRepository.GetMedAssistencePendingToPay(DateTime.UtcNow);
+            var medPendingToPay = await _medEnsuranceApplicationRepository.GetMedAssistancePendingToPay(DateTime.UtcNow);
             await MedPaymentAssistence(medPendingToPay, privateKey, transactionUrl);
         }
 
