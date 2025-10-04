@@ -57,7 +57,7 @@ namespace Bangk.Domain.Implementation.Integrations
                 signature = integrityKey, 
                 customer_email = userPaymentRequest.Email, 
                 reference = reference, 
-                payment_source_id = userPaymentRequest.PaymentSourceId
+                payment_source_id = userPaymentRequest.PaymentSourceId,
             };
 
             var jsonContent = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
@@ -113,7 +113,8 @@ namespace Bangk.Domain.Implementation.Integrations
                     var menssage = new PaymentButtonBancolombiaResponseDto
                     {
                         TransactionReference = reference,
-                        TransactionId = apiResponseTransaction["data"]["id"]
+                        TransactionId = apiResponseTransaction["data"]["id"],
+                        Amount = userPaymentRequest.Amount / 100
                     };
 
                     response = new ResponseDto<PaymentButtonBancolombiaResponseDto>

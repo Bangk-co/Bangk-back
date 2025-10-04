@@ -12,5 +12,6 @@
     {
         public string TransactionReference { get; set; }
         public string TransactionId { get; set; }
+        public long? Amount { get; set; }
     }
 }
