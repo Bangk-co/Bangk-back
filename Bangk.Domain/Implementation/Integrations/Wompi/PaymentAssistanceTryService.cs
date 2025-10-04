@@ -58,7 +58,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                         await PetPaymentAssistence(petApplication, privateKey, transactionUrl, countFailed);
                         break;
                     case string reference when reference.Contains("MED"):
-                        var medApplication = await _medEnsuranceApplicationRepository.GetMedAssistencePayment(reference);
+                        var medApplication = await _medEnsuranceApplicationRepository.GetMedAssistancePayment(reference);
                         await MedPaymentAssistence(medApplication, privateKey, transactionUrl, countFailed);
                         break;
                 }

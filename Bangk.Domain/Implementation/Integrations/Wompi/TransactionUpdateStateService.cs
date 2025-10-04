@@ -51,7 +51,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                     break;
                 case string reference when reference.Contains("MED"):
-                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedInsuranceApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
                     medApplication.Status = (int)InsuranceStatesEnum.Approve;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     break;
@@ -84,7 +84,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                     await _petEnsuranceApplicationRepository.Update(petApplication);
                     break;
                 case string reference when reference.Contains("MED"):
-                    var medApplication = await _medEnsuranceApplicationRepository.GetMedEnsuranceApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
+                    var medApplication = await _medEnsuranceApplicationRepository.GetMedInsuranceApplicationByReference(transactionUpdateDto.Data.Transaction.Reference);
                     medApplication.Status = (int)InsuranceStatesEnum.Rejected;
                     await _medEnsuranceApplicationRepository.Update(medApplication);
                     break;

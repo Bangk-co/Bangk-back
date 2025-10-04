@@ -14,5 +14,6 @@ namespace Bangk.Repositories.Repositories
         Task<List<PaymentJobDto>> GetPetAssistancePendingToPay(DateTime dateTime);
         Task<List<PaymentJobDto>> GetPetAssistancePayment(string applicationReference);
         Task<PaymentJobDto> GetPetAssistanceByReference(string applicationReference);
+        Task<PaymentJobDto> GetPetAssistanceByApplicationId(int applicationId);
     }
 }

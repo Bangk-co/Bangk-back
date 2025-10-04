@@ -34,7 +34,7 @@ namespace Bangk.Domain.Implementation.GEA
             var baseUrl = _configuration.GetSection("GeaKeys:GeaUrl").Value;
             var cuentaId = int.Parse(_configuration["GeaKeys:IdCuenta"]);
             var planId = int.Parse(_configuration["GeaKeys:IdPlan"]);
-            var application = await _medEnsuranceApplicationRepository.GetMedAssistenceGEA(applicationReference);
+            var application = await _medEnsuranceApplicationRepository.GetMedAssistanceGEA(applicationReference);
             var datosExtras = new DataGEAExtrasMedDto
             {
                 identificacion_pagador = application.DocumentNumber,

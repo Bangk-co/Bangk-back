@@ -20,5 +20,7 @@ namespace Bangk.Repositories.Entities
 
         public int? PaymentInstallments { get; set; }
         public long? Amount { get; set; }
+        public string BancolombiaTransactionId { get; set; }
+
     }
 }

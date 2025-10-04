@@ -57,7 +57,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 {
                     var client = new Repositories.Entities.Client
                     {
-                        Email = medPersonInsuredsDto.Email,
+                        Email = medPersonInsuredsDto.Email.Trim(),
                         PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate,
                         DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId,
                         IdentificationNumber = medPersonInsuredsDto.DocumentNumber,
@@ -72,7 +72,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 }
                 else
                 {
-                    clientExistByDocument.Email = medPersonInsuredsDto.Email;
+                    clientExistByDocument.Email = medPersonInsuredsDto.Email.Trim();
                     clientExistByDocument.PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate;
                     clientExistByDocument.DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId;
                     clientExistByDocument.IdentificationNumber = medPersonInsuredsDto.DocumentNumber;
@@ -90,25 +90,26 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
             }
 
             var userReview = await _userRepository.GetUserWithLessApplication();
-            var medEnsuranceApplication = new Repositories.Entities.MedInsuranceApplication()
+            var medInsuranceApplication = new Repositories.Entities.MedInsuranceApplication()
             {
                 ClientId = clientId,
                 PaymentOcurrencyId = medPersonInsuredsDto.PaymentOcurrencyId,
                 Status = (int)InsuranceStatesEnum.PendingToApprove,
                 ReviewerId = userReview.Id,
+                Amount = medPersonInsuredsDto.Amount * 100,
             };
 
-            await _medEnsuranceApplicationRepository.Create(medEnsuranceApplication);
+            await _medEnsuranceApplicationRepository.Create(medInsuranceApplication);
 
             var nextPaymentDate = medPersonInsuredsDto.PaymentOcurrencyId switch
             {
-                (int)MethodPaymentTimeEnum.Mensual => medEnsuranceApplication.CreationDate.AddMonths(1),
-                (int)MethodPaymentTimeEnum.Semestral => medEnsuranceApplication.CreationDate.AddMonths(6),
-                _ => medEnsuranceApplication.CreationDate.AddYears(1)
+                (int)MethodPaymentTimeEnum.Mensual => medInsuranceApplication.CreationDate.AddMonths(1),
+                (int)MethodPaymentTimeEnum.Semestral => medInsuranceApplication.CreationDate.AddMonths(6),
+                _ => medInsuranceApplication.CreationDate.AddYears(1)
             };
 
-            medEnsuranceApplication.NextPaymentDate = nextPaymentDate;
-            await _medEnsuranceApplicationRepository.Update(medEnsuranceApplication);
+            medInsuranceApplication.NextPaymentDate = nextPaymentDate;
+            await _medEnsuranceApplicationRepository.Update(medInsuranceApplication);
 
             var beneficiaries = new List<Repositories.Entities.MedPersonInsureds>();
             foreach (var item in medPersonInsuredsDto.BeneficiaryInsurance)
@@ -120,7 +121,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                     Name = item.Name,
                     Email = item.Email,
                     PhoneNumber = item.PhoneNumber,
-                    MedEnsuraceApplicationId = medEnsuranceApplication.Id,
+                    MedEnsuraceApplicationId = medInsuranceApplication.Id,
                     TreatPErsonalDatadate = item.TreatPErsonalDatadate,
                     CountryCodePhoneId = item.CountryCodePhoneId,
                     LastName = item.LastName,
@@ -134,7 +135,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 await _medPersonalInsuredRepository.CreateBulk(beneficiaries);
             }
 
-            result.Result = medEnsuranceApplication.Id;
+            result.Result = medInsuranceApplication.Id;
             scope.Complete();
             return result;
         }
