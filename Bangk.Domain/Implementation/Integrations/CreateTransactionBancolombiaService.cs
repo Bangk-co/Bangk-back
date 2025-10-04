@@ -114,7 +114,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     {
                         TransactionReference = reference,
                         TransactionId = apiResponseTransaction["data"]["id"],
-                        Amount = userPaymentRequest.Amount * 100
+                        Amount = userPaymentRequest.Amount / 100
                     };
 
                     response = new ResponseDto<PaymentButtonBancolombiaResponseDto>
