@@ -52,7 +52,7 @@ namespace Bangk.Repositories.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<PaymentJobDto>> GetPetAssistencePendingToPay(DateTime dateTime)
+        public async Task<List<PaymentJobDto>> GetPetAssistancePendingToPay(DateTime dateTime)
         {
             var query = from p in Context.PetInsuranceApplication
                         join c in Context.Clients on p.ClientId equals c.Id
@@ -73,7 +73,7 @@ namespace Bangk.Repositories.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<List<PaymentJobDto>> GetPetAssistencePayment(string applicationReference)
+        public async Task<List<PaymentJobDto>> GetPetAssistancePayment(string applicationReference)
         {
             var query = from p in Context.PetInsuranceApplication
                         join c in Context.Clients on p.ClientId equals c.Id
@@ -89,6 +89,7 @@ namespace Bangk.Repositories.Repositories
                             Amount = p.Amount,
                             PaymentInstallments = p.PaymentInstallments,
                             Email = c.Email,
+                            PaymentOcurrency = p.PaymentOcurrencyId
                         };
 
             return await query.ToListAsync();

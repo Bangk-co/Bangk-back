@@ -21,6 +21,7 @@ namespace Bangk.Common.Dto
         public int CountryCodePhoneId { get; set; }
         public bool IsBeneficiary { get; set; }
         public long Amount { get; set; }
+
         public List<BeneficiaryInsuranceDto> BeneficiaryInsurance { get; set; }
     }
 

@@ -104,5 +104,6 @@ namespace Bangk.Api.Controllers
             var result = await _getBancolombiaTransactionIdService.Execute(applicationId, isMed);
             return Ok(result);
         }
+        
     }
 }
