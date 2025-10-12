@@ -16,6 +16,7 @@ namespace Bangk.Common.Dto
         public List<PetsDto> Pets { get; set; }
         public int? CountryCodePhoneId { get; set; }
         public long Amount { get; set; }
+
     }
 
     public class PetsDto

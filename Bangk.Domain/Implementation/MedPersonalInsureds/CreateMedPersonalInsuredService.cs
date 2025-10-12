@@ -57,7 +57,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 {
                     var client = new Repositories.Entities.Client
                     {
-                        Email = medPersonInsuredsDto.Email,
+                        Email = medPersonInsuredsDto.Email.Trim(),
                         PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate,
                         DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId,
                         IdentificationNumber = medPersonInsuredsDto.DocumentNumber,
@@ -72,7 +72,7 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                 }
                 else
                 {
-                    clientExistByDocument.Email = medPersonInsuredsDto.Email;
+                    clientExistByDocument.Email = medPersonInsuredsDto.Email.Trim();
                     clientExistByDocument.PermissionTreatPersonalDataDate = medPersonInsuredsDto.TreatPErsonalDatadate;
                     clientExistByDocument.DocumenIdentificationTypeId = medPersonInsuredsDto.DocumentTypeId;
                     clientExistByDocument.IdentificationNumber = medPersonInsuredsDto.DocumentNumber;
@@ -125,24 +125,6 @@ namespace Bangk.Domain.Implementation.MedPersonalInsureds
                     TreatPErsonalDatadate = item.TreatPErsonalDatadate,
                     CountryCodePhoneId = item.CountryCodePhoneId,
                     LastName = item.LastName,
-                };
-
-                beneficiaries.Add(beneficiary);
-            }
-
-            if (medPersonInsuredsDto.IsBeneficiary)
-            {
-                var beneficiary = new Repositories.Entities.MedPersonInsureds
-                {
-                    DocumentTypeId = medPersonInsuredsDto.DocumentTypeId,
-                    DocumentNumber = medPersonInsuredsDto.DocumentNumber,
-                    Name = medPersonInsuredsDto.Name,
-                    Email = medPersonInsuredsDto.Email.Trim(),
-                    PhoneNumber = medPersonInsuredsDto.PhoneNumber,
-                    MedEnsuraceApplicationId = medInsuranceApplication.Id,
-                    TreatPErsonalDatadate = medPersonInsuredsDto.TreatPErsonalDatadate,
-                    CountryCodePhoneId = medPersonInsuredsDto.CountryCodePhoneId,
-                    LastName = medPersonInsuredsDto.LastName,
                 };
 
                 beneficiaries.Add(beneficiary);

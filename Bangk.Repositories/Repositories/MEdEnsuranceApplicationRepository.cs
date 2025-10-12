@@ -22,7 +22,7 @@ namespace Bangk.Repositories.Repositories
         {
             return await Context.MedInsuranceApplication.FirstOrDefaultAsync(p => p.TransactionReference == reference);
         }
-
+        
         public async Task<CreateMedAssistenceGEADto> GetMedAssistanceGEA(string reference)
         {
             var query = from m in Context.MedInsuranceApplication
@@ -88,6 +88,7 @@ namespace Bangk.Repositories.Repositories
                             Amount = p.Amount,
                             PaymentInstallments = p.PaymentInstallments,
                             Email = c.Email,
+                            PaymentOcurrency = p.PaymentOcurrencyId
                         };
 
             return await query.ToListAsync();

@@ -84,7 +84,7 @@ namespace Bangk.Domain.Implementation.Integrations
                     userPayment.TokenPayment = userPaymentRequest.TokenPayment;
                     userPayment.ApplicationId = userPaymentRequest.ApplicationId;
                     userPayment.TypeApplication = userPaymentRequest.TypeApplication;
-
+                    
                     var resultTransaction = await _createTransactionBancolombiaService.Execute(userPayment);
 
                     response = resultTransaction;

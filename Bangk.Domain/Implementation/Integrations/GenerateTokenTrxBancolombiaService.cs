@@ -24,7 +24,7 @@ namespace Bangk.Domain.Implementation.Integrations
         public GenerateTokenTrxBancolombiaService(IConfiguration configuration,
             IApplicationTransactionRepository applicationTransactionRepository,
             IMedEnsuranceApplicationRepository medInsuranceApplicationRepository,
-            IPetInsuranceApplicationRepository petInsuranceApplicationRepository)
+            IPetInsuranceApplicationRepository petInsuranceApplicationRepository    )
         {
             _configuration = configuration;
             _medInsuranceApplicationRepository = medInsuranceApplicationRepository;
@@ -40,7 +40,7 @@ namespace Bangk.Domain.Implementation.Integrations
             wompiUrl = $"{wompiUrl}tokens/bancolombia_transfer";
             var query = new
             {
-                redirect_url = _configuration.GetSection("WompiKeys:RedirectBankgUrl").Value + "&ApplicationId=" + applicationId + "&Type=" + (isMed ? "0" : "1"),
+                redirect_url = _configuration.GetSection("WompiKeys:RedirectBankgUrl").Value + "&ApplicationId=" + applicationId + "&Type=" + (isMed ? "0":"1"),
                 type_auth = "TOKEN"
             };
 
@@ -73,10 +73,10 @@ namespace Bangk.Domain.Implementation.Integrations
                     }
 
                     response = new ResponseDto<Common.Dto.BancolombiaButtonTransferResponseDto.BancolombiaButtonTransferResponseDto>
-                    {
-                        HasErrors = false,
-                        Result = apiResponseBancolombia
-                    };
+                        {
+                            HasErrors = false,
+                            Result = apiResponseBancolombia
+                        };
                 }
                 else
                 {

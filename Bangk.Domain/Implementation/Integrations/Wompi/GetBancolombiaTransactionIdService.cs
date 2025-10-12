@@ -28,7 +28,7 @@ namespace Bangk.Domain.Implementation.Integrations.Wompi
                 return application.BancolombiaTransactionId;
             }
 
-            var applicationPet = await _petInsuranceApplicationRepository.GetById(applicationId);
+           var applicationPet = await _petInsuranceApplicationRepository.GetById(applicationId);
             return applicationPet.BancolombiaTransactionId;
         }
     }
