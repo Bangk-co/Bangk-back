@@ -90,6 +90,7 @@ namespace Bangk.Api
             columnOpts.PrimaryKey = columnOpts.Id;
             columnOpts.TimeStamp.NonClusteredIndex = true;
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information() //Modificar el nivel mínimo de log a Error Luego de la prueba
                 .WriteTo
                 .MSSqlServer(
                 connectionString: Configuration.GetConnectionString("DefaultConnection"),

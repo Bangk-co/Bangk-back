@@ -8,7 +8,15 @@ namespace Bangk.Common
     {
         public static void WriteInfoLog(string message, [CallerMemberName] string callerName = "")
         {
-            Log.Information($"Called Method: [{callerName}] - Message: [{message}].");
+            try
+            {
+                Log.Information($"Called Method: [{callerName}] - Message: [{message}].");
+
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         public static void WriteErrorLog(string message, Exception exception = null, [CallerMemberName] string callerName = "")
