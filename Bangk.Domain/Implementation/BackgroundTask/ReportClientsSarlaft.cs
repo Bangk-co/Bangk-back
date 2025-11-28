@@ -38,12 +38,18 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task<byte[]> CreateSarlaftReport()
         {
-
+            Logs.WriteInfoLog("Iniciando el metodo CreateSarlaftReport...");
             string fileName =  DateTime.UtcNow.ToString("yyyyMMdd") + " Ingesta BangK.xlsx";
+            Logs.WriteInfoLog($"File name: {fileName}");
+
             string remoteDirectory = "/Ingestas/";
             var stateloanApplication = ApplicationStateHistoryEnum.SolicitudEmisionPoliza;
             var eligibleClients = _clientRepository.GetReportClientsSarlaft(stateloanApplication);
+            Logs.WriteInfoLog($"Count de lista de clientes a incluir en el report {eligibleClients.Count()}");
+
             var fileContent = await GenerateExcel(remoteDirectory, fileName, eligibleClients);
+            Logs.WriteInfoLog("Fin del metodo GenerateExcel...");
+            Logs.WriteInfoLog($"Tamaño del archivo subido en bytes: {fileContent.Length}");
 
             var loanApplicationIds = _clientRepository.GetLoanApplicationIdsWithState(stateloanApplication);
             var clientListId = loanApplicationIds.ToList();
@@ -61,6 +67,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 await _loanApplicationStateHistoryRepository.Create(newLoanApplicationStateHistory);
             }
 
+            Logs.WriteInfoLog("Se actualiza el estado de la solicitud...");
+            Logs.WriteInfoLog($"Tamaño del archivo subido en bytes: {fileContent.Length}");
             return fileContent;
         }
 
@@ -92,25 +100,37 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         {
             try
             {
+                Logs.WriteInfoLog("Iniciando el metodo GenerateExcel...");
+
                 var result = await CreateExcel(clients);
+                Logs.WriteInfoLog("Fin del metodo CreateExcel...");
                 var remotePath = Path.Combine(remoteDirectory, fileName);
+                
+                Logs.WriteInfoLog($"Inicia el proceso de subir el archivo, bytes: {result.Length} path: {remotePath}");
                 using (MemoryStream stream = new MemoryStream(result))
                 {
+                    Logs.WriteInfoLog($"Tamaño del archivo que se va a subir en bytes: {stream.Length} path: {remotePath}");
                     _sftpClient.UploadFile(stream, remotePath);
-
+                    Logs.WriteInfoLog($"Se subio el archivo en bytes: {stream.Length} path: {remotePath}");
                 }
+
+                Logs.WriteInfoLog($"finaliza el proceso de subir el archivo, bytes: {result.Length} path: {remotePath}");
+                
 
                 using (var downloadStream = new MemoryStream())
                 {
+                    Logs.WriteInfoLog("Inicia el proceso de descarga, path: {remotePath}");
                     _sftpClient.DownloadFile(remotePath, downloadStream);
                     downloadStream.Position = 0;
+                    Logs.WriteInfoLog($"Tamaño del archivo descargado en bytes: {downloadStream.Length} path: {remotePath}");
+                    Logs.WriteInfoLog("Fin del metodo CreateExcel...");
                     return downloadStream.ToArray();
                 }
             }
             catch (Exception ex)
             {
-                var result = await CreateExcel(clients);
                 Logs.WriteErrorLog($"Error en el método Crear Ingesta Bangk Polizas  -> {ex.Message}");
+                var result = await CreateExcel(clients);
                 return result;
             }
         }
@@ -119,7 +139,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
         {
             using (var package = new ExcelPackage())
             {
-
+                Logs.WriteInfoLog("Iniciando el metodo CreateExcel...");
+                Logs.WriteInfoLog($"Iniciando el metodo CreateExcel con count lista de clientes: {clients.Count()}");
                 var worksheet = package.Workbook.Worksheets.Add("Reporte Sarlaft");
 
                 Console.WriteLine("Generando Titulos");
@@ -156,6 +177,8 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                 
                 foreach (var client in clientList)
                 {
+                    Logs.WriteInfoLog($"Se recorre cada cliente para crear cada fila en el archivo de excel: Nombre Cliente: {client.Name}, Identificacion: {client.IdentificationNumber}");
+
                     worksheet.Cells[row, 1].Value = 3;
                     worksheet.Cells[row, 2].Value = "SBS SEGUROS COLOMBIA SA";
                     worksheet.Cells[row, 3].Value = 128;
@@ -257,13 +280,56 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                     worksheet.Cells[row, 85].Value = client.YearlyFee;
                     worksheet.Cells[row, 94].Value = !string.IsNullOrEmpty(client.LoanNumber) ? long.Parse(client.LoanNumber) : null;
 
+                    Logs.WriteInfoLog($"Se agrego el usario: Nombre Cliente: {client.Name}, Identificacion: {client.IdentificationNumber} a la fila {row} del archivo");
+
                     row++;
                     await SaveCaratula(caratula, client.LoanPolicyId);
                     await SaveLastConsecutive(consecutive, client.LoanPolicyId);
                 }
+
+                Logs.WriteInfoLog($"Se agregaron todo los clientes al archivo");
                 var result = await package.GetAsByteArrayAsync();
 
+                Logs.WriteInfoLog($"Tamaño del archivo en bytes: {result.Length}");
 
+                if (result.Length == 0)
+                {
+                    Logs.WriteInfoLog("ERROR: El archivo generado está vacío (0 bytes).");
+                    throw new Exception("El archivo Excel está vacío.");
+                }
+
+                try
+                {
+                    using (var ms = new MemoryStream(result))
+                    using (var verifyPackage = new ExcelPackage(ms))
+                    {
+                        var ws = verifyPackage.Workbook.Worksheets.FirstOrDefault();
+                        if (ws == null)
+                        {
+                            Logs.WriteInfoLog("ERROR: El archivo Excel no contiene ninguna hoja.");
+                        }
+
+                        var usedRows = ws.Dimension?.Rows ?? 0;
+
+                        Logs.WriteInfoLog($"Validación interna EPPlus: Nombre de la hoja: {ws.Name}");
+                        Logs.WriteInfoLog($"Validación interna EPPlus: Número de filas usadas: {usedRows}");
+
+                        if (usedRows <= 1)
+                        {
+                            Logs.WriteInfoLog("ADVERTENCIA: El archivo Excel tiene una sola fila (solo encabezados).");
+                        }
+                        else
+                        {
+                            Logs.WriteInfoLog("El archivo Excel tiene datos válidos.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logs.WriteInfoLog($"EXCEPCIÓN validando el archivo Excel: {ex.Message}");
+                }
+
+                Logs.WriteInfoLog("Excel generado correctamente.");
                 return result;
             }
 

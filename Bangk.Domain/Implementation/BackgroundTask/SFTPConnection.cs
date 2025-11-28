@@ -73,13 +73,16 @@ namespace Bangk.Domain.Implementation.BackgroundTask
 
         public async Task SendReportIngesta()
         {
-
+            Logs.WriteInfoLog("Iniciando el envío de reportes de ingesta vía SFTP...");
             var sarlaftReportLogs = await _reportExcel.CreateSarlaftReportLogs();
             var sarlaftReport = await _reportExcel.CreateSarlaftReport();
+            Logs.WriteInfoLog($"Fin metodo CreateSarlaftReport, se genero el archivo con tamano {sarlaftReport.Length}");
             var emailNameList = _settingRepository.GetEmailNames();
 
+            var base64SarlaftReport = Convert.ToBase64String(sarlaftReport);
             foreach (var emailName in emailNameList)
             {
+
                 var sendEmail = new SendGridEmailDto
                 {
                     Email = emailName,
@@ -103,11 +106,13 @@ namespace Bangk.Domain.Implementation.BackgroundTask
                         new AttachmentDto
                         {
                             Filename = "Ingesta BangK.xlsx",
-                            Content = Convert.ToBase64String(sarlaftReport),
+                            Content = base64SarlaftReport,
                             Type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         }
                     }
                 };
+
+                Logs.WriteInfoLog($"Se envia el email a {emailName}, se adjunta el archivo con tamano {sarlaftReport.Length} y se convirtio a base64 con el siguiente string {base64SarlaftReport}");
 
                 await SendGridEmailSender.SendEmailAsync(sendEmail);
             }
