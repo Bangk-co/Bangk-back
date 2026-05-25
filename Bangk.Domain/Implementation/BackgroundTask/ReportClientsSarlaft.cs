@@ -46,7 +46,7 @@ namespace Bangk.Domain.Implementation.BackgroundTask
             var fileContent = await GenerateExcel(remoteDirectory, fileName, eligibleClients);
 
             var loanApplicationIds = _clientRepository.GetLoanApplicationIdsWithState(stateloanApplication);
-            var clientListId = loanApplicationIds.ToList();
+            var clientListId = loanApplicationIds.Distinct().ToList();
             foreach (var loanApplicationId in clientListId)
             {
                 var newLoanApplicationStateHistory = new Repositories.Entities.LoanApplicationStateHistory

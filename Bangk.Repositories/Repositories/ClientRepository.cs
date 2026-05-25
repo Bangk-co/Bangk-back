@@ -110,7 +110,6 @@ namespace Bangk.Repositories.Repositories
         {
             var query = from c in Context.Clients
                         join l in Context.LoanApplication on c.Id equals l.ClientId
-                        join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
                         join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId into t
                         from sublp in t.DefaultIfEmpty()
                         join st in Context.Settings on l.BankId equals st.Id
@@ -122,10 +121,12 @@ namespace Bangk.Repositories.Repositories
                         from ct in ctGroup.DefaultIfEmpty()
                         join lq in Context.LoanQuote on l.Id equals lq.LoanApplicationId into lqGroup
                         from lq in lqGroup.DefaultIfEmpty()
-                        where lh.StateId == (int)stateloanApplication &&
+                        where Context.LoanApplicationStateHistory.Any(lh =>
+                              lh.LoanApplicationId == l.Id &&
+                              lh.StateId == (int)stateloanApplication) &&
                         !Context.LoanApplicationStateHistory.Any(lh2 =>
-                        lh2.LoanApplicationId == lh.LoanApplicationId &&
-                        lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
+                              lh2.LoanApplicationId == l.Id &&
+                              lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
                         select new ClientReportDto
                         {
                             LoanPolicyId = sublp.Id,
@@ -170,11 +171,12 @@ namespace Bangk.Repositories.Repositories
         public IQueryable<int> GetLoanApplicationIdsWithState(ApplicationStateHistoryEnum stateloanApplication)
         {
             var query = from l in Context.LoanApplication
-                        join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
-                        where lh.StateId == (int)stateloanApplication &&
+                        where Context.LoanApplicationStateHistory.Any(lh =>
+                              lh.LoanApplicationId == l.Id &&
+                              lh.StateId == (int)stateloanApplication) &&
                         !Context.LoanApplicationStateHistory.Any(lh2 =>
-                        lh2.LoanApplicationId == lh.LoanApplicationId &&
-                        lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
+                              lh2.LoanApplicationId == l.Id &&
+                              lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
                         select l.Id;
             return query;
         }
@@ -183,7 +185,6 @@ namespace Bangk.Repositories.Repositories
         {
             var query = from c in Context.Clients
                         join l in Context.LoanApplication on c.Id equals l.ClientId
-                        join lh in Context.LoanApplicationStateHistory on l.Id equals lh.LoanApplicationId
                         join lp in Context.LoanInsurancePolicy on l.Id equals lp.LoanApplicationId
                         join ci in Context.Cities on lp.BirthCityId equals ci.Id into ciGroup
                         from ci in ciGroup.DefaultIfEmpty()
@@ -206,10 +207,12 @@ namespace Bangk.Repositories.Repositories
                         join stc in Context.Settings on lp.CivilStatusId equals stc.Id
                         join sta in Context.Settings on lp.OccupationActivityId equals sta.Id
                         join stp in Context.Settings on c.CountryCodePhoneId equals stp.Id
-                        where lh.StateId == (int)stateloanApplication &&
+                        where Context.LoanApplicationStateHistory.Any(lh =>
+                              lh.LoanApplicationId == l.Id &&
+                              lh.StateId == (int)stateloanApplication) &&
                         !Context.LoanApplicationStateHistory.Any(lh2 =>
-                            lh2.LoanApplicationId == lh.LoanApplicationId &&
-                            lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
+                              lh2.LoanApplicationId == l.Id &&
+                              lh2.StateId == (int)ApplicationStateHistoryEnum.PolizaEmitida)
                         select new ClientReport2Dto
                         {
                             LoanPolicyId = lp.Id,
